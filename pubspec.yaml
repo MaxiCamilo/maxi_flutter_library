@@ -1,6 +1,7 @@
 name: maxi_flutter_library
 description: "A new Flutter package project."
 version: 0.0.1
+publish_to: none
 homepage:
 
 environment:
@@ -8,6 +9,12 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  maxi_library:
+  #git:
+    #  url: https://github.com/MaxiCamilo/maxi_library.git
+    #  ref: main
+    path: ../maxi_library
+
   flutter:
     sdk: flutter
 
