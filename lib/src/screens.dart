@@ -9,4 +9,6 @@ export 'package:maxi_flutter_library/src/screens/stacked_canvas/stacked_canvas_p
 export 'package:maxi_flutter_library/src/screens/single_screen_carousel/single_screen_carousel_operator.dart';
 export 'package:maxi_flutter_library/src/screens/single_screen_carousel/single_screen_carousel.dart';
 
-export 'package:maxi_flutter_library/src/screens/single_stacked_screen_operator.dart';
+export 'package:maxi_flutter_library/src/screens/iwidget_has_screen_operator.dart';
+export 'package:maxi_flutter_library/src/screens/single_stacked_screen/single_stacked_screen.dart';
+export 'package:maxi_flutter_library/src/screens/single_stacked_screen/single_stacked_screen_operator.dart';

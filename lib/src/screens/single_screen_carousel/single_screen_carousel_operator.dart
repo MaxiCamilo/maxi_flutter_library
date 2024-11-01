@@ -18,6 +18,7 @@ class SingleScreenCarouselOperator {
     required Widget child,
     required Duration animationDuration,
     required bool goLeftPrevious,
+    required Curve curve,
     bool showScreen = false,
   }) {
     late final StackedCanvasWidget newScreen;
@@ -30,6 +31,7 @@ class SingleScreenCarouselOperator {
         bottom: 0,
         left: 0,
         right: 0,
+        curve: curve,
       );
     } else if (goLeftPrevious) {
       newScreen = canvasOperator.createCanvas(
@@ -37,6 +39,7 @@ class SingleScreenCarouselOperator {
         animationDuration: animationDuration,
         left: canvasOperator.currentSize!.maxWidth * -1,
         right: canvasOperator.currentSize!.maxWidth,
+        curve: curve,
         top: 0,
         bottom: 0,
       );
@@ -46,6 +49,7 @@ class SingleScreenCarouselOperator {
         animationDuration: animationDuration,
         left: canvasOperator.currentSize!.maxWidth,
         right: canvasOperator.currentSize!.maxWidth * -1,
+        curve: curve,
         top: 0,
         bottom: 0,
       );
@@ -57,6 +61,7 @@ class SingleScreenCarouselOperator {
             goLeftPrevious: !goLeftPrevious,
             screen: newScreen,
             animationDuration: animationDuration,
+            curve: curve,
           ));
     }
 
@@ -134,5 +139,11 @@ class SingleScreenCarouselOperator {
     } else {
       screen.autoRemove();
     }
+  }
+
+  Widget generateWidget() {
+    return SingleScreenCarousel(
+      carouselOperator: this,
+    );
   }
 }

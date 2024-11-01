@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
+import 'package:maxi_flutter_library/src/screens/iwidget_has_screen_operator.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class SingleStackedScreenOperator with IStackedScreenOperator {
@@ -13,6 +14,13 @@ class SingleStackedScreenOperator with IStackedScreenOperator {
 
   SingleStackedScreenOperator();
 
+  Widget generateWidget() {
+    return _SingleStackedScreenStateContainer(
+      stackedScreenOperator: this,
+      child: _carouselOperator.generateWidget(),
+    );
+  }
+
   @override
   void goBack() {
     if (_previousScreens.isEmpty) {
@@ -22,7 +30,7 @@ class SingleStackedScreenOperator with IStackedScreenOperator {
     final screenToChange = _previousScreens.removeLast();
     _carouselOperator.showScreen(
       screen: screenToChange,
-      goLeftPrevious: true,
+      goLeftPrevious: false,
       animationDuration: animationDuration,
       curve: curve,
     );
@@ -41,7 +49,13 @@ class SingleStackedScreenOperator with IStackedScreenOperator {
       _previousScreens.add(_actualScreen!);
     }
 
-    _actualScreen = _carouselOperator.createScreen(child: newWidget, animationDuration: animationDuration, goLeftPrevious: false, showScreen: true);
+    _actualScreen = _carouselOperator.createScreen(
+      child: newWidget,
+      animationDuration: animationDuration,
+      goLeftPrevious: false,
+      showScreen: true,
+      curve: curve,
+    );
   }
 
   @override
@@ -58,4 +72,15 @@ class SingleStackedScreenOperator with IStackedScreenOperator {
       previousScreens.iterar((x) => _carouselOperator.deleteScreen(screen: x, goLeftPrevious: false));
     });
   }
+}
+
+class _SingleStackedScreenStateContainer extends StatelessWidget with IWidgetHasScreenOperator {
+  @override
+  final IStackedScreenOperator stackedScreenOperator;
+  final Widget child;
+
+  const _SingleStackedScreenStateContainer({required this.stackedScreenOperator, required this.child});
+
+  @override
+  Widget build(BuildContext context) => child;
 }

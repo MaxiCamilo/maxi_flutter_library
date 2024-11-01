@@ -9,6 +9,13 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
   final _controllersList = <StreamController>[];
   final _otherActiveList = <Object>[];
 
+  Completer<StateWithLifeCycle<T>>? _waitingDiscarded;
+
+  Future<StateWithLifeCycle<T>> get onDispose {
+    _waitingDiscarded ??= Completer<StateWithLifeCycle<T>>();
+    return _waitingDiscarded!.future;
+  }
+
   StreamController<R> createEventController<R>({required bool isBroadcast}) {
     late final StreamController<R> newController;
 
@@ -69,5 +76,8 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     _eventsList.clear();
     _controllersList.clear();
     _otherActiveList.clear();
+
+    _waitingDiscarded?.complete(this);
+    _waitingDiscarded = null;
   }
 }
