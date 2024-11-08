@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:maxi_flutter_library/maxi_flutter_library.dart';
+import 'package:maxi_flutter_library/src/forms/one_value_form_field_implementation.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class FormNumber extends OneValueFormField<num> {
   final bool enable;
-  final String formalName;
+  final String title;
   final Widget? icon;
   final num? minimum;
   final num? maximum;
@@ -16,7 +16,7 @@ class FormNumber extends OneValueFormField<num> {
 
   const FormNumber({
     required super.propertyName,
-    required this.formalName,
+    required this.title,
     required this.isDecimal,
     super.key,
     super.manager,
@@ -84,6 +84,9 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
     if (previousText != _formatText(newValue) || _wasValid != isValid) {
       previousText = _formatText(newValue);
       textController.text = previousText;
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -118,7 +121,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       textAlign: TextAlign.end,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
-        labelText: widget.formalName,
+        labelText: widget.title,
         icon: widget.icon,
         errorText: isValid ? null : lastError.message.toString(),
       ),
@@ -148,23 +151,66 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       return;
     }
 
-    final dio = double.tryParse(text);
+    late final double? dio;
+
+    if (text == '') {
+      dio = 0;
+    } else {
+      dio = double.tryParse(text);
+    }
+
     if (dio == null) {
       textController.text = previousText.toString();
       return;
     }
+    /*
 
     if (minimum > dio) {
-      textController.text = _formatText(minimum);
+      //textController.text = _formatText(minimum);
+      declareFailded(
+        error: NegativeResult(
+          identifier: NegativeResultCodes.invalidValue,
+          message: tr('The minimum accepted is %1', [minimum]),
+        ),
+        value: dio,
+      );
       return;
     }
 
     if (maximum < dio) {
-      textController.text = _formatText(maximum);
+      //textController.text = _formatText(maximum);
+      declareFailded(
+        error: NegativeResult(
+          identifier: NegativeResultCodes.invalidValue,
+          message: tr('The maximum accepted is %1', [maximum]),
+        ),
+        value: dio,
+      );
       return;
-    }
+    }*/
 
     declareChangedValue(value: dio);
+  }
+
+  @override
+  NegativeResult? validateValue({required value}) {
+    if (minimum > value) {
+      //textController.text = _formatText(minimum);
+      return NegativeResult(
+        identifier: NegativeResultCodes.invalidValue,
+        message: tr('The minimum accepted is %1', [minimum]),
+      );
+    }
+
+    if (maximum < value) {
+      //textController.text = _formatText(maximum);
+      return NegativeResult(
+        identifier: NegativeResultCodes.invalidValue,
+        message: tr('The maximum accepted is %1', [maximum]),
+      );
+    }
+
+    return super.validateValue(value: value);
   }
 
   void _changeTextController() {

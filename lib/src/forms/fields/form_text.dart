@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:maxi_flutter_library/maxi_flutter_library.dart';
+import 'package:maxi_flutter_library/src/forms/one_value_form_field_implementation.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class FormText extends OneValueFormField<String> {
   final bool enable;
-  final String formalName;
+  final String title;
   final int? maxCharacter;
   final int? maxLines;
   final TextInputAction? inputAction;
@@ -13,7 +13,7 @@ class FormText extends OneValueFormField<String> {
 
   const FormText({
     required super.propertyName,
-    required this.formalName,
+    required this.title,
     super.key,
     super.getterInitialValue,
     super.manager,
@@ -39,6 +39,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
   String get getDefaultValue => '';
 
   late bool _wasValid;
+  late int? _maxLines;
 
   @override
   void initState() {
@@ -48,11 +49,14 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
 
     if (widget.maxCharacter != null) {
       maxCharacter = widget.maxCharacter;
+      _maxLines = widget.maxLines;
     } else if (widget.validators.any((element) => element is CheckTextLength)) {
       final rango = widget.validators.firstWhere((element) => element is CheckTextLength) as CheckTextLength;
       maxCharacter = rango.maximum.toInt();
+      _maxLines = rango.maximumLines ?? widget.maxLines;
     } else {
       maxCharacter = null;
+      _maxLines = widget.maxLines;
     }
 
     textController.text = actualValue;
@@ -74,11 +78,11 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
     return TextField(
       controller: textController,
       enabled: widget.enable,
-      maxLines: widget.maxLines,
+      maxLines: _maxLines,
       textInputAction: widget.inputAction,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
-        labelText: widget.formalName,
+        labelText: widget.title,
         icon: widget.icon,
         errorText: isValid ? null : lastError.message.toString(),
       ),

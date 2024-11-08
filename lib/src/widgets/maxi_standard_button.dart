@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MaxiStandardButton extends StatelessWidget {
-  final IconData icon;
+  final Widget icon;
   final String text;
   final void Function()? onTouch;
   final Color? backgroundColor;
@@ -33,7 +33,7 @@ class MaxiStandardButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(circularRadius),
           ),
         ),
-        child: Flex(direction: Axis.horizontal, children: [Icon(icon), const SizedBox(width: 5), Text(text)]),
+        child: Flex(direction: Axis.horizontal, children: [icon, const SizedBox(width: 5), Text(text)]),
       ),
     );
   }

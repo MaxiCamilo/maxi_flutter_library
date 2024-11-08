@@ -101,7 +101,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
   @protected
   bool declareChangedValue({required T value}) {
     if (_actualValue == value) {
-      return true;
+      return isValid;
     }
 
     final result = _internalChangeValue(value: value);
@@ -152,6 +152,21 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
 
     return isValid;
   }
+
+/*  @protected
+  void declareFailded({required NegativeResult error, required T value}) {
+    lastError = error;
+    isValid = false;
+
+    if (manager != null) {
+      manager!.setValue(propertyName: propertyName, value: value);
+    }
+
+    if (mounted) {
+      renderingNewValue(value);
+      //requestUpdate();
+    }
+  }*/
 
   @override
   Map<String, dynamic> getValues() {

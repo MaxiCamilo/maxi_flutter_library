@@ -38,12 +38,12 @@ class MaxiTransparentButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(circularRadius),
           ),
         ),
-        child: _generarContenido(context),
+        child: _createContent(context),
       ),
     );
   }
 
-  Widget _generarContenido(BuildContext context) {
+  Widget _createContent(BuildContext context) {
     if (icon == null) {
       return Text(text);
     } else {

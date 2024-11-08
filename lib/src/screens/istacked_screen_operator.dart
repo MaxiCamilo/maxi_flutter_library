@@ -1,9 +1,11 @@
 import 'package:flutter/widgets.dart';
 
-mixin IStackedScreenOperator {
-  void goBack();
+mixin StackedScreenOperator {
+  int get numberOfScreens;
 
-  void pushScreen({required Widget newWidget});
+  void goBack({Duration? duration, Curve? curve});
 
-  void resetScreen({required Widget newWidget});
+  void pushScreen({required Widget newWidget, Duration? duration, Curve? curve});
+
+  void resetScreen({required Widget newWidget, Duration? duration, Curve? curve});
 }
