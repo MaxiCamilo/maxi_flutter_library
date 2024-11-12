@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:maxi_library/maxi_library.dart';
 
-class MaxiStandardButton extends StatelessWidget {
+class MaxiStandardButton extends StatefulWidget {
   final Widget icon;
-  final String text;
+  final TranslatableText text;
   final void Function()? onTouch;
   final Color? backgroundColor;
   final Color? textColor;
@@ -21,19 +22,41 @@ class MaxiStandardButton extends StatelessWidget {
   });
 
   @override
+  State<MaxiStandardButton> createState() => _MaxiStandardButtonState();
+}
+
+class _MaxiStandardButtonState extends State<MaxiStandardButton> {
+  late String text;
+
+  @override
+  void initState() {
+    super.initState();
+
+    text = widget.text.toString();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(padding),
-      child: ElevatedButton(
-        onPressed: onTouch,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(circularRadius),
-          ),
+    return ElevatedButton(
+      onPressed: widget.onTouch,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: widget.backgroundColor,
+        foregroundColor: widget.textColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(widget.circularRadius),
         ),
-        child: Flex(direction: Axis.horizontal, children: [icon, const SizedBox(width: 5), Text(text)]),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(widget.padding),
+        child: Flex(
+          direction: Axis.horizontal,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            widget.icon,
+            const SizedBox(width: 5),
+            Flexible(child: Text(text)),
+          ],
+        ),
       ),
     );
   }

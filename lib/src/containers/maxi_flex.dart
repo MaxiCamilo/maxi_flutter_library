@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
-import 'package:maxi_flutter_library/src/widgets/maxi_flex_widgets/expanded_only_column.dart';
-import 'package:maxi_flutter_library/src/widgets/maxi_flex_widgets/expanded_only_row.dart';
-import 'package:maxi_flutter_library/src/widgets/maxi_flex_widgets/flex_child.dart';
-import 'package:maxi_flutter_library/src/widgets/maxi_flex_widgets/flexible_only_column.dart';
-import 'package:maxi_flutter_library/src/widgets/maxi_flex_widgets/flexible_only_row.dart';
-import 'package:maxi_flutter_library/src/widgets/maxi_flex_widgets/only_column.dart';
-import 'package:maxi_flutter_library/src/widgets/maxi_flex_widgets/only_row.dart';
+import 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/expanded_only_column.dart';
+import 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/expanded_only_row.dart';
+import 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/flex_child.dart';
+import 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/flexible_only_column.dart';
+import 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/flexible_only_row.dart';
+import 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/only_column.dart';
+import 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/only_row.dart';
 
 class MaxiFlex extends StatelessWidget {
   final List<Widget> children;
@@ -72,7 +72,7 @@ class MaxiFlex extends StatelessWidget {
   }
 
   Widget _createFlex(BuildContext context, double width) {
-    if (rowFrom >= width) {
+    if (width >= rowFrom) {
       return _createRow(context);
     } else {
       return _createColumn(context);

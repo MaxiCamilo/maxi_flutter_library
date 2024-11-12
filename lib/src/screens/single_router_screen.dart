@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class SingleStackedScreen extends StatefulWidget {
+class SingleRouterScreen extends StatefulWidget {
   final Duration duration;
   final Curve curve;
 
   final void Function(StackedScreenOperator)? onCreatedOperator;
 
-  const SingleStackedScreen({
+  const SingleRouterScreen({
     super.key,
     this.duration = const Duration(seconds: 1),
     this.curve = Curves.linear,
@@ -18,10 +18,10 @@ class SingleStackedScreen extends StatefulWidget {
   });
 
   @override
-  State<SingleStackedScreen> createState() => _SingleStackedScreenState();
+  State<SingleRouterScreen> createState() => _SingleRouterScreenState();
 }
 
-class _SingleStackedScreenState extends State<SingleStackedScreen> with StackedScreenOperator {
+class _SingleRouterScreenState extends State<SingleRouterScreen> with StackedScreenOperator {
   late BoxConstraints actualConstraints;
 
   final children = <MaxiAnimatedWidget>[];

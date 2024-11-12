@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:maxi_flutter_library/src/framework/state_with_life_cycle.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 /*
@@ -29,21 +28,20 @@ class MaxiPortrait extends StatefulWidget {
   final Curve curve;
   final Duration duration;
 
-  final void Function(MaxiPortraitState)? onCreated;
-
   const MaxiPortrait({
     super.key,
     required this.child,
     required this.duration,
     this.curve = Curves.linear,
-    this.onCreated,
   });
 
   @override
-  State<MaxiPortrait> createState() => MaxiPortraitState();
+  State<MaxiPortrait> createState() => _MaxiPortraitState();
 }
 
-class MaxiPortraitState extends State<MaxiPortrait> {
+
+
+class _MaxiPortraitState extends State<MaxiPortrait>  {
   bool isFirst = true;
 
   bool hideFirst = false;
@@ -55,7 +53,7 @@ class MaxiPortraitState extends State<MaxiPortrait> {
   late Curve curve;
   late Duration duration;
 
-  Completer? _waiter;
+  Completer? waiter;
 
   @override
   void initState() {
@@ -67,9 +65,7 @@ class MaxiPortraitState extends State<MaxiPortrait> {
     curve = widget.curve;
     duration = widget.duration;
 
-    if (widget.onCreated != null) {
-      widget.onCreated!(this);
-    }
+    
   }
 /*
 
@@ -107,15 +103,9 @@ class MaxiPortraitState extends State<MaxiPortrait> {
 
     return Stack(
       children: [
-        //CREO QUE SOLO UNO DEBE ANIMAR SU TRANSPARECIA, YA QUE SINO EN UN MOMENTO LOS DOS QUEDAN TRANSPARENTES
         Offstage(
           offstage: hideFirst,
-          child: AnimatedOpacity(
-            opacity: isFirst ? 1.0 : 0.0,
-            curve: curve,
-            duration: duration,
-            child: firstWidget,
-          ),
+          child: firstWidget,
         ),
         Offstage(
           offstage: hideSecond,
@@ -131,15 +121,21 @@ class MaxiPortraitState extends State<MaxiPortrait> {
   }
 
   Future<void> _investHidden() async {
+    hideSecond = !hideSecond;
+    if (mounted) {
+      setState(() {});
+    }
+
     await Future.delayed(widget.duration);
     hideFirst = !hideFirst;
-    hideSecond = !hideSecond;
 
     if (mounted) {
       setState(() {});
     }
 
-    _waiter?.completeIfIncomplete();
-    _waiter = null;
+    waiter?.completeIfIncomplete();
+    waiter = null;
   }
+
+  
 }

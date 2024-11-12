@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:maxi_library/maxi_library.dart';
 
-class MaxiTransparentButton extends StatelessWidget {
+class MaxiTransparentButton extends StatefulWidget {
   final IconData? icon;
-  final String text;
+  final TranslatableText? text;
   final void Function()? onTouch;
   final Color? backgroundColor;
   final Color? textColor;
@@ -13,7 +14,7 @@ class MaxiTransparentButton extends StatelessWidget {
 
   const MaxiTransparentButton({
     super.key,
-    this.text = '',
+    this.text,
     this.icon,
     this.onTouch,
     this.backgroundColor,
@@ -25,26 +26,40 @@ class MaxiTransparentButton extends StatelessWidget {
   });
 
   @override
+  State<MaxiTransparentButton> createState() => _MaxiTransparentButtonState();
+}
+
+class _MaxiTransparentButtonState extends State<MaxiTransparentButton> {
+  late String text;
+
+  @override
+  void initState() {
+    super.initState();
+
+    text = widget.text?.toString() ?? '';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(padding),
-      child: OutlinedButton(
-        onPressed: onTouch,
-        style: OutlinedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
-          side: BorderSide(width: borderWidth, color: borderColors ?? textColor ?? Colors.white),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(circularRadius),
-          ),
+    return OutlinedButton(
+      onPressed: widget.onTouch,
+      style: OutlinedButton.styleFrom(
+        backgroundColor: widget.backgroundColor,
+        foregroundColor: widget.textColor,
+        side: BorderSide(width: widget.borderWidth, color: widget.borderColors ?? widget.textColor ?? Colors.white),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(widget.circularRadius),
         ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(widget.padding),
         child: _createContent(context),
       ),
     );
   }
 
   Widget _createContent(BuildContext context) {
-    if (icon == null) {
+    if (widget.icon == null) {
       return Text(text);
     } else {
       return Flex(
@@ -52,12 +67,12 @@ class MaxiTransparentButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: text.isNotEmpty
             ? [
-                Icon(icon),
+                Icon(widget.icon),
                 const SizedBox(width: 5),
                 Flexible(child: Text(text)),
               ]
             : [
-                Icon(icon),
+                Icon(widget.icon),
               ],
       );
     }
