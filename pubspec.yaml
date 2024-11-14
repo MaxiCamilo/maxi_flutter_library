@@ -10,6 +10,8 @@ environment:
 
 dependencies:
   path_provider: ^2.1.5
+  shared_preferences: ^2.3.3
+  
 
   maxi_library:
   #git:
@@ -24,6 +26,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

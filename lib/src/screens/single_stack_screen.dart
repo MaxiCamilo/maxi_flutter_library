@@ -50,7 +50,7 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
   void initState() {
     super.initState();
 
-    actualWidget = buildFirstChild(widget.initialChild);
+    actualWidget = const SizedBox();
     duration = widget.duration;
     curve = widget.curve;
 
@@ -64,6 +64,8 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
     if (!wasBuild) {
       wasBuild = true;
       waiterPortrait.completeIfIncomplete();
+
+      Future.delayed(Duration.zero).whenComplete(() => changeScreen(newChild: buildFirstChild(widget.initialChild)));
     }
 
     return AnimatedSwitcher(
