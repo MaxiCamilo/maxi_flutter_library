@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 import 'package:path_provider/path_provider.dart';
@@ -62,6 +63,7 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
     if (isWeb) {
       _currentDirectory = '';
     } else if (isAndroid || isIOS) {
+      WidgetsFlutterBinding.ensureInitialized();
       _currentDirectory = (await getApplicationDocumentsDirectory()).path;
     } else if (useWorkingPath || (useWorkingPathInDebug && isDebug)) {
       _currentDirectory = isDebug ? '${Directory.current.path}/debug' : Directory.current.path;

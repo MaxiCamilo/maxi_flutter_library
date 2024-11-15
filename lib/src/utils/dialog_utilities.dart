@@ -12,11 +12,34 @@ class _DialogWindowPop<T> with IDialogWindow<T> {
 }
 
 mixin DialogUtilities {
-  static Future<T?> showWidgetAsBottomSheet<T>(BuildContext context, Widget Function(BuildContext context, IDialogWindow<T> dialogOperator) builder) {
+  static Future<T?> showWidgetAsBottomSheet<T>({required BuildContext context, required Widget Function(BuildContext context, IDialogWindow<T> dialogOperator) builder}) {
     final dialogOperator = _DialogWindowPop<T>();
     return showModalBottomSheet(
       context: context,
       builder: (context) => builder(context, dialogOperator),
+    );
+  }
+
+  static Future<T?> showWidgetAsMaterialDialog<T>({
+    required BuildContext context,
+    required Widget Function(BuildContext context, IDialogWindow<T> dialogOperator) builder,
+    bool barrierDismissible = true,
+    RoundedRectangleBorder? shape,
+  }) async {
+    final dialogOperator = _DialogWindowPop<T>();
+    return showDialog(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            shape: shape ??
+                const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(7.0)),
+                ),
+            content: Material(
+              child: builder(context, dialogOperator),
+            ));
+      },
     );
   }
 }
