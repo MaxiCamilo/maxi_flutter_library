@@ -10,7 +10,7 @@ abstract class OneValueFormField<T> extends StatefulWidget {
   final String propertyName;
   final IFormFieldManager? manager;
   final T Function()? getterInitialValue;
-  final void Function(T)? onChangeValue;
+  final void Function(T, NegativeResult?)? onChangeValue;
   final List<ValueValidator> validators;
 
   const OneValueFormField({
@@ -67,6 +67,14 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
       }
     }
 
+    if (widget.manager == null) {
+      final firstError = validateValue(value: _actualValue);
+      if (firstError != null) {
+        isValid = false;
+        lastError = firstError;
+      }
+    }
+
     _internalChangeValue(value: _actualValue);
   }
 
@@ -107,7 +115,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
     final result = _internalChangeValue(value: value);
 
     if (widget.onChangeValue != null) {
-      widget.onChangeValue!(value);
+      widget.onChangeValue!(value, isValid ? null : lastError);
     }
     _notifyValueChanged.add(this);
 
@@ -210,6 +218,12 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
       } else {
         _actualValue = widget.getterInitialValue!();
       }
+    }
+
+    final firstError = validateValue(value: _actualValue);
+    if (firstError != null) {
+      isValid = false;
+      lastError = firstError;
     }
 
     if (!hasValue) {

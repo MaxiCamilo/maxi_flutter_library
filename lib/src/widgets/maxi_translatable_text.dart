@@ -29,17 +29,24 @@ class MaxiTranslatableText extends StatefulWidget {
 }
 
 class _MaxiTranslatableTextState extends State<MaxiTranslatableText> {
-  late final String _text;
+  late String _originalText;
+  late String _text;
 
   @override
   void initState() {
     super.initState();
 
+    _originalText = widget.text.message;
     _text = widget.text.toString();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_originalText != widget.text.message) {
+      _originalText = widget.text.message;
+      _text = widget.text.toString();
+    }
+
     return MaxiText(
       text: _text,
       aling: widget.aling,

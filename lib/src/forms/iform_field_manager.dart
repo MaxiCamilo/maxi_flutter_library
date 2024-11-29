@@ -6,6 +6,8 @@ mixin IFormFieldManager {
   List<NegativeResult> get errors;
   List<IFormFieldOperator> get fields;
 
+  Stream<IFormFieldManager> get notifyStatusChange;
+
   dynamic getValue({required String propertyName});
   NegativeResult? setValue({required String propertyName, required dynamic value});
 
@@ -13,4 +15,6 @@ mixin IFormFieldManager {
   void removeField({required IFormFieldOperator field});
 
   Map<String, dynamic> createMap({required bool onlyIfIsValid});
+
+  void dispose();
 }

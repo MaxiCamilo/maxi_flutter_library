@@ -3,7 +3,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class ErrorLabelTemplate extends StatelessWidget {
-  final NegativeResult negativeResult;
+  final TranslatableText message;
   final bool expand;
   final Color iconColor;
   final double iconSize;
@@ -13,7 +13,7 @@ class ErrorLabelTemplate extends StatelessWidget {
 
   const ErrorLabelTemplate({
     super.key,
-    required this.negativeResult,
+    required this.message,
     this.expand = true,
     this.iconColor = Colors.orange,
     this.iconSize = 42,
@@ -35,13 +35,13 @@ class ErrorLabelTemplate extends StatelessWidget {
           child: expand
               ? Expanded(
                   child: MaxiTranslatableText(
-                  text: negativeResult.message,
+                  text: message,
                   size: textSize,
                   aling: TextAlign.center,
                 ))
               : Flexible(
                   child: MaxiTranslatableText(
-                    text: negativeResult.message,
+                    text: message,
                     size: textSize,
                     aling: TextAlign.center,
                   ),
@@ -50,7 +50,7 @@ class ErrorLabelTemplate extends StatelessWidget {
         OnlyColumn(
           child: Flexible(
             child: MaxiTranslatableText(
-              text: negativeResult.message,
+              text: message,
               size: textSize,
               aling: TextAlign.center,
             ),

@@ -7,12 +7,16 @@ class FormFieldManager with IFormFieldManager {
   late Map<String, dynamic> _values;
   final _mapErrors = <IFormFieldOperator, NegativeResult>{};
   final _mapSubscriptions = <IFormFieldOperator, StreamSubscription>{};
+  final _notifyStatusChange = StreamController<IFormFieldManager>.broadcast();
 
   @override
   final fields = <IFormFieldOperator>[];
 
   @override
   List<NegativeResult> get errors => _mapErrors.values.toList(growable: true);
+
+  @override
+  Stream<IFormFieldManager> get notifyStatusChange => _notifyStatusChange.stream;
 
   @override
   bool get isValid => _mapErrors.isEmpty;
@@ -52,6 +56,9 @@ class FormFieldManager with IFormFieldManager {
     return _values;
   }
 
+
+  
+
   @override
   getValue({required String propertyName}) {
     return _values[propertyName];
@@ -59,6 +66,7 @@ class FormFieldManager with IFormFieldManager {
 
   @override
   NegativeResult? setValue({required String propertyName, required value}) {
+    final lastStatus = isValid;
     _values[propertyName] = value;
 
     NegativeResult? result;
@@ -66,8 +74,17 @@ class FormFieldManager with IFormFieldManager {
     for (final field in fields) {
       if (field.listenToThatProperty(name: propertyName)) {
         field.changeValue(propertyName: propertyName, value: value);
-        if (!field.isValid) {
+        if (field.isValid) {
+          _mapErrors.remove(field);
+        } else {
           result = field.lastError;
+          if (!_mapErrors.containsKey(field)) {
+            _mapErrors[field] = field.lastError;
+          }
+        }
+
+        if (lastStatus != isValid) {
+          _notifyStatusChange.add(this);
         }
       }
     }
@@ -94,9 +111,11 @@ class FormFieldManager with IFormFieldManager {
     }
   }
 
+  @override
   void dispose() {
     _mapSubscriptions.values.iterar((x) => x.cancel());
     _mapSubscriptions.clear();
     _mapErrors.clear();
+    _notifyStatusChange.close();
   }
 }

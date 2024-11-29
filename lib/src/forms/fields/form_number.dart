@@ -13,6 +13,7 @@ class FormNumber extends OneValueFormField<num> {
   final bool isDecimal;
   final bool showButtons;
   final bool expandHorizontally;
+  final void Function(num, NegativeResult?)? onSubmitted;
 
   const FormNumber({
     required super.propertyName,
@@ -30,6 +31,7 @@ class FormNumber extends OneValueFormField<num> {
     this.interval = 1,
     this.showButtons = true,
     this.expandHorizontally = false,
+    this.onSubmitted,
   });
 
   @override
@@ -127,6 +129,12 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       ),
       inputFormatters: _makeInputFormatters(),
       onChanged: (x) => _changeText(x),
+      onSubmitted: (x) {
+        _changeText(x);
+        if (widget.onSubmitted != null) {
+          widget.onSubmitted!(actualValue, isValid ? null : lastError);
+        }
+      },
     );
   }
 

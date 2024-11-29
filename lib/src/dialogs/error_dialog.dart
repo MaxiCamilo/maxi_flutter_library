@@ -24,7 +24,7 @@ class ErrorDialog extends StatelessWidget {
       this.icon = Icons.warning,
       this.rowFrom = 400,
       this.textSize,
-      this.doneButtonText = const TranslatableText(message: 'Understood')});
+      this.doneButtonText = const TranslatableText(message: 'Done')});
 
   static Future<void> showMaterialDialog({
     required BuildContext context,
@@ -35,7 +35,7 @@ class ErrorDialog extends StatelessWidget {
     IconData icon = Icons.warning,
     double rowFrom = 400,
     EdgeInsets? padding,
-    TranslatableText doneButtonText = const TranslatableText(message: 'Understood'),
+    TranslatableText doneButtonText = const TranslatableText(message: 'Done'),
   }) {
     return DialogUtilities.showWidgetAsMaterialDialog(
       context: context,
@@ -91,7 +91,7 @@ class ErrorDialog extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ErrorLabelTemplate(
-          negativeResult: negativeResult,
+          message: negativeResult.message,
           expand: true,
           icon: icon,
           iconColor: iconColor,

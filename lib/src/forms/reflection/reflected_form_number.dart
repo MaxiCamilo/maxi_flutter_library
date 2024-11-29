@@ -10,6 +10,7 @@ class ReflectionFormNumber extends ReflectionFieldImplementation {
   final double interval;
   final bool showButtons;
   final bool expandHorizontally;
+  final void Function(num, NegativeResult?)? onSubmitted;
 
   const ReflectionFormNumber({
     super.key,
@@ -22,6 +23,7 @@ class ReflectionFormNumber extends ReflectionFieldImplementation {
     this.interval = 1,
     this.showButtons = true,
     this.expandHorizontally = false,
+    this.onSubmitted,
   });
 
   @override
@@ -50,6 +52,7 @@ class _StateReflectionFormNumber extends StateReflectionFieldImplementation<Refl
       expandHorizontally: widget.expandHorizontally,
       interval: widget.interval,
       showButtons: widget.showButtons,
+      onSubmitted: widget.onSubmitted,
     );
   }
 }

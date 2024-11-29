@@ -5,6 +5,8 @@ class MaxiSelectiveList<T> extends StatefulWidget {
   final Future<List<T>> Function() getterValue;
   final Widget Function(BuildContext context, T item) builder;
   final void Function(T)? onSelect;
+  final void Function(T)? onLongSelect;
+  final void Function(T)? onSecondarySelect;
   final Widget waitingWidget;
   final Future<List<Stream>> Function()? updateStreamList;
   final Widget? whenListIsEmpty;
@@ -58,6 +60,8 @@ class MaxiSelectiveList<T> extends StatefulWidget {
     this.updateStreamList,
     this.whenListIsEmpty,
     this.rowFrom,
+    this.onLongSelect,
+    this.onSecondarySelect,
   });
 
   @override
@@ -118,6 +122,8 @@ class _MaxiSelectiveListState<T> extends StateWithLifeCycle<MaxiSelectiveList<T>
       curve: widget.curve,
       duration: widget.duration,
       hoverDuration: widget.hoverDuration,
+      onLongSelect: widget.onLongSelect,
+      onSecondarySelect: widget.onSecondarySelect,
       child: itemWidget,
     );
   }
@@ -128,6 +134,8 @@ class _MaxiSelectiveListItem<T> extends StatefulWidget {
   final Color backgroundColorOnMouseover;
   final Color backgroundColorOnTouch;
   final void Function(T)? onSelect;
+  final void Function(T)? onLongSelect;
+  final void Function(T)? onSecondarySelect;
   final Duration duration;
   final Duration hoverDuration;
   final Curve curve;
@@ -139,6 +147,8 @@ class _MaxiSelectiveListItem<T> extends StatefulWidget {
     required this.backgroundColor,
     required this.backgroundColorOnMouseover,
     required this.backgroundColorOnTouch,
+    required this.onLongSelect,
+    required this.onSecondarySelect,
     required this.child,
     required this.value,
     required this.onSelect,
@@ -172,6 +182,16 @@ class _MaxiSelectiveListItemState<T> extends State<_MaxiSelectiveListItem<T>> {
           onTap: () {
             if (widget.onSelect != null) {
               widget.onSelect!(widget.value);
+            }
+          },
+          onLongPress: () {
+            if (widget.onLongSelect != null) {
+              widget.onLongSelect!(widget.value);
+            }
+          },
+          onSecondaryTap: () {
+            if (widget.onSecondarySelect != null) {
+              widget.onSecondarySelect!(widget.value);
             }
           },
           splashColor: widget.backgroundColorOnTouch,

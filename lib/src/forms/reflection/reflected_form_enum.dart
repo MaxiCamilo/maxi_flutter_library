@@ -114,11 +114,11 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
     }
   }
 
-  void _dropdownChanged(dynamic value) {
+  void _dropdownChanged(dynamic value, NegativeResult? error) {
     widget.fieldManager.setValue(propertyName: widget.propertyName, value: value);
   }
 
-  void _togglesChanged(List list) {
+  void _togglesChanged(List list, NegativeResult? error) {
     widget.fieldManager.setValue(propertyName: widget.propertyName, value: [list]);
   }
 }

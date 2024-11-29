@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
@@ -7,7 +9,8 @@ class LoadingScreen<T> extends StatefulWidget {
   final Future<T> Function() getterValue;
   final Widget Function(BuildContext context, T item) builder;
   final Widget waitingWidget;
-  final Future<List<Stream>> Function()? updateStreamList;
+  final FutureOr<List<Stream>> Function()? updateStreamList;
+  final FutureOr<List<Stream>> Function()? reloadWidgets;
   final bool canRetry;
   final double iconSize;
   final double textSize;
@@ -22,9 +25,10 @@ class LoadingScreen<T> extends StatefulWidget {
     this.waitingWidget = const CircularProgressIndicator(),
     this.canRetry = true,
     this.iconSize = 42,
-    this.textSize = 12,
+    this.textSize = 15,
     this.duration = const Duration(milliseconds: 500),
-    this.curve = Curves.linear,
+    this.reloadWidgets,
+    this.curve = Curves.decelerate,
     this.updateStreamList,
   });
 
@@ -97,7 +101,13 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     try {
       item = await widget.getterValue();
       if (mounted) {
-        singleStackScreenOperator.changeScreen(newChild: widget.builder(context, item));
+        if (widget.reloadWidgets == null) {
+          singleStackScreenOperator.changeScreen(newChild: widget.builder(context, item));
+        } else {
+          singleStackScreenOperator.changeScreen(
+            newChild: MaxiBuildBox(reloaders: widget.reloadWidgets!, cached: true, builer: (x) => widget.builder(x, item)),
+          );
+        }
       }
     } catch (ex) {
       final error = NegativeResult.searchNegativity(item: ex, actionDescription: tr('Getting value to widget'));
@@ -116,9 +126,11 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: Colors.grey, // Color del borde
-          width: 1.0, // Grosor del borde
+          color: const Color.fromARGB(255, 90, 90, 90), // Color del borde
+          width: 1.0,
+          // Grosor del borde
         ),
+        borderRadius: BorderRadius.circular(5.0),
       ),
       padding: const EdgeInsets.all(8.0),
       margin: const EdgeInsets.all(2.0),
@@ -129,7 +141,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
         children: [
           Flex(
             direction: Axis.horizontal,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Icon(
                 Icons.dangerous,
@@ -137,8 +149,9 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
                 size: widget.iconSize,
               ),
               const SizedBox(width: 10),
-              Flexible(
+              Expanded(
                 child: MaxiText(
+                  aling: TextAlign.center,
                   text: errorMessage,
                   size: widget.textSize,
                 ),

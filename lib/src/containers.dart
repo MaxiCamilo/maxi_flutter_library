@@ -11,3 +11,4 @@ export 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/flexible_o
 export 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/flexible_only_row.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/only_column.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/only_row.dart';
+export 'package:maxi_flutter_library/src/containers/maxi_builder_box.dart';

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maxi_flutter_library/src/forms/one_value_form_field_implementation.dart';
@@ -10,6 +12,7 @@ class FormText extends OneValueFormField<String> {
   final int? maxLines;
   final TextInputAction? inputAction;
   final Widget? icon;
+  final void Function(String, NegativeResult?)? onSubmitted;
 
   const FormText({
     required super.propertyName,
@@ -24,6 +27,7 @@ class FormText extends OneValueFormField<String> {
     this.maxLines,
     this.icon,
     this.inputAction,
+    this.onSubmitted,
   });
 
   @override
@@ -41,18 +45,20 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
   late bool _wasValid;
   late int? _maxLines;
 
+  TranslatableText lastTextError = TranslatableText.empty;
+  String lastTranslatedErrorText = '';
+
   @override
   void initState() {
-    super.initState();
-
     textController = joinObject(item: TextEditingController());
+    super.initState();
 
     if (widget.maxCharacter != null) {
       maxCharacter = widget.maxCharacter;
       _maxLines = widget.maxLines;
     } else if (widget.validators.any((element) => element is CheckTextLength)) {
       final rango = widget.validators.firstWhere((element) => element is CheckTextLength) as CheckTextLength;
-      maxCharacter = rango.maximum.toInt();
+      maxCharacter = rango.maximum == double.infinity ? null : rango.maximum.toInt();
       _maxLines = rango.maximumLines ?? widget.maxLines;
     } else {
       maxCharacter = null;
@@ -66,9 +72,12 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
 
   @override
   void renderingNewValue(String newValue) {
-    if (newValue != textController.text || _wasValid != isValid) {
+    if (newValue != textController.text || _wasValid != isValid || lastTextError != lastError.message) {
+      lastTextError = lastError.message;
+      lastTranslatedErrorText = lastTextError.toString();
       _wasValid = isValid;
       textController.text = newValue;
+
       setState(() {});
     }
   }
@@ -84,7 +93,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
         border: const OutlineInputBorder(),
         labelText: widget.title,
         icon: widget.icon,
-        errorText: isValid ? null : lastError.message.toString(),
+        errorText: isValid ? null : lastTranslatedErrorText,
       ),
       inputFormatters: _createFormat(),
       onEditingComplete: () {
@@ -92,6 +101,9 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
       },
       onSubmitted: (_) {
         declareChangedValue(value: textController.text);
+        if (widget.onSubmitted != null) {
+          widget.onSubmitted!(actualValue, isValid ? null : lastError);
+        }
       },
     );
   }
@@ -106,5 +118,29 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
 
   void _textControllerChanger() {
     declareChangedValue(value: textController.text);
+  }
+
+  @override
+  bool declareChangedValue({required String value}) {
+    if (ApplicationManager.instance.isWeb && textController.selection.start >= 0) {
+      final wasValid = isValid;
+      final position = textController.selection.start;
+
+      final isCorrect = super.declareChangedValue(value: value);
+
+      if (wasValid != isCorrect) {
+        scheduleMicrotask(() {
+          textController.value = TextEditingValue(
+            text: textController.text,
+            selection: TextSelection.collapsed(offset: textController.selection.end),
+          );
+          textController.selection = TextSelection.collapsed(offset: position);
+        });
+      }
+
+      return isCorrect;
+    } else {
+      return super.declareChangedValue(value: value);
+    }
   }
 }
