@@ -5,10 +5,19 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class LoadingScreen<T> extends StatefulWidget {
-  final void Function(ILoadingScreenOperator)? onCreatedOperator;
+  final bool startActive;
+
+  final void Function(ILoadingScreenOperator<T>)? onCreatedOperator;
   final Future<T> Function() getterValue;
+  final void Function(T)? onGetValue;
+  final void Function()? onLoading;
+  final void Function()? whenCompleted;
+  final void Function(NegativeResult)? onError;
   final Widget Function(BuildContext context, T item) builder;
-  final Widget waitingWidget;
+
+  final Widget loadingWidget;
+  final Widget inactiveWidget;
+
   final FutureOr<List<Stream>> Function()? updateStreamList;
   final FutureOr<List<Stream>> Function()? reloadWidgets;
   final bool canRetry;
@@ -20,16 +29,22 @@ class LoadingScreen<T> extends StatefulWidget {
   const LoadingScreen({
     super.key,
     this.onCreatedOperator,
+    required this.startActive,
     required this.getterValue,
     required this.builder,
-    this.waitingWidget = const CircularProgressIndicator(),
+    this.loadingWidget = const CircularProgressIndicator(),
     this.canRetry = true,
     this.iconSize = 42,
     this.textSize = 15,
     this.duration = const Duration(milliseconds: 500),
     this.reloadWidgets,
     this.curve = Curves.decelerate,
+    this.inactiveWidget = const SizedBox(),
     this.updateStreamList,
+    this.onGetValue,
+    this.onLoading,
+    this.onError,
+    this.whenCompleted,
   });
 
   @override
@@ -56,10 +71,16 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
   void initState() {
     super.initState();
 
-    executor.execute(function: _getValue);
-
     if (widget.updateStreamList != null) {
       getUpdateStream();
+    }
+
+    if (widget.startActive) {
+      executor.execute(function: _getValue);
+    }
+
+    if (widget.onCreatedOperator != null) {
+      widget.onCreatedOperator!(this);
     }
   }
 
@@ -76,20 +97,24 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     return SingleStackScreen(
       curve: widget.curve,
       duration: widget.duration,
-      initialChild: widget.waitingWidget,
+      initialChild: widget.inactiveWidget,
       onCreatedOperator: _onCreatedOperator,
     );
   }
 
   @override
   void reload() async {
-    if (isActive) {
+    if (executor.isActive) {
       return;
     }
 
     isActive = true;
-    singleStackScreenOperator.changeScreen(newChild: widget.waitingWidget);
+    singleStackScreenOperator.changeScreen(newChild: widget.loadingWidget);
     executor.executeIfStopped(function: _getValue);
+
+    if (widget.onLoading != null) {
+      widget.onLoading!();
+    }
   }
 
   Future<void> _getValue() async {
@@ -108,6 +133,13 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
             newChild: MaxiBuildBox(reloaders: widget.reloadWidgets!, cached: true, builer: (x) => widget.builder(x, item)),
           );
         }
+        if (widget.onGetValue != null) {
+          widget.onGetValue!(item);
+        }
+
+        if (widget.whenCompleted != null) {
+          widget.whenCompleted!();
+        }
       }
     } catch (ex) {
       final error = NegativeResult.searchNegativity(item: ex, actionDescription: tr('Getting value to widget'));
@@ -116,6 +148,14 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
 
       if (mounted) {
         singleStackScreenOperator.changeScreen(newChild: _createErrorWidget(context));
+
+        if (widget.onError != null) {
+          widget.onError!(error);
+        }
+
+        if (widget.whenCompleted != null) {
+          widget.whenCompleted!();
+        }
       }
     } finally {
       isActive = false;

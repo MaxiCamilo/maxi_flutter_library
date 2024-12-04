@@ -11,8 +11,11 @@ class FormText extends OneValueFormField<String> {
   final int? maxCharacter;
   final int? maxLines;
   final TextInputAction? inputAction;
+  final FocusNode? focusNode;
   final Widget? icon;
   final void Function(String, NegativeResult?)? onSubmitted;
+  final void Function(String)? onIsValid;
+  final void Function(NegativeResult)? onIsInvalid;
 
   const FormText({
     required super.propertyName,
@@ -28,6 +31,9 @@ class FormText extends OneValueFormField<String> {
     this.icon,
     this.inputAction,
     this.onSubmitted,
+    this.onIsValid,
+    this.focusNode,
+    this.onIsInvalid,
   });
 
   @override
@@ -72,7 +78,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
 
   @override
   void renderingNewValue(String newValue) {
-    if (newValue != textController.text || _wasValid != isValid || lastTextError != lastError.message) {
+    if (newValue != textController.text || _wasValid != isValid || (!isValid && lastTextError != lastError.message)) {
       lastTextError = lastError.message;
       lastTranslatedErrorText = lastTextError.toString();
       _wasValid = isValid;
@@ -88,6 +94,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
       controller: textController,
       enabled: widget.enable,
       maxLines: _maxLines,
+      focusNode: widget.focusNode,
       textInputAction: widget.inputAction,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
@@ -122,8 +129,10 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
 
   @override
   bool declareChangedValue({required String value}) {
+    final wasValid = isValid;
+    late final bool nowIsValid;
+
     if (ApplicationManager.instance.isWeb && textController.selection.start >= 0) {
-      final wasValid = isValid;
       final position = textController.selection.start;
 
       final isCorrect = super.declareChangedValue(value: value);
@@ -138,9 +147,19 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
         });
       }
 
-      return isCorrect;
+      nowIsValid = isCorrect;
     } else {
-      return super.declareChangedValue(value: value);
+      nowIsValid = super.declareChangedValue(value: value);
     }
+
+    if (nowIsValid != wasValid) {
+      if (nowIsValid && widget.onIsValid != null) {
+        widget.onIsValid!(value);
+      } else if (!nowIsValid && widget.onIsInvalid != null) {
+        widget.onIsInvalid!(lastError);
+      }
+    }
+
+    return nowIsValid;
   }
 }

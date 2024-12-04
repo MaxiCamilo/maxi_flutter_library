@@ -9,7 +9,7 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
   final bool canRetry;
   final bool startWhenDisplayed;
 
-  final Future<StreamStateTexts<T>> Function() function;
+  final FutureOr<StreamStateTexts<T>> Function() function;
 
   final void Function(T)? onDone;
   final void Function()? onStart;
@@ -34,7 +34,7 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
     required BuildContext context,
     required bool canCancel,
     required bool canRetry,
-    required Future<StreamStateTexts<T>> Function() function,
+    required FutureOr<StreamStateTexts<T>> Function() function,
   }) {
     return DialogUtilities.showWidgetAsMaterialDialog<T>(
       context: context,

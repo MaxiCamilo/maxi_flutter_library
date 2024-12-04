@@ -85,7 +85,7 @@ class _QuestionDialogState extends State<QuestionDialog> {
               smallerChild: Center(child: Icon(widget.icon)),
             ),
             const SizedBox(height: 10, width: 10),
-            ExpandedOnlyRow(child: MaxiTranslatableText(text: widget.text)),
+            ExpandedOnlyRow(child: MaxiTranslatableText(text: widget.text, selectable: true)),
           ],
         ),
         const SizedBox(height: 10, width: 10),

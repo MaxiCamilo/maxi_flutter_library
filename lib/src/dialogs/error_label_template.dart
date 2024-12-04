@@ -37,12 +37,14 @@ class ErrorLabelTemplate extends StatelessWidget {
                   child: MaxiTranslatableText(
                   text: message,
                   size: textSize,
+                  selectable: true,
                   aling: TextAlign.center,
                 ))
               : Flexible(
                   child: MaxiTranslatableText(
                     text: message,
                     size: textSize,
+                    selectable: true,
                     aling: TextAlign.center,
                   ),
                 ),
@@ -52,6 +54,7 @@ class ErrorLabelTemplate extends StatelessWidget {
             child: MaxiTranslatableText(
               text: message,
               size: textSize,
+              selectable: true,
               aling: TextAlign.center,
             ),
           ),

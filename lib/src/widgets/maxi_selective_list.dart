@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 
 class MaxiSelectiveList<T> extends StatefulWidget {
+  final bool startActive;
   final Future<List<T>> Function() getterValue;
   final Widget Function(BuildContext context, T item) builder;
   final void Function(T)? onSelect;
   final void Function(T)? onLongSelect;
   final void Function(T)? onSecondarySelect;
-  final Widget waitingWidget;
+  final Widget loadingWidget;
   final Future<List<Stream>> Function()? updateStreamList;
   final Widget? whenListIsEmpty;
   final bool canRetry;
@@ -37,8 +38,9 @@ class MaxiSelectiveList<T> extends StatefulWidget {
     super.key,
     required this.getterValue,
     required this.builder,
+    this.startActive = true,
     this.onSelect,
-    this.waitingWidget = const CircularProgressIndicator(),
+    this.loadingWidget = const CircularProgressIndicator(),
     this.canRetry = true,
     this.iconSize = 42,
     this.textSize = 12,
@@ -72,6 +74,7 @@ class _MaxiSelectiveListState<T> extends StateWithLifeCycle<MaxiSelectiveList<T>
   @override
   Widget build(BuildContext context) {
     return LoadingScreen<List<T>>(
+      startActive: widget.startActive,
       builder: _buildList,
       getterValue: widget.getterValue,
       canRetry: widget.canRetry,
@@ -80,7 +83,7 @@ class _MaxiSelectiveListState<T> extends StateWithLifeCycle<MaxiSelectiveList<T>
       iconSize: widget.iconSize,
       textSize: widget.textSize,
       updateStreamList: widget.updateStreamList,
-      waitingWidget: widget.waitingWidget,
+      loadingWidget: widget.loadingWidget,
     );
   }
 
