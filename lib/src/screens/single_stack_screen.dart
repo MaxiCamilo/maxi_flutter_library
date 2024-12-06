@@ -28,6 +28,9 @@ class SingleStackScreen extends StatefulWidget {
 }
 
 mixin ISingleStackScreenOperator {
+  Widget get actualWidget;
+  String get actuanWidgetName;
+
   Future<void> waitAnimationEnd();
   Future<void> waitForConstruction();
   Future<void> changeScreen({required Widget newChild, Duration? duration, Curve? curve});
@@ -36,10 +39,13 @@ mixin ISingleStackScreenOperator {
 class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStackScreenOperator {
   late Duration duration;
   late Curve curve;
+  @override
   late Widget actualWidget;
 
   bool wasBuild = false;
   bool isFirst = true;
+
+  String actuanWidgetName = '';
 
   final waiterPortrait = Completer();
   final changeSemaphore = Semaphore();
@@ -108,6 +114,9 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
   @override
   Future<void> changeScreen({required Widget newChild, Duration? duration, Curve? curve}) async {
     await waitForConstruction();
+
+    actuanWidgetName = newChild.runtimeType.toString();
+
     await changeSemaphore.execute(function: () => _changeScreen(newChild: newChild, curve: curve, duration: duration));
   }
 

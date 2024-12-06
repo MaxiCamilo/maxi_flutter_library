@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -6,9 +8,11 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 import 'package:path_provider/path_provider.dart';
 
-class FlutterApplicationManager with StartableFunctionality, IThreadInitializer, IApplicationManager {
+class FlutterApplicationManager with StartableFunctionality, IThreadInitializer, IApplicationManager, WidgetsBindingObserver {
   final bool useWorkingPath;
   final bool useWorkingPathInDebug;
+
+  final _appLifecycleStateController = StreamController<AppLifecycleState>.broadcast();
 
   @override
   final List<IReflectorAlbum> reflectors;
@@ -45,7 +49,10 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
   @override
   bool get isFlutter => true;
 
+  Stream<AppLifecycleState> get appLifeCycleStateStream => _appLifecycleStateController.stream;
+
   String? _currentDirectory;
+  bool _wasBinding = false;
 
   FlutterApplicationManager({
     this.useWorkingPath = false,
@@ -53,6 +60,26 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
     required this.reflectors,
     required this.defineLanguageOperatorInOtherThread,
   });
+
+  void initObserver() {
+    if (!_wasBinding) {
+      WidgetsBinding.instance.addObserver(this);
+      _wasBinding = true;
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _appLifecycleStateController.add(state);
+
+    if (state == AppLifecycleState.detached) {
+      _declareClosed();
+    }
+  }
+
+  void _declareClosed() async {
+    killAllThread();
+  }
 
   @override
   Future<String> getCurrentDirectory() async {
@@ -95,6 +122,23 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
       return const FakeThreadFactory();
     } else {
       return const IsolatedThreadFactory();
+    }
+  }
+
+  @override
+  void closeAllThreads() {
+    if (ThreadManager.instance is IThreadManagerServer) {
+      (ThreadManager.instance as IThreadManagerServer).closeAllThread();
+    } else {
+      ThreadManager.instance.callFunctionOnTheServer(function: (x) => (ThreadManager.instance as IThreadManagerServer).closeAllThread());
+    }
+  }
+
+  void killAllThread() {
+    if (ThreadManager.instance is IThreadManagerServer) {
+      (ThreadManager.instance as IThreadManagerServer).killAllThread();
+    } else {
+      ThreadManager.instance.callFunctionOnTheServer(function: (x) => (ThreadManager.instance as IThreadManagerServer).killAllThread());
     }
   }
 }
