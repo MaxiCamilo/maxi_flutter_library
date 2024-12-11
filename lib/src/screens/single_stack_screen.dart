@@ -69,9 +69,11 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
   Widget build(BuildContext context) {
     if (!wasBuild) {
       wasBuild = true;
-      waiterPortrait.completeIfIncomplete();
 
-      Future.delayed(Duration.zero).whenComplete(() => changeScreen(newChild: buildFirstChild(widget.initialChild)));
+      Future.delayed(Duration.zero).whenComplete(() {
+        changeScreen(newChild: buildFirstChild(widget.initialChild));
+        waiterPortrait.completeIfIncomplete();
+      });
     }
 
     return AnimatedSwitcher(
@@ -121,6 +123,7 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
   }
 
   Future<void> _changeScreen({required Widget newChild, Duration? duration, Curve? curve}) async {
+    await Future.delayed(Duration.zero);
     setState(() {
       if (duration != null && this.duration != duration) {
         this.duration = duration;

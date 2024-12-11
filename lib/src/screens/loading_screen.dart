@@ -53,7 +53,8 @@ class LoadingScreen<T> extends StatefulWidget {
 
 mixin ILoadingScreenOperator<T> {
   bool get isActive;
-  void reload();
+  void updateValue();
+  void reloadWidgets();
 }
 
 class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with ILoadingScreenOperator<T> {
@@ -67,9 +68,13 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
 
   final executor = Semaphore();
 
+  late final StreamController _reloader;
+
   @override
   void initState() {
     super.initState();
+
+    _reloader = createEventController(isBroadcast: true);
 
     if (widget.updateStreamList != null) {
       getUpdateStream();
@@ -88,7 +93,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     final list = await widget.updateStreamList!();
 
     for (final item in list) {
-      joinEvent(event: item, onData: (_) => reload());
+      joinEvent(event: item, onData: (_) => updateValue());
     }
   }
 
@@ -103,7 +108,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
   }
 
   @override
-  void reload() async {
+  void updateValue() async {
     if (executor.isActive) {
       return;
     }
@@ -117,9 +122,17 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     }
   }
 
+  @override
+  void reloadWidgets() {
+    if (mounted) {
+      _reloader.add(null);
+    }
+  }
+
   Future<void> _getValue() async {
     isActive = true;
     wasFailed = false;
+    // singleStackScreenOperator.changeScreen(newChild: widget.loadingWidget);
 
     await Future.delayed(Duration.zero);
 
@@ -127,10 +140,20 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
       item = await widget.getterValue();
       if (mounted) {
         if (widget.reloadWidgets == null) {
-          singleStackScreenOperator.changeScreen(newChild: widget.builder(context, item));
+          singleStackScreenOperator.changeScreen(
+            newChild: MaxiBuildBox(
+              reloaders: () => [_reloader.stream],
+              cached: false,
+              builer: (x) => widget.builder(x, item),
+            ),
+          );
         } else {
           singleStackScreenOperator.changeScreen(
-            newChild: MaxiBuildBox(reloaders: widget.reloadWidgets!, cached: true, builer: (x) => widget.builder(x, item)),
+            newChild: MaxiBuildBox(
+              reloaders: () async => [_reloader.stream, ...await widget.reloadWidgets!()],
+              cached: false,
+              builer: (x) => widget.builder(x, item),
+            ),
           );
         }
         if (widget.onGetValue != null) {
@@ -202,7 +225,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
           MaxiTransparentButton(
             text: const TranslatableText(message: 'Retry'),
             icon: Icons.replay_outlined,
-            onTouch: reload,
+            onTouch: updateValue,
           ),
         ],
       ),
@@ -211,5 +234,8 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
 
   void _onCreatedOperator(ISingleStackScreenOperator newOperator) {
     singleStackScreenOperator = newOperator;
+    if (isActive) {
+      singleStackScreenOperator.changeScreen(newChild: widget.loadingWidget);
+    }
   }
 }

@@ -9,7 +9,11 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
   final _controllersList = <StreamController>[];
   final _otherActiveList = <Object>[];
 
+  bool _isDispose = false;
+
   Completer<StateWithLifeCycle<T>>? _waitingDiscarded;
+
+  bool get isDispose => _isDispose;
 
   Future<StateWithLifeCycle<T>> get onDispose {
     _waitingDiscarded ??= Completer<StateWithLifeCycle<T>>();
@@ -57,9 +61,35 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     return item;
   }
 
+  Future<void> callEntityStreamDirectly<S extends Object, R>({
+    InvocationParameters parameters = InvocationParameters.emptry,
+    required FutureOr<Stream<R>> Function(S serv, InvocationParameters para) function,
+    bool cancelOnError = false,
+    void Function(R)? onListen,
+    void Function()? onDone,
+    void Function(Object error, [StackTrace? stackTrace])? onError,
+  }) async {
+    final subscription = await ThreadManager.callEntityStreamDirectly(
+      function: function,
+      cancelOnError: cancelOnError,
+      onDone: onDone,
+      onError: onError,
+      onListen: onListen,
+      parameters: parameters,
+    );
+
+    if (isDispose) {
+      subscription.cancel();
+    } else {
+      _eventsList.add(subscription);
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
+
+    _isDispose = true;
 
     _eventsList.iterar((x) => x.cancel());
 
