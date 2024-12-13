@@ -50,6 +50,32 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
     );
   }
 
+  static Future<T?> showFutureMaterialDialog<T>(
+      {required BuildContext context,
+      required bool canCancel,
+      required bool canRetry,
+      required FutureOr<T> Function() function,
+      TranslatableText text = const TranslatableText(message: 'Wait for the task to complete its execution')}) {
+    return DialogUtilities.showWidgetAsMaterialDialog<T>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context, dialogOperator) => FunctionalTextStreamerWidget(
+        canCancel: canCancel,
+        canRetry: canRetry,
+        startWhenDisplayed: true,
+        onDone: (x) => dialogOperator.defineResult(context, x),
+        onCancel: () => dialogOperator.defineResult(context),
+        function: () => _runAsFuture(function, text),
+      ),
+    );
+  }
+
+  static Stream<StreamState<TranslatableText, T>> _runAsFuture<T>(FutureOr<T> Function() function, TranslatableText text) async* {
+    yield streamTranslateText(text);
+    final result = await function();
+    streamResult(result);
+  }
+
   @override
   State<FunctionalTextStreamerWidget<T>> createState() => _FunctionalTextStreamerWidgetState<T>();
 }

@@ -45,6 +45,7 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
   bool wasBuild = false;
   bool isFirst = true;
 
+  @override
   String actuanWidgetName = '';
 
   final waiterPortrait = Completer();

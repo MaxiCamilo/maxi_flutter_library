@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
+  List<Stream> getReloaderStreams() => const [];
+
   final _eventsList = <StreamSubscription>[];
   final _controllersList = <StreamController>[];
   final _otherActiveList = <Object>[];
@@ -18,6 +20,15 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
   Future<StateWithLifeCycle<T>> get onDispose {
     _waitingDiscarded ??= Completer<StateWithLifeCycle<T>>();
     return _waitingDiscarded!.future;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    for (final stream in getReloaderStreams()) {
+      joinEvent(event: stream, onData: changueWidgetState);
+    }
   }
 
   StreamController<R> createEventController<R>({required bool isBroadcast}) {
@@ -109,5 +120,11 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
 
     _waitingDiscarded?.complete(this);
     _waitingDiscarded = null;
+  }
+
+  void changueWidgetState([dynamic value]) {
+    if (mounted) {
+      setState(() {});
+    }
   }
 }

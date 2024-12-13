@@ -5,7 +5,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/animation/widget_animator.dart';
 
 class MaxiAnimatedWidget extends StatefulWidget {
-  final List<WidgetAnimator> animators;
+  final  List<WidgetAnimator> animators;
   final bool isFixedAnimatorsList;
   final Widget child;
 

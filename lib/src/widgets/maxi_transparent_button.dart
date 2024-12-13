@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class MaxiTransparentButton extends StatefulWidget {
+class MaxiTransparentButton extends StatelessWidget {
   final IconData? icon;
   final TranslatableText? text;
   final void Function()? onTouch;
@@ -25,54 +26,41 @@ class MaxiTransparentButton extends StatefulWidget {
     this.borderColors,
   });
 
-  @override
-  State<MaxiTransparentButton> createState() => _MaxiTransparentButtonState();
-}
-
-class _MaxiTransparentButtonState extends State<MaxiTransparentButton> {
-  late String text;
-
-  @override
-  void initState() {
-    super.initState();
-
-    text = widget.text?.toString() ?? '';
-  }
-
+  //late String text;
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: widget.onTouch,
+      onPressed: onTouch,
       style: OutlinedButton.styleFrom(
-        backgroundColor: widget.backgroundColor,
-        foregroundColor: widget.textColor,
-        side: BorderSide(width: widget.borderWidth, color: widget.borderColors ?? widget.textColor ?? Colors.white),
+        backgroundColor: backgroundColor,
+        foregroundColor: textColor,
+        side: BorderSide(width: borderWidth, color: borderColors ?? textColor ?? Colors.white),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(widget.circularRadius),
+          borderRadius: BorderRadius.circular(circularRadius),
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(widget.padding),
+        padding: EdgeInsets.all(padding),
         child: _createContent(context),
       ),
     );
   }
 
   Widget _createContent(BuildContext context) {
-    if (widget.icon == null) {
-      return Text(text);
+    if (icon == null) {
+      return text == null ? const SizedBox() : MaxiTranslatableText(text: text!);
     } else {
       return Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
-        children: text.isNotEmpty
+        children: text != null && text!.isNotEmpty
             ? [
-                Icon(widget.icon),
+                Icon(icon),
                 const SizedBox(width: 5),
-                Flexible(child: Text(text)),
+                Flexible(child: MaxiTranslatableText(text: text!)),
               ]
             : [
-                Icon(widget.icon),
+                Icon(icon),
               ],
       );
     }

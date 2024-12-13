@@ -11,6 +11,7 @@ class MaxiTranslatableText extends StatefulWidget {
   final bool italic;
   final TextDecoration? decoration;
   final bool selectable;
+  final List<Stream> Function()? reloaders;
 
   const MaxiTranslatableText({
     required this.text,
@@ -22,29 +23,46 @@ class MaxiTranslatableText extends StatefulWidget {
     this.italic = false,
     this.decoration,
     this.selectable = false,
+    this.reloaders,
   });
 
   @override
   State<MaxiTranslatableText> createState() => _MaxiTranslatableTextState();
 }
 
-class _MaxiTranslatableTextState extends State<MaxiTranslatableText> {
-  late String _originalText;
+class _MaxiTranslatableTextState extends StateWithLifeCycle<MaxiTranslatableText> {
+  late TranslatableText _originalText;
   late String _text;
+
+  @override
+  List<Stream> getReloaderStreams() {
+    return widget.reloaders == null ? super.getReloaderStreams() : widget.reloaders!();
+  }
+/*
+  @override
+  void reloadWidget(value) {
+    if (value is TranslatableText) {
+      _originalText = value.message;
+      _text = value.toString();
+    }
+
+    super.reloadWidget(value);
+  }
+  */
 
   @override
   void initState() {
     super.initState();
 
-    _originalText = widget.text.message;
+    _originalText = widget.text;
     _text = widget.text.toString();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_originalText != widget.text.message) {
-      _originalText = widget.text.message;
-      _text = widget.text.toString();
+    if (_originalText != widget.text) {
+      _originalText = widget.text;
+      _text = _originalText.toString();
     }
 
     return MaxiText(

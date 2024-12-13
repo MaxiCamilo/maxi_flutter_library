@@ -29,8 +29,10 @@ class MaxiAnimatedOpacity with WidgetAnimator {
   }
 }
 
-abstract class MaxiAnimatedOpacityState extends State<_MaxiAnimatedOpacityWidget> {
+mixin MaxiAnimatedOpacityState<T extends StatefulWidget> on State<T> {
   double get opacity;
+
+  Stream<double> get opacityChanged;
 
   Future<void> changeOpacity({
     double? opacity,
@@ -60,7 +62,7 @@ class _MaxiAnimatedOpacityWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _MaxiAnimatedOpacityState();
 }
 
-class _MaxiAnimatedOpacityState extends MaxiAnimatedOpacityState {
+class _MaxiAnimatedOpacityState extends StateWithLifeCycle<_MaxiAnimatedOpacityWidget> with MaxiAnimatedOpacityState {
   @override
   late double opacity;
   late Duration duration;
@@ -71,8 +73,14 @@ class _MaxiAnimatedOpacityState extends MaxiAnimatedOpacityState {
   Semaphore? _sincronizer;
 
   @override
+  Stream<double> get opacityChanged => _opacityChangedController.stream;
+  late StreamController<double> _opacityChangedController;
+
+  @override
   void initState() {
     super.initState();
+
+    _opacityChangedController = createEventController<double>(isBroadcast: true);
 
     opacity = widget.opacity;
     duration = widget.duration;
@@ -107,6 +115,7 @@ class _MaxiAnimatedOpacityState extends MaxiAnimatedOpacityState {
     }
 
     bool isChange = false;
+    final actualOpacity = this.opacity;
 
     if (opacity != null && opacity != this.opacity) {
       this.opacity = opacity;
@@ -132,6 +141,9 @@ class _MaxiAnimatedOpacityState extends MaxiAnimatedOpacityState {
       _waitFinish ??= Completer();
       setState(() {});
       await _waitFinish!.future;
+      if (actualOpacity != this.opacity) {
+        _opacityChangedController.add(this.opacity);
+      }
     }
   }
 }
