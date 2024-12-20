@@ -59,7 +59,7 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
     if (widget.useDropdown) {
       return FormDropDown(
         propertyName: widget.propertyName,
-        options: widgetOptions,
+        optionsBuild: () => widgetOptions,
         getterInitialValue: () => _initialValue,
         onChangeValue: _dropdownChanged,
       );

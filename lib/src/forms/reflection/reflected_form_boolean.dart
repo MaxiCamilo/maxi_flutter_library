@@ -23,13 +23,13 @@ class ReflectedFormBoolean extends ReflectionFieldImplementation {
 }
 
 class _StateReflectedFormBoolean extends StateReflectionFieldImplementation<ReflectedFormBoolean> {
-  late final String _translatedDescription;
+  late final TranslatableText _translatedDescription;
 
   @override
   void initState() {
     super.initState();
 
-    _translatedDescription = (widget.description ?? Description.searchDescription(annotations: fieldReflection.annotations)).toString();
+    _translatedDescription = (widget.description ?? Description.searchDescription(annotations: fieldReflection.annotations));
   }
 
   @override

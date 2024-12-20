@@ -7,13 +7,13 @@ import 'package:maxi_library/maxi_library.dart';
 class SingleStackScreen extends StatefulWidget {
   final void Function(ISingleStackScreenOperator)? onCreatedOperator;
 
-  final Widget initialChild;
+  final Widget Function(BuildContext)? initialChildBuild;
   final Duration duration;
   final Curve curve;
 
   const SingleStackScreen({
     super.key,
-    this.initialChild = const SizedBox(),
+    this.initialChildBuild,
     this.duration = const Duration(seconds: 1),
     this.curve = Curves.linear,
     this.onCreatedOperator,
@@ -30,10 +30,12 @@ class SingleStackScreen extends StatefulWidget {
 mixin ISingleStackScreenOperator {
   Widget get actualWidget;
   String get actuanWidgetName;
+  bool get wasBuild;
 
   Future<void> waitAnimationEnd();
   Future<void> waitForConstruction();
   Future<void> changeScreen({required Widget newChild, Duration? duration, Curve? curve});
+  void changeScreenWithoutAnimation({required Widget newChild});
 }
 
 class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStackScreenOperator {
@@ -42,8 +44,9 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
   @override
   late Widget actualWidget;
 
+  @override
   bool wasBuild = false;
-  bool isFirst = true;
+  int childID = 0;
 
   @override
   String actuanWidgetName = '';
@@ -66,15 +69,28 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
     }
   }
 
+  Widget _buildChild(Widget child) {
+    return SizedBox(
+      key: ValueKey(childID),
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!wasBuild) {
       wasBuild = true;
-
+      /*
       Future.delayed(Duration.zero).whenComplete(() {
-        changeScreen(newChild: buildFirstChild(widget.initialChild));
-        waiterPortrait.completeIfIncomplete();
+        if (mounted) {
+          // ignore: use_build_context_synchronously
+          changeScreen(newChild: widget.initialChildBuild == null ? const SizedBox() : widget.initialChildBuild!(context));
+          waiterPortrait.completeIfIncomplete();
+        }
       });
+      */
+      actualWidget = _buildChild(widget.initialChildBuild == null ? const SizedBox() : widget.initialChildBuild!(context));
+      waiterPortrait.completeIfIncomplete();
     }
 
     return AnimatedSwitcher(
@@ -99,7 +115,7 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
 
     await waiterPortrait.future;
   }
-
+/*
   Widget buildFirstChild(Widget child) {
     return SizedBox(
       key: const ValueKey(1),
@@ -113,6 +129,7 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
       child: child,
     );
   }
+  */
 
   @override
   Future<void> changeScreen({required Widget newChild, Duration? duration, Curve? curve}) async {
@@ -125,23 +142,31 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
 
   Future<void> _changeScreen({required Widget newChild, Duration? duration, Curve? curve}) async {
     await Future.delayed(Duration.zero);
-    setState(() {
-      if (duration != null && this.duration != duration) {
-        this.duration = duration;
-      }
 
-      if (curve != null && this.curve != curve) {
-        this.curve = curve;
-      }
+    if (duration != null && this.duration != duration) {
+      this.duration = duration;
+    }
 
-      isFirst = !isFirst;
-      actualWidget = isFirst ? buildFirstChild(newChild) : buildSecondChild(newChild);
-    });
+    if (curve != null && this.curve != curve) {
+      this.curve = curve;
+    }
+    childID += 1;
+    actualWidget = _buildChild(newChild);
+    setState(() {});
   }
 
   @override
   Future<void> waitAnimationEnd() {
     waiterAnimationEnd ??= Completer();
     return waiterAnimationEnd!.future;
+  }
+
+  @override
+  void changeScreenWithoutAnimation({required Widget newChild}) {
+    if (mounted) {
+      childID += 1;
+      actualWidget = _buildChild(newChild);
+      setState(() {});
+    }
   }
 }

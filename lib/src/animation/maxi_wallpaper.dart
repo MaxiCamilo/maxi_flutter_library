@@ -112,7 +112,7 @@ class _MaxiWallpaperState extends State<MaxiWallpaper> with IMaxiWallpaperOperat
     return SingleStackScreen(
       curve: widget.curve,
       duration: widget.duration,
-      initialChild: initialChild,
+      initialChildBuild: (p0) => initialChild,
       onCreatedOperator: onCreatedOperator,
     );
   }

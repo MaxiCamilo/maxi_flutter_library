@@ -127,7 +127,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
       return true;
     }
 
-    if (value == null) {
+    if (value == null && value is! T) {
       if (widget.getterInitialValue == null) {
         value = getDefaultValue;
       } else {

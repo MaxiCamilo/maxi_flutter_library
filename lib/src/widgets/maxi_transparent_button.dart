@@ -3,7 +3,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class MaxiTransparentButton extends StatelessWidget {
-  final IconData? icon;
+  final Widget? icon;
   final TranslatableText? text;
   final void Function()? onTouch;
   final Color? backgroundColor;
@@ -55,12 +55,12 @@ class MaxiTransparentButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: text != null && text!.isNotEmpty
             ? [
-                Icon(icon),
-                const SizedBox(width: 5),
+                icon ?? const SizedBox(),
+                icon == null ? const SizedBox() : const SizedBox(width: 5),
                 Flexible(child: MaxiTranslatableText(text: text!)),
               ]
             : [
-                Icon(icon),
+                icon ?? const SizedBox(),
               ],
       );
     }

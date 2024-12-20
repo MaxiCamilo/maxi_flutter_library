@@ -1,9 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/src/forms/one_value_form_field_implementation.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class FormDropDown<T> extends OneValueFormField<T> {
-  final Map<T, Widget> options;
+  final Map<T, Widget> Function() optionsBuild;
   final Widget? icon;
   final bool isExpanded;
 
@@ -32,7 +33,7 @@ class FormDropDown<T> extends OneValueFormField<T> {
 
   const FormDropDown({
     required super.propertyName,
-    required this.options,
+    required this.optionsBuild,
     this.onSelected,
     super.key,
     super.manager,
@@ -69,32 +70,48 @@ class FormDropDown<T> extends OneValueFormField<T> {
 }
 
 class _StateFormDropDown<T> extends OneValueFormFieldImplementation<T, FormDropDown<T>> {
-  late final List<DropdownMenuItem<T>> _optionWidgets;
+  late Map<T, Widget> _optionsMap;
+  late List<DropdownMenuItem<T>> _optionWidgets;
 
   @override
-  T get getDefaultValue => widget.options.entries.first.key;
+  T get getDefaultValue => _optionsMap.entries.first.key;
 
   @override
   void initState() {
-    checkProgrammingFailure(thatChecks: tr('Options list is not empty'), result: () => widget.options.isNotEmpty);
-    super.initState();
-
-    _optionWidgets = widget.options.entries.map<DropdownMenuItem<T>>((MapEntry<T, Widget> value) {
+    _optionsMap = widget.optionsBuild();
+    _optionWidgets = _optionsMap.entries.map<DropdownMenuItem<T>>((MapEntry<T, Widget> value) {
       return DropdownMenuItem<T>(
         value: value.key,
         child: value.value,
       );
     }).toList();
+    checkProgrammingFailure(thatChecks: tr('Options list is not empty'), result: () => _optionWidgets.isNotEmpty);
+    super.initState();
   }
 
   @override
   Widget buildField(BuildContext context) {
+    final otherMap = widget.optionsBuild();
+    if (_optionsMap != otherMap && !mapEquals(otherMap, _optionsMap)) {
+      _optionsMap = otherMap;
+      _optionWidgets = _optionsMap.entries.map<DropdownMenuItem<T>>((MapEntry<T, Widget> value) {
+        return DropdownMenuItem<T>(
+          value: value.key,
+          child: value.value,
+        );
+      }).toList();
+
+      if (!_optionsMap.containsKey(actualValue) && _optionsMap.isNotEmpty) {
+        declareChangedValue(value: _optionsMap.entries.first.key);
+      }
+    }
+
     return DropdownButton<T>(
       isExpanded: widget.isExpanded,
       value: actualValue,
       icon: widget.icon,
-      onChanged: (T? value) {
-        if (value == null) {
+      onChanged: (dynamic value) {
+        if (value is! T) {
           return;
         }
         declareChangedValue(value: value);

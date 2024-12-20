@@ -212,7 +212,7 @@ class _SingleRouterScreenState extends State<SingleRouterScreen> with StackedScr
   }
 
   Future<void> _resetScreen({required Widget newWidget, Duration? duration, Curve? curve}) async {
-    await opacity.last.changeOpacity(opacity: 0, duration: Duration(milliseconds: (duration ?? widget.duration).inMilliseconds ~/ 2));
+    await opacity.last.changeOpacity(opacity: 0, duration: Duration(milliseconds: (duration ?? widget.duration).inMilliseconds ~/ 5));
 
     children.clear();
     opacity.clear();

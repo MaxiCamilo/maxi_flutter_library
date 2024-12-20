@@ -8,7 +8,11 @@ class QuestionDialog extends StatefulWidget {
   final TranslatableText secondOption;
   final IconData icon;
   final double rowFrom;
+
   final void Function(bool) onDone;
+
+  final Color? iconColor;
+  final double? iconSize;
 
   const QuestionDialog({
     super.key,
@@ -18,6 +22,8 @@ class QuestionDialog extends StatefulWidget {
     this.icon = Icons.question_mark,
     this.firstOption = const TranslatableText(message: 'Yes'),
     this.secondOption = const TranslatableText(message: 'No'),
+    this.iconColor,
+    this.iconSize,
   });
 
   static Future<bool?> showMaterialDialog({
@@ -28,6 +34,8 @@ class QuestionDialog extends StatefulWidget {
     IconData icon = Icons.question_mark,
     double rowFrom = 400,
     bool barrierDismissible = true,
+    Color? iconColor,
+    double? iconSize,
   }) async {
     return DialogUtilities.showWidgetAsMaterialDialog(
       context: context,
@@ -38,6 +46,8 @@ class QuestionDialog extends StatefulWidget {
         secondOption: secondOption,
         icon: icon,
         rowFrom: rowFrom,
+        iconColor: iconColor,
+        iconSize: iconSize,
         onDone: (x) => dialogOperator.defineResult(context, x),
       ),
     );
@@ -81,8 +91,8 @@ class _QuestionDialogState extends State<QuestionDialog> {
           children: [
             OnlyIfWidth(
               width: widget.rowFrom,
-              largestChild: Icon(widget.icon),
-              smallerChild: Center(child: Icon(widget.icon)),
+              largestChild: Icon(widget.icon, color: widget.iconColor, size: widget.iconSize),
+              smallerChild: Center(child: Icon(widget.icon, color: widget.iconColor, size: widget.iconSize)),
             ),
             const SizedBox(height: 10, width: 10),
             ExpandedOnlyRow(child: MaxiTranslatableText(text: widget.text, selectable: true)),

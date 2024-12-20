@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/forms/one_value_form_field_implementation.dart';
+import 'package:maxi_library/maxi_library.dart';
 
 class FormBoolean extends OneValueFormField<bool> {
   final bool useSwitch;
   final bool expandHorizontally;
-  final String description;
+  final TranslatableText description;
 
   const FormBoolean({
     required super.propertyName,
@@ -50,12 +51,12 @@ class _FormBooleanState extends OneValueFormFieldImplementation<bool, FormBoolea
               const SizedBox(width: 7),
               widget.expandHorizontally
                   ? Expanded(
-                      child: MaxiText(
-                      text: lastError.message.toString(),
+                      child: MaxiTranslatableText(
+                      text: lastError.message,
                       textColor: Colors.red,
                     ))
-                  : MaxiText(
-                      text: lastError.message.toString(),
+                  : MaxiTranslatableText(
+                      text: lastError.message,
                       textColor: Colors.red,
                     ),
             ],
@@ -83,9 +84,9 @@ class _FormBooleanState extends OneValueFormFieldImplementation<bool, FormBoolea
     if (widget.description.isNotEmpty) {
       list.add(const SizedBox(width: 10));
       if (widget.expandHorizontally) {
-        list.add(MaxiText(text: widget.description));
+        list.add(Expanded(child: MaxiTranslatableText(text: widget.description)));
       } else {
-        list.add(Expanded(child: MaxiText(text: widget.description)));
+        list.add(MaxiTranslatableText(text: widget.description));
       }
     }
 

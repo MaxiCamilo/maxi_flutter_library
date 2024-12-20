@@ -5,9 +5,11 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 mixin StartableState<T extends StatefulWidget, R> {
+  bool _firstExecution = true;
+
   Future<R> initializedAsynchronous();
 
-  Widget buildAfterInitialized(BuildContext context, R item);
+  Widget buildAfterInitialized(BuildContext context, R result);
 
   Widget get loadingWidget => const CircularProgressIndicator();
   bool get canRetry => true;
@@ -22,7 +24,7 @@ mixin StartableState<T extends StatefulWidget, R> {
   Widget build(BuildContext context) {
     return LoadingScreen<R>(
       startActive: true,
-      getterValue: initializedAsynchronous,
+      getterValue: _startEjecution,
       builder: buildAfterInitialized,
       loadingWidget: loadingWidget,
       canRetry: canRetry,
@@ -40,6 +42,17 @@ mixin StartableState<T extends StatefulWidget, R> {
       onCreatedOperator: (x) => screenOperator = x,
     );
   }
+
+  Future<R> _startEjecution() async {
+    if (_firstExecution) {
+      await firstExecution();
+      _firstExecution = false;
+    }
+
+    return await initializedAsynchronous();
+  }
+
+  FutureOr<void> firstExecution() {}
 
   FutureOr<List<Stream<dynamic>>> generateReloadersStream() {
     return [];
