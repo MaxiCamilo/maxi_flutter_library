@@ -56,9 +56,6 @@ class FormFieldManager with IFormFieldManager {
     return _values;
   }
 
-
-  
-
   @override
   getValue({required String propertyName}) {
     return _values[propertyName];
@@ -104,10 +101,15 @@ class FormFieldManager with IFormFieldManager {
   }
 
   void _reactFieldChanged(IFormFieldOperator field) {
+    final lastStatus = isValid;
     if (field.isValid) {
       _mapErrors.remove(field);
     } else {
       _mapErrors[field] = field.lastError;
+    }
+
+    if (lastStatus != isValid) {
+      _notifyStatusChange.add(this);
     }
   }
 
@@ -117,5 +119,15 @@ class FormFieldManager with IFormFieldManager {
     _mapSubscriptions.clear();
     _mapErrors.clear();
     _notifyStatusChange.close();
+  }
+
+  @override
+  void refreshStatus({required IFormFieldOperator field}) {
+    if (!fields.contains(field)) {
+      addField(field: field);
+      return;
+    }
+
+    _reactFieldChanged(field);
   }
 }

@@ -13,6 +13,7 @@ mixin IFormFieldManager {
 
   void addField({required IFormFieldOperator field});
   void removeField({required IFormFieldOperator field});
+  void refreshStatus({required IFormFieldOperator field});
 
   Map<String, dynamic> createMap({required bool onlyIfIsValid});
 

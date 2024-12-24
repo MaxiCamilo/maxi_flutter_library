@@ -46,6 +46,7 @@ class _FormBooleanState extends OneValueFormFieldImplementation<bool, FormBoolea
           Flex(
             direction: Axis.horizontal,
             mainAxisSize: widget.expandHorizontally ? MainAxisSize.max : MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Icon(Icons.error),
               const SizedBox(width: 7),
@@ -84,9 +85,29 @@ class _FormBooleanState extends OneValueFormFieldImplementation<bool, FormBoolea
     if (widget.description.isNotEmpty) {
       list.add(const SizedBox(width: 10));
       if (widget.expandHorizontally) {
-        list.add(Expanded(child: MaxiTranslatableText(text: widget.description)));
+        list.add(
+          Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => declareChangedValue(value: !actualValue),
+                child: MaxiTranslatableText(text: widget.description),
+              ),
+            ),
+          ),
+        );
       } else {
-        list.add(MaxiTranslatableText(text: widget.description));
+        list.add(
+          Flexible(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => declareChangedValue(value: !actualValue),
+                child: MaxiTranslatableText(text: widget.description),
+              ),
+            ),
+          ),
+        );
       }
     }
 

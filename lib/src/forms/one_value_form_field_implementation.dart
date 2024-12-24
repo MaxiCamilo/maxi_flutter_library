@@ -224,6 +224,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
     if (firstError != null) {
       isValid = false;
       lastError = firstError;
+      _notifyValueChanged.add(this);
     }
 
     if (!hasValue) {

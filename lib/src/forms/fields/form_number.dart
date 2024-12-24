@@ -53,11 +53,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
 
   @override
   void initState() {
-    super.initState();
-
-    textController = joinObject(item: TextEditingController());
     final range = widget.validators.selectByType<CheckNumberRange>();
-
     if (widget.maximum != null) {
       maximum = widget.maximum!.toDouble();
     } else if (range != null) {
@@ -68,11 +64,15 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
 
     if (widget.minimum != null) {
       minimum = widget.minimum!.toDouble();
-    } else if (range != null) {
+    } else if (range != null && range.minimum.toDouble() != double.negativeInfinity) {
       minimum = range.minimum.toDouble();
     } else {
       minimum = 0;
     }
+
+    super.initState();
+
+    textController = joinObject(item: TextEditingController());
 
     previousText = _formatText(actualValue);
     textController.text = previousText;

@@ -3,7 +3,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/forms/reflection_field_implementation.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class ReflectionFormNumber extends ReflectionFieldImplementation {
+class ReflectedFormNumber extends ReflectionFieldImplementation {
   final bool enable;
   final TranslatableText? title;
   final Widget? icon;
@@ -12,7 +12,7 @@ class ReflectionFormNumber extends ReflectionFieldImplementation {
   final bool expandHorizontally;
   final void Function(num, NegativeResult?)? onSubmitted;
 
-  const ReflectionFormNumber({
+  const ReflectedFormNumber({
     super.key,
     required super.entityType,
     required super.propertyName,
@@ -27,10 +27,10 @@ class ReflectionFormNumber extends ReflectionFieldImplementation {
   });
 
   @override
-  State<StatefulWidget> createState() => _StateReflectionFormNumber();
+  State<StatefulWidget> createState() => _StateReflectedFormNumber();
 }
 
-class _StateReflectionFormNumber extends StateReflectionFieldImplementation<ReflectionFormNumber> {
+class _StateReflectedFormNumber extends StateReflectionFieldImplementation<ReflectedFormNumber> {
   late final String _translatedTitle;
 
   @override
@@ -53,6 +53,7 @@ class _StateReflectionFormNumber extends StateReflectionFieldImplementation<Refl
       interval: widget.interval,
       showButtons: widget.showButtons,
       onSubmitted: widget.onSubmitted,
+      validators: validators,
     );
   }
 }
