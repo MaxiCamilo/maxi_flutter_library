@@ -13,6 +13,10 @@ class MaxiContinuousList<T> extends StatefulWidget {
   final Widget Function(BuildContext, List<Widget>)? listGenerator;
   final Widget Function(BuildContext)? emptyGenerator;
   final bool ascendant;
+  final Duration waitingReupdated;
+  final Duration animationDuration;
+  final Curve animationCurve;
+  final void Function(MaxiContinuousListOperator<T>)? onCreatedOperator;
 
   const MaxiContinuousList({
     super.key,
@@ -24,25 +28,51 @@ class MaxiContinuousList<T> extends StatefulWidget {
     this.listGenerator,
     this.emptyGenerator,
     this.ascendant = true,
+    this.waitingReupdated = const Duration(seconds: 1),
+    this.animationDuration = const Duration(milliseconds: 500),
+    this.animationCurve = Curves.decelerate,
+    this.onCreatedOperator,
   });
 
   @override
   State<MaxiContinuousList<T>> createState() => _MaxiContinuousListState<T>();
 }
 
-class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<T>> with StartableState<MaxiBasicList<T>, void> {
+mixin MaxiContinuousListOperator<T> {
+  bool get ascendant;
+  bool get isLoading;
+  set ascendant(bool value);
+  updateValue();
+}
+
+class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<T>> with StartableState<MaxiBasicList<T>, void>, MaxiContinuousListOperator<T> {
   final content = <T>[];
 
   late ScrollController scrollController;
 
   NegativeResult? lastError;
 
+  @override
   bool isLoading = false;
   int lastID = 0;
+
+  late bool _ascendant;
+
+  @override
+  Duration? get waitingReupdated => widget.waitingReupdated;
+  @override
+  Duration get duration => widget.animationDuration;
+  @override
+  Curve get curve => widget.animationCurve;
+
+  @override
+  bool get ascendant => _ascendant;
 
   @override
   void initState() {
     super.initState();
+
+    _ascendant = widget.ascendant;
 
     scrollController = ScrollController();
     scrollController.addListener(onScroll);
@@ -64,6 +94,10 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
         }
       });
     }
+
+    if (widget.onCreatedOperator != null) {
+      widget.onCreatedOperator!(this);
+    }
   }
 
   void _reload(_) {
@@ -71,8 +105,13 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
   }
 
   void _updateValues(_) {
-    content.clear();
     updateValue();
+  }
+
+  @override
+  void updateValue() {
+    content.clear();
+    super.updateValue();
   }
 
   @override
@@ -94,7 +133,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     List<T> result = await widget.valueGetter(0);
 
     if (result.isNotEmpty) {
-      if (widget.ascendant) {
+      if (_ascendant) {
         result = result.orderByFunction((x) => widget.gettetIdentifier(x));
       } else {
         result = result.orderByFunction((x) => widget.gettetIdentifier(x)).reversed.toList();
@@ -184,5 +223,13 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
         },
       ),
     );
+  }
+
+  @override
+  set ascendant(bool newValue) {
+    if (newValue != _ascendant) {
+      _ascendant = newValue;
+      updateValue();
+    }
   }
 }

@@ -73,7 +73,7 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
   static Stream<StreamState<TranslatableText, T>> _runAsFuture<T>(FutureOr<T> Function() function, TranslatableText text) async* {
     yield streamTranslateText(text);
     final result = await function();
-    streamResult(result);
+    yield streamResult(result);
   }
 
   @override

@@ -18,6 +18,7 @@ mixin StartableState<T extends StatefulWidget, R> {
   Duration get duration => const Duration(milliseconds: 500);
   Curve get curve => Curves.decelerate;
   Widget get inactiveWidget => const SizedBox();
+  Duration? get waitingReupdated => null;
 
   late ILoadingScreenOperator screenOperator;
 
@@ -40,6 +41,7 @@ mixin StartableState<T extends StatefulWidget, R> {
       onError: onError,
       whenCompleted: whenCompleted,
       onCreatedOperator: (x) => screenOperator = x,
+      waitingReupdated: waitingReupdated,
     );
   }
 

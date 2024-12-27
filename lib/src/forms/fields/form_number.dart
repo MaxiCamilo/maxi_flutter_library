@@ -232,13 +232,9 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 3.0),
-        child: OutlinedButton(
+        child: TextButton(
           onPressed: enableIncrease ? _increase : null,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: enableIncrease ? Colors.blue.shade700 : Colors.grey,
-            padding: const EdgeInsets.all(2.0),
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: Colors.transparent)),
-          ),
+          style: TextButton.styleFrom(foregroundColor: enableIncrease ? Colors.blue.shade700 : Colors.grey),
           child: const Icon(Icons.add),
         ),
       ),

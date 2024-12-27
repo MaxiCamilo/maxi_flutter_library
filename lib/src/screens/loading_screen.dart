@@ -25,6 +25,7 @@ class LoadingScreen<T> extends StatefulWidget {
   final double textSize;
   final Duration duration;
   final Curve curve;
+  final Duration? waitingReupdated;
 
   const LoadingScreen({
     super.key,
@@ -45,6 +46,7 @@ class LoadingScreen<T> extends StatefulWidget {
     this.onLoading,
     this.onError,
     this.whenCompleted,
+    this.waitingReupdated,
   });
 
   @override
@@ -113,7 +115,12 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
 
   @override
   void updateValue() async {
-    updaterSynchronizer.reExecute();
+    if (widget.waitingReupdated == null || !isActive) {
+      updaterSynchronizer.reExecute();
+    } else {
+      await Future.delayed(widget.waitingReupdated!);
+      updaterSynchronizer.executeIfNotActive();
+    }
   }
 
   @override

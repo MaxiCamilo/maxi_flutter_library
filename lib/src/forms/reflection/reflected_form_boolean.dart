@@ -39,6 +39,7 @@ class _StateReflectedFormBoolean extends StateReflectionFieldImplementation<Refl
       expandHorizontally: widget.expandHorizontally,
       description: _translatedDescription,
       useSwitch: widget.useSwitch,
+      manager: widget.fieldManager,
     );
   }
 }

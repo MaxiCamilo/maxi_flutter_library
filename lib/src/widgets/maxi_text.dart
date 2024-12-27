@@ -4,7 +4,7 @@ class MaxiText extends StatelessWidget {
   final String text;
   final double? size;
   final bool bold;
-  final Color? textColor;
+  final Color? color;
   final TextAlign? aling;
   final bool italic;
   final TextDecoration? decoration;
@@ -15,7 +15,7 @@ class MaxiText extends StatelessWidget {
     super.key,
     this.size,
     this.bold = false,
-    this.textColor,
+    this.color,
     this.aling,
     this.italic = false,
     this.decoration,
@@ -30,7 +30,7 @@ class MaxiText extends StatelessWidget {
         textAlign: aling,
         style: TextStyle(
           decoration: decoration,
-          color: textColor,
+          color: color,
           fontWeight: bold ? FontWeight.bold : FontWeight.normal,
           fontSize: size,
           fontStyle: italic ? FontStyle.italic : FontStyle.normal,
@@ -42,7 +42,7 @@ class MaxiText extends StatelessWidget {
         textAlign: aling,
         style: TextStyle(
           decoration: decoration,
-          color: textColor,
+          color: color,
           fontWeight: bold ? FontWeight.bold : FontWeight.normal,
           fontSize: size,
           fontStyle: italic ? FontStyle.italic : FontStyle.normal,

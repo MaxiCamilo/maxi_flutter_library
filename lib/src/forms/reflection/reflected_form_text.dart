@@ -34,13 +34,17 @@ class ReflectedFormText extends ReflectionFieldImplementation {
 }
 
 class _StateReflectedFormText extends StateReflectionFieldImplementation<ReflectedFormText> {
-  late final String _translatedTitle;
+  late final AlreadyTranslatedText _translatedTitle;
 
   @override
   void initState() {
     super.initState();
 
-    _translatedTitle = (widget.title ?? formalName).toString();
+    if (widget.title == null) {
+      _translatedTitle = AlreadyTranslatedText.translate(text: formalName);
+    } else {
+      _translatedTitle = AlreadyTranslatedText.translate(text: widget.title!);
+    }
   }
 
   @override
@@ -57,7 +61,6 @@ class _StateReflectedFormText extends StateReflectionFieldImplementation<Reflect
       validators: validators,
       onChangeValue: widget.onChangeValue,
       onSubmitted: widget.onSubmitted,
-      
     );
   }
 }

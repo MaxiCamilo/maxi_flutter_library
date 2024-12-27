@@ -7,7 +7,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 class FormText extends OneValueFormField<String> {
   final bool enable;
-  final String title;
+  final TranslatableText title;
   final int? maxCharacter;
   final int? maxLines;
   final TextInputAction? inputAction;
@@ -50,14 +50,18 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
 
   late bool _wasValid;
   late int? _maxLines;
+  late String title;
 
   TranslatableText lastTextError = TranslatableText.empty;
+
   String lastTranslatedErrorText = '';
 
   @override
   void initState() {
     textController = joinObject(item: TextEditingController());
     super.initState();
+
+    title = widget.title.toString();
 
     if (widget.maxCharacter != null) {
       maxCharacter = widget.maxCharacter;
@@ -98,7 +102,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
       textInputAction: widget.inputAction,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
-        labelText: widget.title,
+        labelText: title,
         icon: widget.icon,
         errorText: isValid ? null : lastTranslatedErrorText,
       ),

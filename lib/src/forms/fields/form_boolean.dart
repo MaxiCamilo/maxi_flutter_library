@@ -54,11 +54,11 @@ class _FormBooleanState extends OneValueFormFieldImplementation<bool, FormBoolea
                   ? Expanded(
                       child: MaxiTranslatableText(
                       text: lastError.message,
-                      textColor: Colors.red,
+                      color: Colors.red,
                     ))
                   : MaxiTranslatableText(
                       text: lastError.message,
-                      textColor: Colors.red,
+                      color: Colors.red,
                     ),
             ],
           )

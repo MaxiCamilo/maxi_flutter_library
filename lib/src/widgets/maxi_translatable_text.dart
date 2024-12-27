@@ -6,7 +6,7 @@ class MaxiTranslatableText extends StatefulWidget {
   final TranslatableText text;
   final double? size;
   final bool bold;
-  final Color? textColor;
+  final Color? color;
   final TextAlign? aling;
   final bool italic;
   final TextDecoration? decoration;
@@ -18,7 +18,7 @@ class MaxiTranslatableText extends StatefulWidget {
     super.key,
     this.size,
     this.bold = false,
-    this.textColor,
+    this.color,
     this.aling,
     this.italic = false,
     this.decoration,
@@ -73,7 +73,7 @@ class _MaxiTranslatableTextState extends StateWithLifeCycle<MaxiTranslatableText
       italic: widget.italic,
       selectable: widget.selectable,
       size: widget.size,
-      textColor: widget.textColor,
+      color: widget.color,
     );
   }
 }
