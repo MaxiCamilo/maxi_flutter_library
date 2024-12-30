@@ -34,6 +34,7 @@ class FormDropDown<T> extends OneValueFormField<T> {
   const FormDropDown({
     required super.propertyName,
     required this.optionsBuild,
+    super.formalName = TranslatableText.empty,
     this.onSelected,
     super.key,
     super.manager,

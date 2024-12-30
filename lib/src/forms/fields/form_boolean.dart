@@ -10,6 +10,7 @@ class FormBoolean extends OneValueFormField<bool> {
 
   const FormBoolean({
     required super.propertyName,
+    super.formalName = TranslatableText.empty,
     super.key,
     super.manager,
     super.getterInitialValue,

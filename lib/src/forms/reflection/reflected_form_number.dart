@@ -44,6 +44,7 @@ class _StateReflectedFormNumber extends StateReflectionFieldImplementation<Refle
   Widget build(BuildContext context) {
     return FormNumber(
       propertyName: widget.propertyName,
+      formalName: fieldReflection.formalName,
       title: _translatedTitle,
       manager: widget.fieldManager,
       enable: widget.enable,

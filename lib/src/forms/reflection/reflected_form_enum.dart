@@ -59,6 +59,7 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
     if (widget.useDropdown) {
       return FormDropDown(
         propertyName: widget.propertyName,
+        formalName: fieldReflection.formalName,
         optionsBuild: () => widgetOptions,
         getterInitialValue: () => _initialValue,
         onChangeValue: _dropdownChanged,
@@ -66,6 +67,7 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
     } else {
       return FormToggles(
         propertyName: widget.propertyName,
+        formalName: fieldReflection.formalName,
         options: widgetOptions,
         selecteds: [_initialValue],
         isSingleOption: true,

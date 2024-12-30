@@ -51,6 +51,7 @@ class _StateReflectedFormText extends StateReflectionFieldImplementation<Reflect
   Widget build(BuildContext context) {
     return FormText(
       propertyName: widget.propertyName,
+      formalName: fieldReflection.formalName,
       title: _translatedTitle,
       enable: widget.enable,
       icon: widget.icon,

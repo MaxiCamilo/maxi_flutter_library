@@ -19,6 +19,7 @@ class FormNumber extends OneValueFormField<num> {
     required super.propertyName,
     required this.title,
     required this.isDecimal,
+    super.formalName = TranslatableText.empty,
     super.key,
     super.manager,
     super.validators,

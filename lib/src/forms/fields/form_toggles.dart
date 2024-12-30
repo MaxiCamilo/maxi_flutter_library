@@ -34,6 +34,7 @@ class FormToggles<T> extends OneValueFormField<List<T>> {
     required this.options,
     required this.selecteds,
     required this.isSingleOption,
+    super.formalName = TranslatableText.empty,
     this.onSelected,
     super.key,
     super.manager,

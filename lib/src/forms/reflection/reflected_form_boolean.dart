@@ -36,6 +36,7 @@ class _StateReflectedFormBoolean extends StateReflectionFieldImplementation<Refl
   Widget build(BuildContext context) {
     return FormBoolean(
       propertyName: widget.propertyName,
+      formalName: fieldReflection.formalName,
       expandHorizontally: widget.expandHorizontally,
       description: _translatedDescription,
       useSwitch: widget.useSwitch,

@@ -7,7 +7,11 @@ class FormFieldManager with IFormFieldManager {
   late Map<String, dynamic> _values;
   final _mapErrors = <IFormFieldOperator, NegativeResult>{};
   final _mapSubscriptions = <IFormFieldOperator, StreamSubscription>{};
+
   final _notifyStatusChange = StreamController<IFormFieldManager>.broadcast();
+  final _fieldChangeValue = StreamController<IFormFieldOperator>.broadcast();
+  final _newField = StreamController<IFormFieldOperator>.broadcast();
+  final _retiredField = StreamController<IFormFieldOperator>.broadcast();
 
   @override
   final fields = <IFormFieldOperator>[];
@@ -21,6 +25,15 @@ class FormFieldManager with IFormFieldManager {
   @override
   bool get isValid => _mapErrors.isEmpty;
 
+  @override
+  Stream<IFormFieldOperator> get fieldChangeValue => _fieldChangeValue.stream;
+
+  @override
+  Stream<IFormFieldOperator> get newField => _newField.stream;
+
+  @override
+  Stream<IFormFieldOperator> get retiredField => _retiredField.stream;
+
   FormFieldManager({Map<String, dynamic>? values}) {
     if (values != null) {
       _values = values;
@@ -28,6 +41,9 @@ class FormFieldManager with IFormFieldManager {
       _values = <String, dynamic>{};
     }
   }
+
+  @override
+  bool hasProperty({required String propertyName}) => _values.containsKey(propertyName);
 
   @override
   void addField({required IFormFieldOperator field}) {
@@ -42,6 +58,8 @@ class FormFieldManager with IFormFieldManager {
 
     _mapSubscriptions[field] = subscription;
     fields.add(field);
+
+    _newField.add(field);
   }
 
   @override
@@ -91,6 +109,7 @@ class FormFieldManager with IFormFieldManager {
 
   @override
   void removeField({required IFormFieldOperator field}) {
+    final lastStatus = isValid;
     final subscription = _mapSubscriptions.remove(field);
     if (subscription != null) {
       subscription.cancel();
@@ -98,6 +117,12 @@ class FormFieldManager with IFormFieldManager {
 
     _mapErrors.remove(field);
     fields.remove(field);
+
+    _retiredField.add(field);
+
+    if (lastStatus != isValid) {
+      _notifyStatusChange.add(this);
+    }
   }
 
   void _reactFieldChanged(IFormFieldOperator field) {
@@ -111,6 +136,8 @@ class FormFieldManager with IFormFieldManager {
     if (lastStatus != isValid) {
       _notifyStatusChange.add(this);
     }
+
+    _fieldChangeValue.add(field);
   }
 
   @override
@@ -119,6 +146,9 @@ class FormFieldManager with IFormFieldManager {
     _mapSubscriptions.clear();
     _mapErrors.clear();
     _notifyStatusChange.close();
+    _fieldChangeValue.close();
+    _newField.close();
+    _retiredField.close();
   }
 
   @override
@@ -129,5 +159,18 @@ class FormFieldManager with IFormFieldManager {
     }
 
     _reactFieldChanged(field);
+  }
+
+  @override
+  void removeValue({required String propertyName}) {
+    if (!_values.containsKey(propertyName)) {
+      return;
+    }
+
+    if (fields.any((x) => x.listenToThatProperty(name: propertyName))) {
+      throw NegativeResult(identifier: NegativeResultCodes.contextInvalidFunctionality, message: tr('property %1 is being used by another field', [propertyName]));
+    }
+
+    _values.remove(propertyName);
   }
 }

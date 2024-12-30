@@ -5,6 +5,7 @@ mixin IFormFieldOperator {
   bool get isValid;
   bool get isActive;
   NegativeResult get lastError;
+  List<String> get fixedPropertiesListened;
 
   Stream<IFormFieldOperator> get notifyValueChanged;
   Future<IFormFieldOperator> get discardedField;

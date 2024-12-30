@@ -22,6 +22,7 @@ class FormDateButton extends OneValueFormField<DateTime> {
     required super.propertyName,
     required this.firstDate,
     required this.lastDate,
+    super.formalName = TranslatableText.empty,
     super.manager,
     super.validators,
     super.onChangeValue,

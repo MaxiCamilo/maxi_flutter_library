@@ -20,6 +20,7 @@ class FormText extends OneValueFormField<String> {
   const FormText({
     required super.propertyName,
     required this.title,
+    super.formalName = TranslatableText.empty,
     super.key,
     super.getterInitialValue,
     super.manager,

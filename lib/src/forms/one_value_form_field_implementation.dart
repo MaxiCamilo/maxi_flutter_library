@@ -8,6 +8,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 abstract class OneValueFormField<T> extends StatefulWidget {
   final String propertyName;
+  final TranslatableText formalName;
   final IFormFieldManager? manager;
   final T Function()? getterInitialValue;
   final void Function(T, NegativeResult?)? onChangeValue;
@@ -15,6 +16,7 @@ abstract class OneValueFormField<T> extends StatefulWidget {
 
   const OneValueFormField({
     required this.propertyName,
+    required this.formalName,
     super.key,
     this.manager,
     this.getterInitialValue,
@@ -48,6 +50,9 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
 
   @override
   Stream<IFormFieldOperator> get notifyValueChanged => _notifyValueChanged.stream;
+
+  @override
+  List<String> get fixedPropertiesListened => [widget.propertyName];
 
   late final StreamController<OneValueFormFieldImplementation<T, W>> _notifyValueChanged;
 
@@ -235,7 +240,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
   @override
   NegativeResult? validateValue({required value}) {
     for (final valid in widget.validators) {
-      final detectedError = valid.performValidation(name: propertyName, item: value, parentEntity: null);
+      final detectedError = valid.performValidation(formalName: widget.formalName, name: propertyName, item: value, parentEntity: null);
       if (detectedError != null) {
         return detectedError;
       }
