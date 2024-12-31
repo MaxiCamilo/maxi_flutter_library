@@ -5,7 +5,7 @@ import 'package:maxi_library/maxi_library.dart';
 abstract class ReflectionFieldImplementation extends StatefulWidget {
   final Type entityType;
   final String propertyName;
-  final FormFieldManager fieldManager;
+  final IFormFieldManager fieldManager;
 
   const ReflectionFieldImplementation({super.key, required this.entityType, required this.propertyName, required this.fieldManager});
 }

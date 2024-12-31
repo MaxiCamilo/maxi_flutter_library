@@ -16,3 +16,4 @@ export 'package:maxi_flutter_library/src/containers/startable_state.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_basic_list.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_continuous_list.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_vertical_hider.dart';
+export 'package:maxi_flutter_library/src/containers/maxi_rectangle.dart';

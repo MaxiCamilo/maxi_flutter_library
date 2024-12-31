@@ -118,10 +118,10 @@ class FormFieldManager with IFormFieldManager {
     _mapErrors.remove(field);
     fields.remove(field);
 
-    _retiredField.add(field);
+    _retiredField.addIfActive(field);
 
     if (lastStatus != isValid) {
-      _notifyStatusChange.add(this);
+      _notifyStatusChange.addIfActive(this);
     }
   }
 

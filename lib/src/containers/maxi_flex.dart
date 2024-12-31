@@ -39,9 +39,9 @@ class MaxiFlex extends StatelessWidget {
 
   const MaxiFlex({
     super.key,
-    required this.children,
     required this.rowFrom,
-    required this.useScreenSize,
+    required this.children,
+    this.useScreenSize = true,
     this.expandColumn = false,
     this.expandRow = false,
     this.rowCrossAxisAlignment = CrossAxisAlignment.start,

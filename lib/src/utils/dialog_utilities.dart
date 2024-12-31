@@ -25,6 +25,7 @@ mixin DialogUtilities {
     required Widget Function(BuildContext context, IDialogWindow<T> dialogOperator) builder,
     bool barrierDismissible = true,
     RoundedRectangleBorder? shape,
+    Color? backgroundColor,
   }) async {
     final dialogOperator = _DialogWindowPop<T>();
     return showDialog(
@@ -36,7 +37,9 @@ mixin DialogUtilities {
                 const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(7.0)),
                 ),
+            backgroundColor: backgroundColor ?? const Color.fromARGB(255, 46, 46, 46),
             content: Material(
+              color: Colors.transparent,
               child: builder(context, dialogOperator),
             ));
       },
