@@ -10,6 +10,7 @@ mixin IFormFieldManager {
   Stream<IFormFieldOperator> get newField;
   Stream<IFormFieldOperator> get retiredField;
   Stream<IFormFieldOperator> get fieldChangeValue;
+  Stream<IFormFieldManager> get notifyErrorListChange;
 
   dynamic getValue({required String propertyName});
   NegativeResult? setValue({required String propertyName, required dynamic value});

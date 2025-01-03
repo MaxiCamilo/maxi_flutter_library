@@ -125,7 +125,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
 
       isDone = true;
 
-      if (widget.onDone != null && lastResult != null) {
+      if (widget.onDone != null && lastResult is T) {
         widget.onDone!(lastResult as T);
       }
     } catch (ex) {
@@ -159,7 +159,9 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     }
 
     isActive = false;
-    if (value == null) {
+    if (value is T) {
+      lastResult = value;
+    } else {
       final lastError = NegativeResult(
         identifier: NegativeResultCodes.functionalityCancelled,
         message: tr('The functionality was canceled'),
@@ -174,8 +176,6 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
       if (widget.onError != null) {
         widget.onError!(lastError);
       }
-    } else {
-      lastResult = value;
     }
 
     if (mounted) {

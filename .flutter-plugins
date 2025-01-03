@@ -1,4 +1,11 @@
 # This is a generated file; do not edit or check into version control.
+file_selector=/home/maxiro/.pub-cache/hosted/pub.dev/file_selector-1.0.3/
+file_selector_android=/home/maxiro/.pub-cache/hosted/pub.dev/file_selector_android-0.5.1+12/
+file_selector_ios=/home/maxiro/.pub-cache/hosted/pub.dev/file_selector_ios-0.5.3+1/
+file_selector_linux=/home/maxiro/.pub-cache/hosted/pub.dev/file_selector_linux-0.9.3+2/
+file_selector_macos=/home/maxiro/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.4+2/
+file_selector_web=/home/maxiro/.pub-cache/hosted/pub.dev/file_selector_web-0.9.4+2/
+file_selector_windows=/home/maxiro/.pub-cache/hosted/pub.dev/file_selector_windows-0.9.3+3/
 path_provider=/home/maxiro/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
 path_provider_android=/home/maxiro/.pub-cache/hosted/pub.dev/path_provider_android-2.2.15/
 path_provider_foundation=/home/maxiro/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.1/

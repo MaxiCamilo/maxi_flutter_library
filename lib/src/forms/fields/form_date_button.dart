@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
-import 'package:maxi_flutter_library/src/forms/one_value_form_field_implementation.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class FormDateButton extends OneValueFormField<DateTime> {

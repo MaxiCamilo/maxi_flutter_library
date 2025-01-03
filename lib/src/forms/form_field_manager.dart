@@ -9,6 +9,7 @@ class FormFieldManager with IFormFieldManager {
   final _mapSubscriptions = <IFormFieldOperator, StreamSubscription>{};
 
   final _notifyStatusChange = StreamController<IFormFieldManager>.broadcast();
+  final _notifyErrorListChange = StreamController<IFormFieldManager>.broadcast();
   final _fieldChangeValue = StreamController<IFormFieldOperator>.broadcast();
   final _newField = StreamController<IFormFieldOperator>.broadcast();
   final _retiredField = StreamController<IFormFieldOperator>.broadcast();
@@ -33,6 +34,9 @@ class FormFieldManager with IFormFieldManager {
 
   @override
   Stream<IFormFieldOperator> get retiredField => _retiredField.stream;
+
+  @override
+  Stream<IFormFieldManager> get notifyErrorListChange => _notifyErrorListChange.stream;
 
   FormFieldManager({Map<String, dynamic>? values}) {
     if (values != null) {
@@ -81,6 +85,7 @@ class FormFieldManager with IFormFieldManager {
 
   @override
   NegativeResult? setValue({required String propertyName, required value}) {
+    final errorLength = _mapErrors.length;
     final lastStatus = isValid;
     _values[propertyName] = value;
 
@@ -104,12 +109,17 @@ class FormFieldManager with IFormFieldManager {
       }
     }
 
+    if (errorLength != _mapErrors.length) {
+      _notifyErrorListChange.add(this);
+    }
+
     return result;
   }
 
   @override
   void removeField({required IFormFieldOperator field}) {
     final lastStatus = isValid;
+    final errorLength = _mapErrors.length;
     final subscription = _mapSubscriptions.remove(field);
     if (subscription != null) {
       subscription.cancel();
@@ -122,6 +132,10 @@ class FormFieldManager with IFormFieldManager {
 
     if (lastStatus != isValid) {
       _notifyStatusChange.addIfActive(this);
+    }
+
+    if (errorLength != _mapErrors.length) {
+      _notifyErrorListChange.addIfActive(this);
     }
   }
 
@@ -149,6 +163,7 @@ class FormFieldManager with IFormFieldManager {
     _fieldChangeValue.close();
     _newField.close();
     _retiredField.close();
+    _notifyErrorListChange.close();
   }
 
   @override

@@ -31,6 +31,9 @@ class ReflectedFormFieldManager<T> with IFormFieldManager {
   Stream<IFormFieldOperator> get retiredField => _formOperator.retiredField;
 
   @override
+  Stream<IFormFieldManager> get notifyErrorListChange => _formOperator.notifyErrorListChange;
+
+  @override
   bool get isValid => _formOperator.isValid && _hideErrors.isEmpty;
 
   late bool beforeValid;

@@ -79,6 +79,12 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
     textController.text = actualValue;
     textController.addListener(_textControllerChanger);
     _wasValid = isValid;
+
+    if (isValid && widget.onIsValid != null) {
+      widget.onIsValid!(actualValue);
+    } else if (!isValid && widget.onIsInvalid != null) {
+      widget.onIsInvalid!(lastError);
+    }
   }
 
   @override

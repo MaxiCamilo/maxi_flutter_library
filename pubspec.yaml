@@ -11,6 +11,7 @@ environment:
 dependencies:
   path_provider: ^2.1.5
   shared_preferences: ^2.3.3
+  file_selector: ^1.0.3
   
 
   maxi_library:

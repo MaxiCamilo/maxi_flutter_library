@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/forms/one_value_form_field_implementation.dart';
 import 'package:maxi_library/maxi_library.dart';
 
@@ -233,18 +234,16 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 3.0),
-        child: TextButton(
-          onPressed: enableIncrease ? _increase : null,
-          style: TextButton.styleFrom(foregroundColor: enableIncrease ? Colors.blue.shade700 : Colors.grey),
-          child: const Icon(Icons.add),
+        child: MaxiTapArea(
+          onTouch: enableIncrease ? _increase : null,
+          child: Icon(Icons.add, color: enableIncrease ? Colors.blue.shade700 : Colors.grey),
         ),
       ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 3.0),
-        child: TextButton(
-          onPressed: enableDecrease ? _decrease : null,
-          style: TextButton.styleFrom(foregroundColor: enableDecrease ? Colors.blue.shade700 : Colors.grey),
-          child: const Icon(Icons.remove),
+        child: MaxiTapArea(
+          onTouch: enableDecrease ? _decrease : null,
+          child: Icon(Icons.remove, color: enableDecrease ? Colors.blue.shade700 : Colors.grey),
         ),
       ),
     ];
