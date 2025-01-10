@@ -8,13 +8,19 @@ class MaxiBuildBox extends StatefulWidget {
   final bool cached;
   final Widget Function(BuildContext) builer;
 
-  const MaxiBuildBox({super.key, required this.reloaders, required this.cached, required this.builer});
+  const MaxiBuildBox({
+    super.key,
+    required this.reloaders,
+    required this.cached,
+    required this.builer,
+  });
 
   @override
   State<MaxiBuildBox> createState() => _MaxiBuildWidgetState();
 }
 
 class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> {
+  int stateNumber = 0;
   Widget? savedItem;
 
   @override
@@ -31,6 +37,7 @@ class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> {
           event: item,
           onData: (_) {
             if (mounted) {
+              stateNumber += 1;
               savedItem = null;
               setState(() {});
             }
@@ -40,11 +47,17 @@ class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> {
 
   @override
   Widget build(BuildContext context) {
+    late final Widget child;
     if (widget.cached) {
       savedItem ??= widget.builer(context);
-      return savedItem!;
+      child = savedItem!;
     } else {
-      return widget.builer(context);
+      child = widget.builer(context);
     }
+
+    return SizedBox(
+      key: ValueKey(stateNumber),
+      child: child,
+    );
   }
 }

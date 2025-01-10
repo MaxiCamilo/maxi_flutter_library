@@ -10,7 +10,6 @@ class MaxiContinuousList<T> extends StatefulWidget {
   final int Function(T) gettetIdentifier;
   final FutureOr<List<T>> Function(int from) valueGetter;
   final Widget Function(BuildContext cont, T item, int ind) childGenerator;
-  final Widget Function(BuildContext, List<Widget>)? listGenerator;
   final Widget Function(BuildContext)? emptyGenerator;
   final bool ascendant;
   final Duration waitingReupdated;
@@ -25,7 +24,6 @@ class MaxiContinuousList<T> extends StatefulWidget {
     required this.gettetIdentifier,
     this.reloaders,
     this.valueUpdaters,
-    this.listGenerator,
     this.emptyGenerator,
     this.ascendant = true,
     this.waitingReupdated = const Duration(seconds: 1),
@@ -39,16 +37,20 @@ class MaxiContinuousList<T> extends StatefulWidget {
 }
 
 mixin MaxiContinuousListOperator<T> {
+  List<T> get content;
   bool get ascendant;
   bool get isLoading;
+  Stream<MaxiContinuousListOperator<T>> get onValueUpdate;
   set ascendant(bool value);
   updateValue();
 }
 
-class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<T>> with StartableState<MaxiBasicList<T>, void>, MaxiContinuousListOperator<T> {
+class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<T>> with StartableState<void>, MaxiContinuousListOperator<T> {
+  @override
   final content = <T>[];
 
   late ScrollController scrollController;
+  late StreamController<MaxiContinuousListOperator<T>> onValueUpdateControler;
 
   NegativeResult? lastError;
 
@@ -64,6 +66,8 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
   Duration get duration => widget.animationDuration;
   @override
   Curve get curve => widget.animationCurve;
+  @override
+  Stream<MaxiContinuousListOperator<T>> get onValueUpdate => onValueUpdateControler.stream;
 
   @override
   bool get ascendant => _ascendant;
@@ -76,6 +80,8 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
 
     scrollController = ScrollController();
     scrollController.addListener(onScroll);
+
+    onValueUpdateControler = createEventController(isBroadcast: true);
 
     if (widget.reloaders != null) {
       scheduleMicrotask(() async {
@@ -125,6 +131,8 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     lastID = 0;
     lastError = null;
     content.clear();
+
+    onValueUpdateControler.addIfActive(this);
 
     scrollController.dispose();
     scrollController = ScrollController();

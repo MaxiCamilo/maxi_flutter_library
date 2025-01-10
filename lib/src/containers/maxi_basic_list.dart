@@ -26,7 +26,7 @@ class MaxiBasicList<T> extends StatefulWidget {
   State<MaxiBasicList> createState() => _MaxiBasicListState<T>();
 }
 
-class _MaxiBasicListState<T> extends StateWithLifeCycle<MaxiBasicList<T>> with StartableState<MaxiBasicList<T>, List<T>> {
+class _MaxiBasicListState<T> extends StateWithLifeCycle<MaxiBasicList<T>> with StartableState<List<T>> {
   @override
   void initState() {
     super.initState();

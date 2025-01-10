@@ -12,7 +12,6 @@ export 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/flexible_o
 export 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/only_column.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_flex_widgets/only_row.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_builder_box.dart';
-export 'package:maxi_flutter_library/src/containers/startable_state.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_basic_list.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_continuous_list.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_vertical_hider.dart';

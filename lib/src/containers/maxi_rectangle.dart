@@ -10,6 +10,8 @@ class MaxiRectangle extends StatelessWidget {
   final double borderWidth;
   final BorderStyle borderStyle;
   final double borderStrokeAlign;
+  final double? width;
+  final double? height;
 
   final Widget child;
 
@@ -21,6 +23,8 @@ class MaxiRectangle extends StatelessWidget {
     this.backgroundColor,
     this.borderColor,
     this.borderRadious,
+    this.width,
+    this.height,
     this.borderWidth = 0,
     this.borderStyle = BorderStyle.solid,
     this.borderStrokeAlign = BorderSide.strokeAlignInside,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-mixin StartableState<T extends StatefulWidget, R> {
+mixin StartableState<R> {
   bool _firstExecution = true;
 
   Future<R> initializedAsynchronous();
@@ -15,6 +15,7 @@ mixin StartableState<T extends StatefulWidget, R> {
   bool get canRetry => true;
   double get iconSize => 42;
   double get textSize => 15;
+  bool get itsFirstRun => _firstExecution;
   Duration get duration => const Duration(milliseconds: 500);
   Curve get curve => Curves.decelerate;
   Widget get inactiveWidget => const SizedBox();

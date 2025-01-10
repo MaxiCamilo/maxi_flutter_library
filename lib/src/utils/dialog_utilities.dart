@@ -14,9 +14,14 @@ class _DialogWindowPop<T> with IDialogWindow<T> {
 }
 
 mixin DialogUtilities {
-  static Future<T?> showWidgetAsBottomSheet<T>({required BuildContext context, required Widget Function(BuildContext context, IDialogWindow<T> dialogOperator) builder}) {
+  static Future<T?> showWidgetAsBottomSheet<T>({
+    required BuildContext context,
+    required Widget Function(BuildContext context, IDialogWindow<T> dialogOperator) builder,
+    Color? backgroundColor,
+  }) {
     final dialogOperator = _DialogWindowPop<T>();
     return showModalBottomSheet(
+      backgroundColor: backgroundColor,
       context: context,
       builder: (context) => builder(context, dialogOperator),
     );
