@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:maxi_flutter_library/maxi_flutter_library.dart';
+import 'package:maxi_library/maxi_library.dart';
 
 class MaxiTapArea extends StatelessWidget {
   final void Function()? onTouch;
@@ -11,6 +13,7 @@ class MaxiTapArea extends StatelessWidget {
   final Color? backgroundColorOnMouseover;
   final Color? backgroundColorOnTouch;
   final Color? backgroundColorOnFocus;
+  final TranslatableText? tooltipText;
 
   const MaxiTapArea({
     super.key,
@@ -23,10 +26,19 @@ class MaxiTapArea extends StatelessWidget {
     this.backgroundColorOnMouseover,
     this.backgroundColorOnTouch,
     this.backgroundColorOnFocus,
+    this.tooltipText,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (tooltipText == null) {
+      return _buildRectangle(context);
+    } else {
+      return MaxiTooltip(text: tooltipText!, child: _buildRectangle(context));
+    }
+  }
+
+  Widget _buildRectangle(BuildContext context) {
     return Material(
       color: backgroundColor,
       child: InkWell(

@@ -123,4 +123,27 @@ class SharedPreferencesOperator with IFileOperator {
     routeSplit.removeLast();
     return SharedPreferencesOperator(route: routeSplit.join('/'));
   }
+
+  @override
+  Future<void> add({required Uint8List content, bool secured = false}) async {
+    final actual = await _prefs.getString(route);
+    if (actual == null) {
+      await write(content: content, secured: secured);
+    } else {
+      final actualBinary = base64.decode(actual);
+      final newBinarry = Uint8List.fromList([...actualBinary, ...content]);
+      await write(content: newBinarry, secured: secured);
+    }
+  }
+
+  @override
+  Future<void> addText({required String content, Encoding? encoder, bool secured = false}) async {
+    final actual = await _prefs.getString(route);
+    if (actual == null) {
+      await writeText(content: content, secured: secured);
+    } else {
+      final newText = content + actual;
+      await writeText(content: newText, secured: secured);
+    }
+  }
 }

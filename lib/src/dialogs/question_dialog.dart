@@ -88,11 +88,12 @@ class _QuestionDialogState extends State<QuestionDialog> {
         MaxiFlex(
           rowFrom: widget.rowFrom,
           useScreenSize: true,
+          rowCrossAxisAlignment: CrossAxisAlignment.center,
           children: [
             OnlyIfWidth(
               width: widget.rowFrom,
-              largestChild: Icon(widget.icon, color: widget.iconColor, size: widget.iconSize),
-              smallerChild: Center(child: Icon(widget.icon, color: widget.iconColor, size: widget.iconSize)),
+              largestChild: Icon(widget.icon, color: widget.iconColor, size: widget.iconSize ?? 35),
+              smallerChild: Center(child: Icon(widget.icon, color: widget.iconColor, size: widget.iconSize ?? 35)),
             ),
             const SizedBox(height: 10, width: 10),
             ExpandedOnlyRow(child: MaxiTranslatableText(text: widget.text, selectable: true)),

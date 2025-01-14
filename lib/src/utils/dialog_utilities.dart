@@ -1,6 +1,8 @@
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
+export 'package:file_selector/file_selector.dart';
 
 mixin IDialogWindow<T> {
   void defineResult(BuildContext context, [T? result]);
@@ -65,17 +67,45 @@ mixin DialogUtilities {
     return getDirectoryPath(confirmButtonText: title?.toString(), initialDirectory: initialAddress);
   }
 
-  static Future<String?> saveFile({required String fileExtension, String? initialAddress, List<XTypeGroup> filter = const [], TranslatableText? title, String? suggestiveName}) async {
+  static Future<String?> saveFile({
+    required BuildContext context,
+    required String fileExtension,
+    String? initialAddress,
+    List<XTypeGroup> filter = const [],
+    bool askIfWantReplace = true,
+    TranslatableText? title,
+    String? suggestiveName,
+  }) async {
     initialAddress ??= await ApplicationManager.instance.getCurrentDirectory();
 
     final dio = await getSaveLocation(confirmButtonText: title?.toString(), initialDirectory: initialAddress, acceptedTypeGroups: filter, suggestedName: suggestiveName);
     if (dio == null) {
       return null;
     }
+
+    late final String address;
+
     if (dio.path.endsWith('.$fileExtension')) {
-      return dio.path;
+      address = dio.path;
     } else {
-      return '${dio.path}.$fileExtension';
+      address = '${dio.path}.$fileExtension';
     }
+
+    if (askIfWantReplace && await FileOperatorMask(isLocal: false, rawRoute: address).existsFile()) {
+      if (!context.mounted) {
+        return null;
+      }
+      if (await QuestionDialog.showMaterialDialog(
+            context: context,
+            text: const TranslatableText(message: 'The file already exists, do you want to replace it?'),
+            icon: Icons.warning,
+            iconColor: Colors.orangeAccent,
+          ) !=
+          true) {
+        return null;
+      }
+    }
+
+    return address;
   }
 }
