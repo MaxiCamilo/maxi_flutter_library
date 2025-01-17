@@ -6,7 +6,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 class FormNumber extends OneValueFormField<num> {
   final bool enable;
-  final String title;
+  final TranslatableText title;
   final Widget? icon;
   final num? minimum;
   final num? maximum;
@@ -43,6 +43,7 @@ class FormNumber extends OneValueFormField<num> {
 class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> {
   late double minimum;
   late double maximum;
+  late String translateTitle;
 
   late final TextEditingController textController;
 
@@ -55,6 +56,8 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
 
   @override
   void initState() {
+    translateTitle = widget.title.toString();
+
     final range = widget.validators.selectByType<CheckNumberRange>();
     if (widget.maximum != null) {
       maximum = widget.maximum!.toDouble();
@@ -125,7 +128,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       textAlign: TextAlign.end,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
-        labelText: widget.title,
+        labelText: translateTitle,
         icon: widget.icon,
         errorText: isValid ? null : lastError.message.toString(),
       ),

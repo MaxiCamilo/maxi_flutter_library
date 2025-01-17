@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 
 class MaxiBuildBox extends StatefulWidget {
-  final FutureOr<List<Stream>> Function() reloaders;
+  final FutureOr<List<Stream<bool>>> Function() reloaders;
   final bool cached;
   final Widget Function(BuildContext) builer;
 
@@ -35,9 +35,12 @@ class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> {
     for (final item in list) {
       joinEvent(
           event: item,
-          onData: (_) {
+          onData: (x) {
             if (mounted) {
-              stateNumber += 1;
+              if (x) {
+                stateNumber += 1;
+              }
+
               savedItem = null;
               setState(() {});
             }

@@ -5,7 +5,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class MaxiBasicList<T> extends StatefulWidget {
-  final FutureOr<List<Stream>> Function()? reloaders;
+  final FutureOr<List<Stream<bool>>> Function()? reloaders;
   final FutureOr<List<Stream>> Function()? valueUpdaters;
   final FutureOr<List<T>> Function() valueGetter;
   final Widget Function(BuildContext cont, T item, int ind) childGenerator;
@@ -50,8 +50,8 @@ class _MaxiBasicListState<T> extends StateWithLifeCycle<MaxiBasicList<T>> with S
     }
   }
 
-  void _reload(_) {
-    reloadWidgets();
+  void _reload(bool x) {
+    reloadWidgets(changeState: x);
   }
 
   void _updateValues(_) {

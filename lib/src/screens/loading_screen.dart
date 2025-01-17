@@ -19,7 +19,7 @@ class LoadingScreen<T> extends StatefulWidget {
   final Widget inactiveWidget;
 
   final FutureOr<List<Stream>> Function()? updateStreamList;
-  final FutureOr<List<Stream>> Function()? reloadWidgets;
+  final FutureOr<List<Stream<bool>>> Function()? reloadWidgets;
   final bool canRetry;
   final double iconSize;
   final double textSize;
@@ -56,7 +56,7 @@ class LoadingScreen<T> extends StatefulWidget {
 mixin ILoadingScreenOperator<T> {
   bool get isActive;
   void updateValue();
-  void reloadWidgets();
+  void reloadWidgets({required bool changeState});
 }
 
 class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with ILoadingScreenOperator<T> {
@@ -72,7 +72,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
 
   //final executor = Semaphore();
 
-  late final StreamController _reloader;
+  late final StreamController<bool> _reloader;
 
   @override
   void initState() {
@@ -80,7 +80,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
 
     updaterSynchronizer = QueuingSemaphore(reservedFunction: _getValue);
 
-    _reloader = createEventController(isBroadcast: true);
+    _reloader = createEventController<bool>(isBroadcast: true);
 
     if (widget.updateStreamList != null) {
       getUpdateStream();
@@ -124,9 +124,9 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
   }
 
   @override
-  void reloadWidgets() {
+  void reloadWidgets({required bool changeState}) {
     if (mounted) {
-      _reloader.add(null);
+      _reloader.add(changeState);
     }
   }
 

@@ -39,6 +39,9 @@ mixin IMaxiVerticalCollapsorOperator {
   Future<void> get waitForWidgetToDisplay;
 
   void changeState(bool newStatus);
+
+  void updateState();
+
   void investStatus() {
     changeState(!isOpen);
   }
@@ -46,6 +49,8 @@ mixin IMaxiVerticalCollapsorOperator {
   void show() {
     if (!isOpen) {
       investStatus();
+    } else {
+      updateState();
     }
   }
 
@@ -83,6 +88,13 @@ class _MaxiVerticalCollapsorState extends StateWithLifeCycle<MaxiVerticalCollaps
 
     _waitForWidgetToDisplay ??= Completer();
     return _waitForWidgetToDisplay!.future;
+  }
+
+  @override
+  void updateState() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override

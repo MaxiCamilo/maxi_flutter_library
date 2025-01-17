@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
@@ -21,7 +22,7 @@ mixin StartableState<R> {
   Widget get inactiveWidget => const SizedBox();
   Duration? get waitingReupdated => null;
 
-  late ILoadingScreenOperator screenOperator;
+  ILoadingScreenOperator? screenOperator;
 
   Widget build(BuildContext context) {
     return LoadingScreen<R>(
@@ -57,7 +58,7 @@ mixin StartableState<R> {
 
   FutureOr<void> firstExecution() {}
 
-  FutureOr<List<Stream<dynamic>>> generateReloadersStream() {
+  FutureOr<List<Stream<bool>>> generateReloadersStream() {
     return [];
   }
 
@@ -66,11 +67,19 @@ mixin StartableState<R> {
   }
 
   void updateValue() {
-    screenOperator.updateValue();
+    if (screenOperator == null) {
+      log('[Startable State] creen Operator not found');
+    } else {
+      screenOperator?.updateValue();
+    }
   }
 
-  void reloadWidgets() {
-    screenOperator.reloadWidgets();
+  void reloadWidgets({required bool changeState}) {
+    if (screenOperator == null) {
+      log('[Startable State] creen Operator not found');
+    } else {
+      screenOperator?.reloadWidgets(changeState: changeState);
+    }
   }
 
   void onGetValue(R value) {}

@@ -31,13 +31,13 @@ class ReflectedFormNumber extends ReflectionFieldImplementation {
 }
 
 class _StateReflectedFormNumber extends StateReflectionFieldImplementation<ReflectedFormNumber> {
-  late final String _translatedTitle;
+  late final TranslatableText _translatedTitle;
 
   @override
   void initState() {
     super.initState();
 
-    _translatedTitle = (widget.title ?? formalName).toString();
+    _translatedTitle = (widget.title ?? formalName);
   }
 
   @override

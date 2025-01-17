@@ -5,7 +5,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class MaxiContinuousList<T> extends StatefulWidget {
-  final FutureOr<List<Stream>> Function()? reloaders;
+  final FutureOr<List<Stream<bool>>> Function()? reloaders;
   final FutureOr<List<Stream>> Function()? valueUpdaters;
   final int Function(T) gettetIdentifier;
   final FutureOr<List<T>> Function(int from) valueGetter;
@@ -87,7 +87,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
       scheduleMicrotask(() async {
         final reloaders = await widget.reloaders!();
         for (final item in reloaders) {
-          joinEvent(event: item, onData: _reload);
+          joinEvent<bool>(event: item, onData: _reload);
         }
       });
     }
@@ -106,8 +106,8 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     }
   }
 
-  void _reload(_) {
-    reloadWidgets();
+  void _reload(bool x) {
+    reloadWidgets(changeState: x);
   }
 
   void _updateValues(_) {
@@ -182,7 +182,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     } catch (ex) {
       lastError = NegativeResult.searchNegativity(item: ex, actionDescription: tr('Getting values from %1', [lastID]));
       isLoading = false;
-      reloadWidgets();
+      reloadWidgets(changeState: false);
       return;
     }
 
@@ -199,7 +199,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     }
 
     isLoading = false;
-    reloadWidgets();
+    reloadWidgets(changeState: false); //<<--- Ver si los listados se continuan bugueando
   }
 
   @override

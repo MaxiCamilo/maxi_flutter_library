@@ -5,7 +5,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class MaxiSelectableList<T> extends StatefulWidget {
-  final FutureOr<List<Stream>> Function()? reloaders;
+  final FutureOr<List<Stream<bool>>> Function()? reloaders;
   final FutureOr<List<Stream>> Function()? valueUpdaters;
   final int Function(T) gettetIdentifier;
   final FutureOr<List<T>> Function(int from) valueGetter;
