@@ -15,6 +15,9 @@ class SharedPreferencesOperator with IFileOperator {
 
   final _prefs = SharedPreferencesAsync();
 
+  @override
+  String get directAddress => route;
+
   SharedPreferencesOperator({required String route}) : route = route.replaceAll('\\', '/').replaceAll('${DirectoryUtilities.prefixRouteLocal}/', '').replaceAll(DirectoryUtilities.prefixRouteLocal, '');
 
   Future<String?> _getKey() {

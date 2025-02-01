@@ -133,7 +133,11 @@ class MaxiFlex extends StatelessWidget {
         if (child.child is Flexible) {
           child = child.child;
         } else {
-          child = Flexible(child: child.child);
+          child = Flexible(
+            fit: child.fit,
+            flex: child.flex,
+            child: child.child,
+          );
         }
       }
 
