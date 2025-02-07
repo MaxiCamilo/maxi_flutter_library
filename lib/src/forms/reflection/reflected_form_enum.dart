@@ -47,7 +47,7 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
     }
 
     final rawInitialValue = widget.fieldManager.getValue(propertyName: widget.propertyName);
-    if (rawInitialValue) {
+    if (rawInitialValue != null) {
       _initialValue = _convertRawValue(rawInitialValue);
     } else {
       _initialValue = optionsList.first.value;

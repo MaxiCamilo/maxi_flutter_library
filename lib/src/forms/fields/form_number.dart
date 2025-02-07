@@ -1,7 +1,9 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
-import 'package:maxi_flutter_library/src/forms/one_value_form_field_implementation.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class FormNumber extends OneValueFormField<num> {
@@ -11,9 +13,11 @@ class FormNumber extends OneValueFormField<num> {
   final num? minimum;
   final num? maximum;
   final double interval;
+  final int maxDecimalDigit;
   final bool isDecimal;
   final bool showButtons;
   final bool expandHorizontally;
+
   final void Function(num, NegativeResult?)? onSubmitted;
 
   const FormNumber({
@@ -33,6 +37,7 @@ class FormNumber extends OneValueFormField<num> {
     this.interval = 1,
     this.showButtons = true,
     this.expandHorizontally = false,
+    this.maxDecimalDigit = 2,
     this.onSubmitted,
   });
 
@@ -44,6 +49,11 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
   late double minimum;
   late double maximum;
   late String translateTitle;
+  late FocusNode focusNode;
+
+  num actualNumberOnField = 0;
+
+  bool firstSelection = true;
 
   late final TextEditingController textController;
 
@@ -57,6 +67,8 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
   @override
   void initState() {
     translateTitle = widget.title.toString();
+    focusNode = joinObject(item: FocusNode());
+    focusNode.addListener(focusChange);
 
     final range = widget.validators.selectByType<CheckNumberRange>();
     if (widget.maximum != null) {
@@ -79,7 +91,8 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
 
     textController = joinObject(item: TextEditingController());
 
-    previousText = _formatText(actualValue);
+    previousText = _formatText(widget.isDecimal ? actualValue.toDouble() : actualValue.toInt());
+    actualNumberOnField = actualValue;
     textController.text = previousText;
 
     textController.addListener(_changeTextController);
@@ -87,10 +100,27 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
   }
 
   @override
+  void dispose() {
+    focusNode.removeListener(focusChange);
+    super.dispose();
+  }
+
+  @override
   void renderingNewValue(num newValue) {
+    final lastBaseOffset = textController.selection.baseOffset;
+
     if (previousText != _formatText(newValue) || _wasValid != isValid) {
       previousText = _formatText(newValue);
+
       textController.text = previousText;
+
+      if (lastBaseOffset >= 0 && lastBaseOffset < textController.text.length) {
+        textController.selection = TextSelection.collapsed(offset: lastBaseOffset);
+      } else {
+        textController.selection = TextSelection.collapsed(offset: textController.text.length);
+      }
+
+      //log(newValue.toString());
       if (mounted) {
         setState(() {});
       }
@@ -103,9 +133,10 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       return Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(child: _buildTextField(context)),
-          ..._buildButtons(context),
+          _buildButtons(context),
         ],
       );
     } else {
@@ -115,6 +146,18 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
 
   String _formatText(num value) {
     if (widget.isDecimal) {
+      /*
+      final decimalText = value.toString();
+      final decimalParts = decimalText.split('.');
+      if (decimalParts.last.length == widget.maxDecimalDigit) {
+        return value.toString();
+      }
+      else if(decimalParts.last.length > widget.maxDecimalDigit){
+
+      }
+      else{
+
+      }*/
       return value.toString();
     } else {
       return value.toString().split('.').first;
@@ -123,6 +166,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
 
   Widget _buildTextField(BuildContext context) {
     return TextField(
+      focusNode: focusNode,
       enabled: widget.enable,
       controller: textController,
       textAlign: TextAlign.end,
@@ -133,9 +177,9 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
         errorText: isValid ? null : lastError.message.toString(),
       ),
       inputFormatters: _makeInputFormatters(),
-      onChanged: (x) => _changeText(x),
+      onChanged: (x) => _reactChangeText(x),
       onSubmitted: (x) {
-        _changeText(x);
+        _reactChangeText(x);
         if (widget.onSubmitted != null) {
           widget.onSubmitted!(actualValue, isValid ? null : lastError);
         }
@@ -146,7 +190,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
   List<TextInputFormatter> _makeInputFormatters() {
     if (widget.isDecimal) {
       if (maximum != double.infinity) {
-        return [LengthLimitingTextInputFormatter(maximum.toString().replaceAll('.0', '').length + 2)];
+        return [LengthLimitingTextInputFormatter(maximum.toString().split('.').first.length + widget.maxDecimalDigit + 1)];
       } else {
         return [];
       }
@@ -159,7 +203,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
     }
   }
 
-  void _changeText(String text) {
+  void _reactChangeText(String text) {
     if (text == previousText) {
       return;
     }
@@ -167,15 +211,36 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
     late final double? dio;
 
     if (text == '') {
-      dio = 0;
-    } else {
-      dio = double.tryParse(text);
+      return;
+    }
+
+    dio = double.tryParse(text);
+
+    if (dio == actualNumberOnField) {
+      return;
     }
 
     if (dio == null) {
+      final lastBaseOffset = textController.selection.baseOffset - 1;
       textController.text = previousText.toString();
+      if (lastBaseOffset >= 0 && lastBaseOffset < textController.text.length) {
+        textController.selection = TextSelection.collapsed(offset: lastBaseOffset);
+      } else {
+        textController.selection = TextSelection.collapsed(offset: textController.text.length);
+      }
       return;
     }
+
+    if (widget.isDecimal) {
+      final numParts = textController.text.split('.');
+      if (numParts.length >= 2 && numParts.first.isEmpty) {
+        textController.text = dio.toString();
+        textController.selection = const TextSelection(baseOffset: 0, extentOffset: 1);
+      }
+    }
+
+    actualNumberOnField = dio;
+
     /*
 
     if (minimum > dio) {
@@ -227,29 +292,29 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
   }
 
   void _changeTextController() {
-    _changeText(textController.text);
+    _reactChangeText(textController.text);
   }
 
-  List<Widget> _buildButtons(BuildContext context) {
+  Widget _buildButtons(BuildContext context) {
     final enableIncrease = widget.enable && isValid && actualValue < maximum;
     final enableDecrease = widget.enable && isValid && actualValue > minimum;
 
-    return [
+    return Flex(direction: Axis.vertical, children: [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 3.0),
         child: MaxiTapArea(
           onTouch: enableIncrease ? _increase : null,
-          child: Icon(Icons.add, color: enableIncrease ? Colors.blue.shade700 : Colors.grey),
+          child: Icon(Icons.arrow_drop_up, color: enableIncrease ? Colors.blue.shade700 : Colors.grey),
         ),
       ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 3.0),
         child: MaxiTapArea(
           onTouch: enableDecrease ? _decrease : null,
-          child: Icon(Icons.remove, color: enableDecrease ? Colors.blue.shade700 : Colors.grey),
+          child: Icon(Icons.arrow_drop_down, color: enableDecrease ? Colors.blue.shade700 : Colors.grey),
         ),
       ),
-    ];
+    ]);
   }
 
   void _increase() {
@@ -267,6 +332,53 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       declareChangedValue(value: minimum);
     } else {
       declareChangedValue(value: newValue);
+    }
+  }
+
+  void focusChange() {
+    if (widget.isDecimal) {
+      if (focusNode.hasFocus) {
+        HardwareKeyboard.instance.addHandler(checkPointKey);
+      } else {
+        HardwareKeyboard.instance.removeHandler(checkPointKey);
+      }
+    }
+
+    if (firstSelection) {
+      firstSelection = false;
+      //if (widget.isDecimal) {
+      final intLength = textController.text.split('.').first.length;
+      textController.selection = TextSelection(baseOffset: 0, extentOffset: intLength);
+      //}
+    }
+
+    if (!focusNode.hasFocus) {
+      firstSelection = true;
+      if (textController.text == '') {
+        textController.text = _formatText(minimum);
+        declareChangedValue(value: minimum);
+      }
+    }
+  }
+
+  bool checkPointKey(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.period || event.logicalKey == LogicalKeyboardKey.comma) {
+        if (widget.isDecimal) {
+          scheduleMicrotask(selectDecimalSection);
+        }
+
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void selectDecimalSection() {
+    renderingNewValue(actualValue);
+    final comaPosition = textController.text.indexOf('.');
+    if (comaPosition > -1) {
+      textController.selection = TextSelection(baseOffset: comaPosition + 1, extentOffset: textController.text.length);
     }
   }
 }

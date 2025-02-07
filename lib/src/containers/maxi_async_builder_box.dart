@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 
-class MaxiBuildBox extends StatefulWidget {
-  final List<Stream<bool>> Function() reloaders;
+class MaxiAsyncBuildBox extends StatefulWidget {
+  final FutureOr<List<Stream<bool>>> Function() reloaders;
   final bool cached;
   final Widget Function(BuildContext) builer;
 
-  const MaxiBuildBox({
+  const MaxiAsyncBuildBox({
     super.key,
     required this.reloaders,
     required this.cached,
@@ -16,10 +16,10 @@ class MaxiBuildBox extends StatefulWidget {
   });
 
   @override
-  State<MaxiBuildBox> createState() => _MaxiBuildWidgetState();
+  State<MaxiAsyncBuildBox> createState() => _MaxiBuildWidgetState();
 }
 
-class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> {
+class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiAsyncBuildBox> {
   int stateNumber = 0;
   Widget? savedItem;
 
@@ -29,8 +29,8 @@ class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> {
     getReloadWidgets();
   }
 
-  void getReloadWidgets() {
-    final list = widget.reloaders();
+  Future<void> getReloadWidgets() async {
+    final list = await widget.reloaders();
 
     for (final item in list) {
       joinEvent(

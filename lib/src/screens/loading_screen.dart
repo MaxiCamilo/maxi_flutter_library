@@ -57,6 +57,7 @@ mixin ILoadingScreenOperator<T> {
   bool get isActive;
   void updateValue();
   void reloadWidgets({required bool changeState});
+  void cancel();
 }
 
 class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with ILoadingScreenOperator<T> {
@@ -69,6 +70,8 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
 
   late final QueuingSemaphore updaterSynchronizer;
   ISingleStackScreenOperator? singleStackScreenOperator;
+
+  Completer<T>? waitingForCancellation;
 
   //final executor = Semaphore();
 
@@ -147,13 +150,22 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     // singleStackScreenOperator.changeScreen(newChild: widget.loadingWidget);
 
     await continueOtherFutures();
+    late Future<T> getterPromise;
 
     try {
-      item = await widget.getterValue();
+      waitingForCancellation = Completer<T>();
+      getterPromise = widget.getterValue();
+
+      item = await Future.any([getterPromise, waitingForCancellation!.future]);
+
+      waitingForCancellation?.completeIfIncomplete(item);
+      getterPromise.ignore();
+
+      waitingForCancellation = null;
       if (mounted) {
         if (widget.reloadWidgets == null) {
           singleStackScreenOperator!.changeScreen(
-            newChild: MaxiBuildBox(
+            newChild: MaxiAsyncBuildBox(
               reloaders: () => [_reloader.stream],
               cached: false,
               builer: (x) => widget.builder(x, item),
@@ -161,7 +173,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
           );
         } else {
           singleStackScreenOperator!.changeScreen(
-            newChild: MaxiBuildBox(
+            newChild: MaxiAsyncBuildBox(
               reloaders: () async => [_reloader.stream, ...await widget.reloadWidgets!()],
               cached: false,
               builer: (x) => widget.builder(x, item),
@@ -177,6 +189,9 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
         }
       }
     } catch (ex) {
+      waitingForCancellation?.completeErrorIfIncomplete(ex);
+      getterPromise.ignore();
+
       final error = NegativeResult.searchNegativity(item: ex, actionDescription: tr('Getting value to widget'));
       errorMessage = error.message.toString();
       wasFailed = true;
@@ -245,5 +260,17 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
   void _onCreatedOperator(ISingleStackScreenOperator newOperator) {
     singleStackScreenOperator = newOperator;
     //singleStackScreenOperator!.changeScreen(newChild: widget.loadingWidget);
+  }
+
+  @override
+  void cancel() {
+    waitingForCancellation?.completeErrorIfIncomplete(
+      NegativeResult(
+        identifier: NegativeResultCodes.functionalityCancelled,
+        message: const TranslatableText(message: 'The functionality was canceled'),
+      ),
+    );
+
+    waitingForCancellation = null;
   }
 }

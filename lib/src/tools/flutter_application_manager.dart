@@ -92,10 +92,14 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
       WidgetsFlutterBinding.ensureInitialized();
       _currentDirectory = (await getApplicationDocumentsDirectory()).path;
     } else if (useWorkingPath || (useWorkingPathInDebug && isDebug)) {
-      _currentDirectory = isDebug ? '${Directory.current.path}/debug' : Directory.current.path;
-      if (isDebug && !await Directory(_currentDirectory!).exists()) {
-        await Directory(_currentDirectory!).create();
+      final newRoute = isDebug ? '${Directory.current.path}/debug' : Directory.current.path;
+      await continueOtherFutures();
+      final isExists = Directory(newRoute).existsSync();
+      if (isDebug && !isExists) {
+        await Directory(newRoute).create();
       }
+
+      _currentDirectory = newRoute;
     } else {
       _currentDirectory = DirectoryUtilities.extractFileLocation(fileDirection: Platform.resolvedExecutable, checkPrefix: false);
     }

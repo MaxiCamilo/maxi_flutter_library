@@ -82,6 +82,14 @@ mixin StartableState<R> {
     }
   }
 
+  void cancel() {
+    screenOperator?.cancel();
+    onCancelState();
+  }
+
+  @protected
+  void onCancelState() {}
+
   void onGetValue(R value) {}
 
   void onLoading() {}

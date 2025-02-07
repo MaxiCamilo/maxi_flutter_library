@@ -13,7 +13,10 @@ mixin IFormFieldManager {
   Stream<IFormFieldManager> get notifyErrorListChange;
 
   dynamic getValue({required String propertyName});
+
   NegativeResult? setValue({required String propertyName, required dynamic value});
+  Map<String, NegativeResult> setSeveralValues(Map<String, dynamic> values);
+
   void removeValue({required String propertyName});
 
   bool hasProperty({required String propertyName});

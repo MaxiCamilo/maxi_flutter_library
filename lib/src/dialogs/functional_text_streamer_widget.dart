@@ -270,7 +270,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
   Widget makeRetryButton(BuildContext context) {
     if (!wasExecute) {
       return MaxiTransparentButton(
-        icon: const Icon(Icons.sports_score_outlined),
+        icon: const Icon(Icons.sports_score_outlined, color: Colors.green),
         textColor: Colors.green,
         text: tr('Start'),
         onTouch: startStream,
@@ -279,7 +279,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
 
     if (wasFailure && widget.canRetry) {
       return MaxiTransparentButton(
-        icon: const Icon(Icons.published_with_changes),
+        icon: const Icon(Icons.published_with_changes, color: Colors.yellow),
         textColor: Colors.yellow,
         text: tr('Retry'),
         onTouch: startStream,
@@ -293,7 +293,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     if (isActive) {
       if (widget.canCancel || widget.onCancel != null) {
         return MaxiTransparentButton(
-          icon: const Icon(Icons.close),
+          icon: const Icon(Icons.close, color: Colors.red),
           textColor: Colors.red,
           text: tr('Cancel'),
           onTouch: cancelStream,
@@ -305,7 +305,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
 
     if (widget.onCancel != null) {
       return MaxiTransparentButton(
-        icon: const Icon(Icons.remove),
+        icon: const Icon(Icons.remove, color: Colors.orange),
         textColor: Colors.orange,
         text: tr('Done'),
         onTouch: widget.onCancel,

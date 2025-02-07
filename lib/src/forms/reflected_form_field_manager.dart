@@ -101,6 +101,11 @@ class ReflectedFormFieldManager<T> with IFormFieldManager {
   }
 
   @override
+  Map<String, NegativeResult> setSeveralValues(Map<String, dynamic> values) {
+    return _formOperator.setSeveralValues(values);
+  }
+
+  @override
   void removeValue({required String propertyName}) {
     _formOperator.removeValue(propertyName: propertyName);
   }

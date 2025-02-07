@@ -217,7 +217,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
       _actualValue = managerValue;
       hasValue = true;
     } else {
-      log('Field $propertyName accepts only values of type $T, but a value of ${_actualValue.runtimeType} was returned in the operator');
+      log('Field $propertyName accepts only values of type $T, but a value of "$propertyName"(${managerValue.runtimeType}) was returned in the operator');
       if (widget.getterInitialValue == null) {
         _actualValue = getDefaultValue;
       } else {

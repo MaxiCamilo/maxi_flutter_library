@@ -8,6 +8,7 @@ import 'package:maxi_library/maxi_library.dart';
 class MaxiAnimatedVisible with WidgetAnimator {
   final bool visible;
   final bool maintainState;
+
   final void Function(MaxiAnimatedVisibleState)? onCreated;
 
   const MaxiAnimatedVisible({
@@ -62,6 +63,8 @@ class _MaxiAnimatedVisibleState extends MaxiAnimatedVisibleState {
     super.initState();
     visible = widget.visible;
     maintainState = widget.maintainState;
+    
+
 
     if (widget.onCreated != null) {
       widget.onCreated!(this);

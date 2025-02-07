@@ -90,8 +90,13 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
   @override
   void renderingNewValue(String newValue) {
     if (newValue != textController.text || _wasValid != isValid || (!isValid && lastTextError != lastError.message)) {
-      lastTextError = lastError.message;
-      lastTranslatedErrorText = lastTextError.toString();
+      if (isValid) {
+        lastTranslatedErrorText = '';
+      } else {
+        lastTextError = lastError.message;
+        lastTranslatedErrorText = lastTextError.toString();
+      }
+
       _wasValid = isValid;
       textController.text = newValue;
 
@@ -143,12 +148,13 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
     final wasValid = isValid;
     late final bool nowIsValid;
 
-    if (ApplicationManager.instance.isWeb && textController.selection.start >= 0) {
+    if (/*ApplicationManager.instance.isWeb && */ textController.selection.start >= 0) {
+      final lastErrorText = lastTranslatedErrorText;
       final position = textController.selection.start;
 
       final isCorrect = super.declareChangedValue(value: value);
 
-      if (wasValid != isCorrect) {
+      if (wasValid != isCorrect || lastErrorText != lastTranslatedErrorText) {
         scheduleMicrotask(() {
           textController.value = TextEditingValue(
             text: textController.text,

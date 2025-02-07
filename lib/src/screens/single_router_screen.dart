@@ -7,6 +7,7 @@ import 'package:maxi_library/maxi_library.dart';
 class SingleRouterScreen extends StatefulWidget {
   final Duration duration;
   final Curve curve;
+  
 
   final void Function(StackedScreenOperator)? onCreatedOperator;
 

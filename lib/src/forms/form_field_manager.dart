@@ -59,7 +59,6 @@ class FormFieldManager with IFormFieldManager {
 
     field.discardedField.then((x) => removeField(field: x));
     final subscription = field.notifyValueChanged.listen(_reactFieldChanged);
-
     _mapSubscriptions[field] = subscription;
     fields.add(field);
 
@@ -187,5 +186,19 @@ class FormFieldManager with IFormFieldManager {
     }
 
     _values.remove(propertyName);
+  }
+
+  @override
+  Map<String, NegativeResult> setSeveralValues(Map<String, dynamic> values) {
+    final negativeMap = <String, NegativeResult>{};
+
+    for (final part in values.entries) {
+      final error = setValue(propertyName: part.key, value: part.value);
+      if (error != null) {
+        negativeMap[part.key] = error;
+      }
+    }
+
+    return negativeMap;
   }
 }
