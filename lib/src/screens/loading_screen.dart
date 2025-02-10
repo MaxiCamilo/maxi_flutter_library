@@ -141,7 +141,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
       await continueOtherFutures();
     }
 
-    programmingFailure(reasonFailure: tr('The screen operator has not yet been defined'), function: () => singleStackScreenOperator != null);
+    programmingFailure(reasonFailure: const Oration(message: 'The screen operator has not yet been defined'), function: () => singleStackScreenOperator != null);
 
     await singleStackScreenOperator!.waitForConstruction();
 
@@ -192,7 +192,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
       waitingForCancellation?.completeErrorIfIncomplete(ex);
       getterPromise.ignore();
 
-      final error = NegativeResult.searchNegativity(item: ex, actionDescription: tr('Getting value to widget'));
+      final error = NegativeResult.searchNegativity(item: ex, actionDescription: const Oration(message: 'Getting value to widget'));
       errorMessage = error.message.toString();
       wasFailed = true;
 
@@ -248,7 +248,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
           ),
           const SizedBox(height: 20),
           MaxiTransparentButton(
-            text: const TranslatableText(message: 'Retry'),
+            text: const Oration(message: 'Retry'),
             icon: const Icon(Icons.replay_outlined),
             onTouch: updateValue,
           ),
@@ -267,7 +267,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     waitingForCancellation?.completeErrorIfIncomplete(
       NegativeResult(
         identifier: NegativeResultCodes.functionalityCancelled,
-        message: const TranslatableText(message: 'The functionality was canceled'),
+        message: const Oration(message: 'The functionality was canceled'),
       ),
     );
 

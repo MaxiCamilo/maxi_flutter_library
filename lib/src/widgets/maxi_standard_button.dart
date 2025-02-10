@@ -3,7 +3,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 class MaxiStandardButton extends StatefulWidget {
   final Widget icon;
-  final TranslatableText text;
+  final Oration text;
   final void Function()? onTouch;
   final Color? backgroundColor;
   final Color? textColor;

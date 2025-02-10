@@ -3,9 +3,9 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class QuestionDialog extends StatefulWidget {
-  final TranslatableText text;
-  final TranslatableText firstOption;
-  final TranslatableText secondOption;
+  final Oration text;
+  final Oration firstOption;
+  final Oration secondOption;
   final IconData icon;
   final double rowFrom;
 
@@ -20,17 +20,17 @@ class QuestionDialog extends StatefulWidget {
     required this.onDone,
     this.rowFrom = 400,
     this.icon = Icons.question_mark,
-    this.firstOption = const TranslatableText(message: 'Yes'),
-    this.secondOption = const TranslatableText(message: 'No'),
+    this.firstOption = const Oration(message: 'Yes'),
+    this.secondOption = const Oration(message: 'No'),
     this.iconColor,
     this.iconSize,
   });
 
   static Future<bool?> showMaterialDialog({
     required BuildContext context,
-    required TranslatableText text,
-    TranslatableText firstOption = const TranslatableText(message: 'Yes'),
-    TranslatableText secondOption = const TranslatableText(message: 'No'),
+    required Oration text,
+    Oration firstOption = const Oration(message: 'Yes'),
+    Oration secondOption = const Oration(message: 'No'),
     IconData icon = Icons.question_mark,
     double rowFrom = 400,
     bool barrierDismissible = true,
@@ -55,9 +55,9 @@ class QuestionDialog extends StatefulWidget {
 
   static Future<bool?> showBottomSheet({
     required BuildContext context,
-    required TranslatableText text,
-    TranslatableText firstOption = const TranslatableText(message: 'Yes'),
-    TranslatableText secondOption = const TranslatableText(message: 'No'),
+    required Oration text,
+    Oration firstOption = const Oration(message: 'Yes'),
+    Oration secondOption = const Oration(message: 'No'),
     IconData icon = Icons.question_mark,
     double rowFrom = 400,
   }) async {

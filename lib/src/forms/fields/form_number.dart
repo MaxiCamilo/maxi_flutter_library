@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +7,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 class FormNumber extends OneValueFormField<num> {
   final bool enable;
-  final TranslatableText title;
+  final Oration title;
   final Widget? icon;
   final num? minimum;
   final num? maximum;
@@ -24,7 +23,7 @@ class FormNumber extends OneValueFormField<num> {
     required super.propertyName,
     required this.title,
     required this.isDecimal,
-    super.formalName = TranslatableText.empty,
+    super.formalName = Oration.empty,
     super.key,
     super.manager,
     super.validators,
@@ -248,7 +247,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       declareFailded(
         error: NegativeResult(
           identifier: NegativeResultCodes.invalidValue,
-          message: tr('The minimum accepted is %1', [minimum]),
+          message: Oration(message:'The minimum accepted is %1', [minimum]),
         ),
         value: dio,
       );
@@ -260,7 +259,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       declareFailded(
         error: NegativeResult(
           identifier: NegativeResultCodes.invalidValue,
-          message: tr('The maximum accepted is %1', [maximum]),
+          message: Oration(message:'The maximum accepted is %1', [maximum]),
         ),
         value: dio,
       );
@@ -276,7 +275,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       //textController.text = _formatText(minimum);
       return NegativeResult(
         identifier: NegativeResultCodes.invalidValue,
-        message: tr('The minimum accepted is %1', [minimum]),
+        message: Oration(message: 'The minimum accepted is %1', textParts: [minimum]),
       );
     }
 
@@ -284,7 +283,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       //textController.text = _formatText(maximum);
       return NegativeResult(
         identifier: NegativeResultCodes.invalidValue,
-        message: tr('The maximum accepted is %1', [maximum]),
+        message: Oration(message: 'The maximum accepted is %1', textParts: [maximum]),
       );
     }
 

@@ -51,7 +51,7 @@ class FormFieldManager with IFormFieldManager {
 
   @override
   void addField({required IFormFieldOperator field}) {
-    checkProgrammingFailure(thatChecks: tr('Field %1 is active'), result: () => field.isActive);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'Field %1 is active'), result: () => field.isActive);
 
     if (fields.contains(field)) {
       return;
@@ -70,7 +70,7 @@ class FormFieldManager with IFormFieldManager {
     if (onlyIfIsValid && !isValid) {
       throw NegativeResult(
         identifier: NegativeResultCodes.invalidValue,
-        message: tr('The form has invalid values'),
+        message: const Oration(message: 'The form has invalid values'),
       );
     }
 
@@ -182,7 +182,7 @@ class FormFieldManager with IFormFieldManager {
     }
 
     if (fields.any((x) => x.listenToThatProperty(name: propertyName))) {
-      throw NegativeResult(identifier: NegativeResultCodes.contextInvalidFunctionality, message: tr('property %1 is being used by another field', [propertyName]));
+      throw NegativeResult(identifier: NegativeResultCodes.contextInvalidFunctionality, message: Oration(message: 'property %1 is being used by another field', textParts: [propertyName]));
     }
 
     _values.remove(propertyName);

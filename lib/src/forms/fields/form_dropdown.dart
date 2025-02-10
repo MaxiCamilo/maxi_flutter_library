@@ -34,7 +34,7 @@ class FormDropDown<T> extends OneValueFormField<T> {
   const FormDropDown({
     required super.propertyName,
     required this.optionsBuild,
-    super.formalName = TranslatableText.empty,
+    super.formalName = Oration.empty,
     this.onSelected,
     super.key,
     super.manager,
@@ -86,7 +86,7 @@ class _StateFormDropDown<T> extends OneValueFormFieldImplementation<T, FormDropD
         child: value.value,
       );
     }).toList();
-    checkProgrammingFailure(thatChecks: tr('Options list is not empty'), result: () => _optionWidgets.isNotEmpty);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'Options list is not empty'), result: () => _optionWidgets.isNotEmpty);
     super.initState();
   }
 

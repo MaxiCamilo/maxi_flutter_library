@@ -15,7 +15,7 @@ mixin WidgetAnimator {
     if (result == null) {
       throw NegativeResult(
         identifier: NegativeResultCodes.contextInvalidFunctionality,
-        message: tr('The widget is not encapsulated in a flag named %1', [T]),
+        message: Oration(message: 'The widget is not encapsulated in a flag named %1', textParts: [T]),
       );
     }
 

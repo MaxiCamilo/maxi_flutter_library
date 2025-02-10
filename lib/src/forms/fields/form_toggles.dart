@@ -34,7 +34,7 @@ class FormToggles<T> extends OneValueFormField<List<T>> {
     required this.options,
     required this.selecteds,
     required this.isSingleOption,
-    super.formalName = TranslatableText.empty,
+    super.formalName = Oration.empty,
     this.onSelected,
     super.key,
     super.manager,
@@ -78,7 +78,7 @@ class _StateFormToggles<T> extends OneValueFormFieldImplementation<List<T>, Form
 
   @override
   void initState() {
-    checkProgrammingFailure(thatChecks: tr('Options list is not empty'), result: () => widget.options.isNotEmpty);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'Options list is not empty'), result: () => widget.options.isNotEmpty);
 
     _optionWidgets = widget.options.entries.map<DropdownMenuItem<T>>((MapEntry<T, Widget> value) {
       return DropdownMenuItem<T>(
@@ -89,7 +89,7 @@ class _StateFormToggles<T> extends OneValueFormFieldImplementation<List<T>, Form
 
     _optionsSelecteds = _optionWidgets.map((x) => widget.selecteds.contains(x.value)).toList();
 
-    checkProgrammingFailure(thatChecks: tr('in a single option, there is only one item selected'), result: () => !widget.isSingleOption || _optionsSelecteds.isEmpty || _optionsSelecteds.length == 1);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'in a single option, there is only one item selected'), result: () => !widget.isSingleOption || _optionsSelecteds.isEmpty || _optionsSelecteds.length == 1);
 
     if (widget.isSingleOption) {
       _actualOptionPosition = _optionsSelecteds.selectPosition((x) => x);

@@ -7,7 +7,7 @@ class FormTextListEditor extends OneValueFormField<List<String>> {
   final int? maximumLength;
   final int? minimumLength;
   final List<ValueValidator> itemsValidators;
-  final TranslatableText? title;
+  final Oration? title;
   final Color firstBackgroudColor;
   final Color secondBackgroundColor;
 
@@ -20,7 +20,7 @@ class FormTextListEditor extends OneValueFormField<List<String>> {
     this.minimumLength,
     this.maximumLength,
     this.itemsValidators = const [],
-    super.formalName = TranslatableText.empty,
+    super.formalName = Oration.empty,
     super.key,
     super.manager,
     super.validators,
@@ -70,7 +70,7 @@ class _FormTextListEditorState extends OneValueFormFieldImplementation<List<Stri
 
     if (minimum != null && list.length < minimum!) {
       return NegativeResultValue(
-        message: tr('The list of property %1 has %2 items, but at least %3 items are required', [widget.formalName, list.length, minimum!]),
+        message: Oration(message: 'The list of property %1 has %2 items, but at least %3 items are required', textParts: [widget.formalName, list.length, minimum!]),
         formalName: widget.formalName,
         name: widget.propertyName,
         value: value,
@@ -79,7 +79,7 @@ class _FormTextListEditorState extends OneValueFormFieldImplementation<List<Stri
 
     if (maximum != null && list.length > maximum!) {
       return NegativeResultValue(
-        message: tr('The list of property %1 has %2 items, but a maximum of %3 items is accepted', [widget.formalName, list.length, maximum!]),
+        message: Oration(message: 'The list of property %1 has %2 items, but a maximum of %3 items is accepted', textParts: [widget.formalName, list.length, maximum!]),
         formalName: widget.formalName,
         name: widget.propertyName,
         value: value,
@@ -177,7 +177,7 @@ class _FormTextListEditorState extends OneValueFormFieldImplementation<List<Stri
           Expanded(
             child: FormText(
               propertyName: propertyName,
-              title: TranslatableText.empty,
+              title: Oration.empty,
               getterInitialValue: () => actualValue[position],
               validators: itemValidators,
               onChangeValue: (text, _) => onChangueValue(position: position, text: text),

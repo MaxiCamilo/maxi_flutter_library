@@ -51,11 +51,7 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
   }
 
   static Future<T?> showFutureMaterialDialog<T>(
-      {required BuildContext context,
-      required bool canCancel,
-      required bool canRetry,
-      required FutureOr<T> Function() function,
-      TranslatableText text = const TranslatableText(message: 'Wait for the task to complete its execution')}) {
+      {required BuildContext context, required bool canCancel, required bool canRetry, required FutureOr<T> Function() function, Oration text = const Oration(message: 'Wait for the task to complete its execution')}) {
     return DialogUtilities.showWidgetAsMaterialDialog<T>(
       context: context,
       barrierDismissible: false,
@@ -70,7 +66,7 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
     );
   }
 
-  static Stream<StreamState<TranslatableText, T>> _runAsFuture<T>(FutureOr<T> Function() function, TranslatableText text) async* {
+  static Stream<StreamState<Oration, T>> _runAsFuture<T>(FutureOr<T> Function() function, Oration text) async* {
     yield streamTranslateText(text);
     final result = await function();
     yield streamResult(result);
@@ -86,9 +82,9 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
   bool wasFailure = false;
   bool wasExecute = false;
 
-  late TranslatableText lastText;
+  late Oration lastText;
   T? lastResult;
-  StreamSubscription<StreamState<TranslatableText, T>>? actualStream;
+  StreamSubscription<StreamState<Oration, T>>? actualStream;
 
   @override
   void initState() {
@@ -96,10 +92,10 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
 
     if (widget.startWhenDisplayed) {
       isActive = true;
-      lastText = tr('Starting stream');
+      lastText = const Oration(message: 'Starting stream');
       scheduleMicrotask(strartStream);
     } else {
-      lastText = tr('Press "start" to start the function execution');
+      lastText = const Oration(message: 'Press "start" to start the function execution');
     }
   }
 
@@ -109,14 +105,14 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     isDone = false;
     lastResult = null;
     wasExecute = true;
-    lastText = tr('Starting stream');
+    lastText = const Oration(message: 'Starting stream');
 
     try {
       final stream = await widget.function();
       if (mounted) {
         setState(() {});
       }
-      lastResult = await waitFunctionalStream<TranslatableText, T>(
+      lastResult = await waitFunctionalStream<Oration, T>(
         stream: stream,
         onDoneOrCanceled: reactOnDoneOrCanceled,
         onData: reactNewText,
@@ -130,7 +126,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
       }
     } catch (ex) {
       wasFailure = true;
-      final lastError = NegativeResult.searchNegativity(item: ex, actionDescription: tr('Obtaining a functional stream'));
+      final lastError = NegativeResult.searchNegativity(item: ex, actionDescription: const Oration(message: 'Obtaining a functional stream'));
       if (widget.onError != null) {
         widget.onError!(lastError);
       }
@@ -164,7 +160,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     } else {
       final lastError = NegativeResult(
         identifier: NegativeResultCodes.functionalityCancelled,
-        message: tr('The functionality was canceled'),
+        message: const Oration(message: 'The functionality was canceled'),
       );
 
       lastText = lastError.message;
@@ -183,7 +179,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     }
   }
 
-  void reactNewText(TranslatableText text) {
+  void reactNewText(Oration text) {
     if (!mounted) {
       return;
     }
@@ -196,7 +192,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
   void startStream() {
     if (!isActive) {
       isActive = true;
-      lastText = tr('Starting stream');
+      lastText = const Oration(message: 'Starting stream');
 
       scheduleMicrotask(strartStream);
       setState(() {});
@@ -272,7 +268,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
       return MaxiTransparentButton(
         icon: const Icon(Icons.sports_score_outlined, color: Colors.green),
         textColor: Colors.green,
-        text: tr('Start'),
+        text: const Oration(message: 'Start'),
         onTouch: startStream,
       );
     }
@@ -281,7 +277,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
       return MaxiTransparentButton(
         icon: const Icon(Icons.published_with_changes, color: Colors.yellow),
         textColor: Colors.yellow,
-        text: tr('Retry'),
+        text: const Oration(message: 'Retry'),
         onTouch: startStream,
       );
     }
@@ -295,7 +291,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
         return MaxiTransparentButton(
           icon: const Icon(Icons.close, color: Colors.red),
           textColor: Colors.red,
-          text: tr('Cancel'),
+          text: const Oration(message: 'Cancel'),
           onTouch: cancelStream,
         );
       } else {
@@ -307,7 +303,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
       return MaxiTransparentButton(
         icon: const Icon(Icons.remove, color: Colors.orange),
         textColor: Colors.orange,
-        text: tr('Done'),
+        text: const Oration(message: 'Done'),
         onTouch: widget.onCancel,
       );
     }

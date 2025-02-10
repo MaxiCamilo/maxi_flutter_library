@@ -7,7 +7,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 class FormText extends OneValueFormField<String> {
   final bool enable;
-  final TranslatableText title;
+  final Oration title;
   final int? maxCharacter;
   final int? maxLines;
   final TextInputAction? inputAction;
@@ -20,7 +20,7 @@ class FormText extends OneValueFormField<String> {
   const FormText({
     required super.propertyName,
     required this.title,
-    super.formalName = TranslatableText.empty,
+    super.formalName = Oration.empty,
     super.key,
     super.getterInitialValue,
     super.manager,
@@ -53,7 +53,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
   late int? _maxLines;
   late String title;
 
-  TranslatableText lastTextError = TranslatableText.empty;
+  Oration lastTextError = Oration.empty;
 
   String lastTranslatedErrorText = '';
 

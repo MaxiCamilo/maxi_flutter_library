@@ -3,7 +3,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class ErrorLabelTemplate extends StatelessWidget {
-  final TranslatableText message;
+  final Oration message;
   final bool expand;
   final Color iconColor;
   final double iconSize;

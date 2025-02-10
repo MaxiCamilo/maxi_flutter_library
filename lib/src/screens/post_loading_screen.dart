@@ -122,7 +122,7 @@ class _PostLoadingScreenState<T> extends StateWithLifeCycle<PostLoadingScreen<T>
         widget.onResult!(result);
       }
     } catch (ex, st) {
-      final rn = NegativeResult.searchNegativity(item: ex, actionDescription: tr('Loading data'), stackTrace: st);
+      final rn = NegativeResult.searchNegativity(item: ex, actionDescription: const Oration(message: 'Loading data'), stackTrace: st);
       if (widget.errorBuilder == null) {
         if (mounted) {
           screenOperator.changeScreen(newChild: ErrorLabelTemplate(message: rn.message));

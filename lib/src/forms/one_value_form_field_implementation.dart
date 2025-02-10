@@ -8,7 +8,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 abstract class OneValueFormField<T> extends StatefulWidget {
   final String propertyName;
-  final TranslatableText formalName;
+  final Oration formalName;
   final IFormFieldManager? manager;
   final T Function()? getterInitialValue;
   final void Function(T, NegativeResult?)? onChangeValue;

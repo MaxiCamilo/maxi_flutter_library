@@ -180,7 +180,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
         lastResult = await widget.valueGetter(widget.ascendant ? lastID + 1 : lastID - 1);
       }
     } catch (ex) {
-      lastError = NegativeResult.searchNegativity(item: ex, actionDescription: tr('Getting values from %1', [lastID]));
+      lastError = NegativeResult.searchNegativity(item: ex, actionDescription: Oration(message: 'Getting values from %1', textParts:[lastID]));
       isLoading = false;
       reloadWidgets(changeState: false);
       return;

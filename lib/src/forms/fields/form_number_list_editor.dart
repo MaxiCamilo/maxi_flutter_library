@@ -9,7 +9,7 @@ class FormNumberListEditor extends OneValueFormField<List<num>> {
   final double? maximumValue;
   final double? minimumValue;
   final List<ValueValidator> itemsValidators;
-  final TranslatableText? title;
+  final Oration? title;
   final Color firstBackgroudColor;
   final Color secondBackgroundColor;
   final bool isDecimal;
@@ -28,7 +28,7 @@ class FormNumberListEditor extends OneValueFormField<List<num>> {
     this.maximumValue,
     this.minimumValue,
     this.itemsValidators = const [],
-    super.formalName = TranslatableText.empty,
+    super.formalName = Oration.empty,
     super.key,
     super.manager,
     super.validators,
@@ -78,7 +78,7 @@ class _FormNumberListEditorState extends OneValueFormFieldImplementation<List<nu
 
     if (minimumLength != null && list.length < minimumLength!) {
       return NegativeResultValue(
-        message: tr('The list of property %1 has %2 items, but at least %3 items are required', [widget.formalName, list.length, minimumLength!]),
+        message: Oration(message: 'The list of property %1 has %2 items, but at least %3 items are required', textParts:[widget.formalName, list.length, minimumLength!]),
         formalName: widget.formalName,
         name: widget.propertyName,
         value: value,
@@ -87,7 +87,7 @@ class _FormNumberListEditorState extends OneValueFormFieldImplementation<List<nu
 
     if (maximumLength != null && list.length > maximumLength!) {
       return NegativeResultValue(
-        message: tr('The list of property %1 has %2 items, but a maximum of %3 items is accepted', [widget.formalName, list.length, maximumLength!]),
+        message: Oration(message: 'The list of property %1 has %2 items, but a maximum of %3 items is accepted',textParts: [widget.formalName, list.length, maximumLength!]),
         formalName: widget.formalName,
         name: widget.propertyName,
         value: value,
@@ -185,7 +185,7 @@ class _FormNumberListEditorState extends OneValueFormFieldImplementation<List<nu
           Expanded(
             child: FormNumber(
               propertyName: propertyName,
-              title: TranslatableText.empty,
+              title: Oration.empty,
               isDecimal: widget.isDecimal,
               minimum: widget.minimumValue,
               maximum: widget.maximumValue,

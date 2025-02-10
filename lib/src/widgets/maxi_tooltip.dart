@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class MaxiTooltip extends StatefulWidget {
-  final TranslatableText text;
+  final Oration text;
   final Widget child;
 
   const MaxiTooltip({super.key, required this.text, required this.child});
@@ -13,7 +13,7 @@ class MaxiTooltip extends StatefulWidget {
 
 class _MaxiTooltipState extends State<MaxiTooltip> {
   late String translatedText;
-  late TranslatableText text;
+  late Oration text;
 
   @override
   void initState() {

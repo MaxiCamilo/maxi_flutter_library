@@ -7,7 +7,6 @@ import 'package:maxi_library/maxi_library.dart';
 class SingleRouterScreen extends StatefulWidget {
   final Duration duration;
   final Curve curve;
-  
 
   final void Function(StackedScreenOperator)? onCreatedOperator;
 
@@ -89,8 +88,8 @@ class _SingleRouterScreenState extends State<SingleRouterScreen> with StackedScr
       return;
     }
 
-    checkProgrammingFailure(thatChecks: tr('Must be built before'), result: () => wasBuilt);
-    checkProgrammingFailure(thatChecks: tr('Single stacked screen  is still active'), result: () => mounted);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'Must be built before'), result: () => wasBuilt);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'Single stacked screen  is still active'), result: () => mounted);
 
     _sincronizer.execute(function: () => _pushScreen(newWidget: newWidget, curve: curve, duration: duration));
   }
@@ -181,8 +180,8 @@ class _SingleRouterScreenState extends State<SingleRouterScreen> with StackedScr
       return;
     }
 
-    checkProgrammingFailure(thatChecks: tr('Single stacked screen  is still active'), result: () => mounted);
-    checkProgrammingFailure(thatChecks: tr('Must be built before'), result: () => wasBuilt);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'Single stacked screen  is still active'), result: () => mounted);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'Must be built before'), result: () => wasBuilt);
 
     final position = children.length - 1;
 
@@ -201,8 +200,8 @@ class _SingleRouterScreenState extends State<SingleRouterScreen> with StackedScr
 
   @override
   void resetScreen({required Widget newWidget, Duration? duration, Curve? curve}) {
-    checkProgrammingFailure(thatChecks: tr('Must be built before'), result: () => wasBuilt);
-    checkProgrammingFailure(thatChecks: tr('Single stacked screen  is still active'), result: () => mounted);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'Must be built before'), result: () => wasBuilt);
+    checkProgrammingFailure(thatChecks: const Oration(message: 'Single stacked screen  is still active'), result: () => mounted);
     _sincronizer.execute(function: () {
       if (children.isEmpty) {
         return _pushScreen(newWidget: newWidget, curve: curve, duration: duration);

@@ -14,7 +14,7 @@ abstract class StateReflectionFieldImplementation<T extends ReflectionFieldImple
   late final ITypeEntityReflection classReflection;
   late final IFieldReflection fieldReflection;
 
-  TranslatableText get formalName => fieldReflection.formalName;
+  Oration get formalName => fieldReflection.formalName;
   List<ValueValidator> get validators => fieldReflection.validators;
 
   @override
@@ -22,6 +22,7 @@ abstract class StateReflectionFieldImplementation<T extends ReflectionFieldImple
     super.initState();
 
     classReflection = ReflectionManager.getReflectionEntity(widget.entityType);
-    fieldReflection = volatile(detail: tr('Property %1 was not found on entity %2', [widget.propertyName, classReflection.name]), function: () => classReflection.fields.selectItem((x) => x.name == widget.propertyName)!);
+    fieldReflection =
+        volatile(detail: Oration(message: 'Property %1 was not found on entity %2', textParts:[widget.propertyName, classReflection.name]), function: () => classReflection.fields.selectItem((x) => x.name == widget.propertyName)!);
   }
 }

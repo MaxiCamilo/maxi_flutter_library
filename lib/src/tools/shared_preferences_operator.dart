@@ -21,7 +21,7 @@ class SharedPreferencesOperator with IFileOperator {
   SharedPreferencesOperator({required String route}) : route = route.replaceAll('\\', '/').replaceAll('${DirectoryUtilities.prefixRouteLocal}/', '').replaceAll(DirectoryUtilities.prefixRouteLocal, '');
 
   Future<String?> _getKey() {
-    return volatile(detail: tr('An error occurred while reading key %1 in local storage'), function: () => _prefs.getString(route));
+    return volatile(detail: const Oration(message: 'An error occurred while reading key %1 in local storage'), function: () => _prefs.getString(route));
   }
 
   @override
@@ -73,11 +73,11 @@ class SharedPreferencesOperator with IFileOperator {
     if (value == null) {
       throw NegativeResult(
         identifier: NegativeResultCodes.nonExistent,
-        message: tr('The file located at %1 cannot be read because it does not exist', [route]),
+        message: Oration(message: 'The file located at %1 cannot be read because it does not exist', textParts:[route]),
       );
     }
 
-    return volatile(detail: tr('File %1 does not have a valid base64 format'), function: () => base64.decode(value));
+    return volatile(detail:const Oration(message: 'File %1 does not have a valid base64 format'), function: () => base64.decode(value));
   }
 
   @override
@@ -97,7 +97,7 @@ class SharedPreferencesOperator with IFileOperator {
     if (value == null) {
       throw NegativeResult(
         identifier: NegativeResultCodes.nonExistent,
-        message: tr('The file located at %1 cannot be read because it does not exist', [route]),
+        message: Oration(message: 'The file located at %1 cannot be read because it does not exist',textParts: [route]),
       );
     }
     return value;
@@ -119,7 +119,7 @@ class SharedPreferencesOperator with IFileOperator {
     if (routeSplit.length < 2) {
       throw NegativeResult(
         identifier: NegativeResultCodes.contextInvalidFunctionality,
-        message: tr('Cannot download more from the folder'),
+        message:const Oration(message: 'Cannot download more from the folder'),
       );
     }
 

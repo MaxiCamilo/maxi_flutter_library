@@ -4,7 +4,7 @@ import 'package:maxi_flutter_library/src/forms/reflection_field_implementation.d
 import 'package:maxi_library/maxi_library.dart';
 
 class ReflectedTextListEditorForm extends ReflectionFieldImplementation {
-  final TranslatableText? title;
+  final Oration? title;
   final bool useListView;
   final Color firstBackgroudColor;
   final Color secondBackgroundColor;

@@ -4,7 +4,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 class FormDateButton extends OneValueFormField<DateTime> {
   final Widget? icon;
-  final TranslatableText? textIfEmpty;
+  final Oration? textIfEmpty;
   final Color? backgroundColor;
   final Color? textColor;
   final Color? borderColors;
@@ -21,7 +21,7 @@ class FormDateButton extends OneValueFormField<DateTime> {
     required super.propertyName,
     required this.firstDate,
     required this.lastDate,
-    super.formalName = TranslatableText.empty,
+    super.formalName = Oration.empty,
     super.manager,
     super.validators,
     super.onChangeValue,
@@ -44,7 +44,7 @@ class FormDateButton extends OneValueFormField<DateTime> {
 
 class _FormDateButton extends OneValueFormFieldImplementation<DateTime, FormDateButton> {
   DateTime? actualDate;
-  late TranslatableText buttonText;
+  late Oration buttonText;
 
   @override
   DateTime get getDefaultValue => actualDate ?? DateTime.now();
@@ -54,9 +54,9 @@ class _FormDateButton extends OneValueFormFieldImplementation<DateTime, FormDate
     actualDate = widget.initialDate;
 
     if (actualDate == null) {
-      buttonText = TranslatableText.empty;
+      buttonText = Oration.empty;
     } else {
-      buttonText = AlreadyTranslatedText(message: TextUtilities.formatDate(actualDate!, putTime: false));
+      buttonText = TranslatedOration(message: TextUtilities.formatDate(actualDate!, putTime: false));
     }
 
     super.initState();
@@ -65,7 +65,7 @@ class _FormDateButton extends OneValueFormFieldImplementation<DateTime, FormDate
   @override
   void renderingNewValue(DateTime newValue) {
     actualDate = newValue;
-    buttonText = AlreadyTranslatedText(message: TextUtilities.formatDate(actualDate!, putTime: false));
+    buttonText = TranslatedOration(message: TextUtilities.formatDate(actualDate!, putTime: false));
 
     if (mounted) {
       setState(() {});

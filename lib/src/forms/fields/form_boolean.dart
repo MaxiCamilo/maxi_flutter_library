@@ -5,11 +5,11 @@ import 'package:maxi_library/maxi_library.dart';
 class FormBoolean extends OneValueFormField<bool> {
   final bool useSwitch;
   final bool expandHorizontally;
-  final TranslatableText description;
+  final Oration description;
 
   const FormBoolean({
     required super.propertyName,
-    super.formalName = TranslatableText.empty,
+    super.formalName = Oration.empty,
     super.key,
     super.manager,
     super.getterInitialValue,

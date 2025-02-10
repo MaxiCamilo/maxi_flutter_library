@@ -20,7 +20,7 @@ class SingleStackScreen extends StatefulWidget {
   });
 
   static ISingleStackScreenOperator getOperatorByAncestor(BuildContext context) {
-    return volatile(detail: tr('Not encapsulated in Single stack screen'), function: () => WidgetUtilities.findAncestorState<_SingleStackScreenState>(context)!);
+    return volatile(detail: const Oration(message: 'Not encapsulated in Single stack screen'), function: () => WidgetUtilities.findAncestorState<_SingleStackScreenState>(context)!);
   }
 
   @override
@@ -142,6 +142,10 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
 
   Future<void> _changeScreen({required Widget newChild, Duration? duration, Curve? curve}) async {
     await Future.delayed(Duration.zero);
+
+    if (!mounted) {
+      throw NegativeResult(identifier: NegativeResultCodes.implementationFailure, message: const Oration(message: 'You can\'t change the screen of a widget that no longer exists'));
+    }
 
     if (duration != null && this.duration != duration) {
       this.duration = duration;

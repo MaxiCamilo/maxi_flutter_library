@@ -11,7 +11,7 @@ class ErrorDialog extends StatelessWidget {
   final double? textSize;
   final IconData icon;
   final double rowFrom;
-  final TranslatableText doneButtonText;
+  final Oration doneButtonText;
 
   final void Function() onDone;
 
@@ -24,7 +24,7 @@ class ErrorDialog extends StatelessWidget {
       this.icon = Icons.warning,
       this.rowFrom = 400,
       this.textSize,
-      this.doneButtonText = const TranslatableText(message: 'Done')});
+      this.doneButtonText = const Oration(message: 'Done')});
 
   static Future<void> showMaterialDialog({
     required BuildContext context,
@@ -35,7 +35,7 @@ class ErrorDialog extends StatelessWidget {
     IconData icon = Icons.warning,
     double rowFrom = 400,
     EdgeInsets? padding,
-    TranslatableText doneButtonText = const TranslatableText(message: 'Done'),
+    Oration doneButtonText = const Oration(message: 'Done'),
   }) {
     return DialogUtilities.showWidgetAsMaterialDialog(
       context: context,
@@ -64,7 +64,7 @@ class ErrorDialog extends StatelessWidget {
     IconData icon = Icons.warning,
     double rowFrom = 400,
     EdgeInsets? padding,
-    TranslatableText doneButtonText = const TranslatableText(message: 'Understood'),
+    Oration doneButtonText = const Oration(message: 'Understood'),
   }) {
     return DialogUtilities.showWidgetAsBottomSheet(
       context: context,

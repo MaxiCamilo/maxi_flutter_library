@@ -35,7 +35,7 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
   void initState() {
     super.initState();
 
-    enumType = volatile(detail: tr('Property %1 is not an Enum', [widget.propertyName]), function: () => fieldReflection.reflectedType as TypeEnumeratorReflector);
+    enumType = volatile(detail: Oration(message: 'Property %1 is not an Enum', textParts: [widget.propertyName]), function: () => fieldReflection.reflectedType as TypeEnumeratorReflector);
 
     widgetOptions = {};
     for (final opt in optionsList) {
@@ -95,23 +95,23 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
   Enum _convertRawValue(rawInitialValue) {
     if (rawInitialValue is int) {
       return volatile(
-        detail: tr('Option %1 not found in the enumeration', [rawInitialValue]),
+        detail: Oration(message: 'Option %1 not found in the enumeration', textParts: [rawInitialValue]),
         function: () => optionsList.selectItem((x) => x.position == rawInitialValue)!.value,
       );
     } else if (rawInitialValue is String) {
       return volatile(
-        detail: tr('Option %1 not found in the enumeration', [rawInitialValue]),
+        detail: Oration(message: 'Option %1 not found in the enumeration', textParts: [rawInitialValue]),
         function: () => optionsList.selectItem((x) => x.name.toLowerCase() == rawInitialValue.toLowerCase())!.value,
       );
     } else if (rawInitialValue is Enum) {
       return volatile(
-        detail: tr('Option %1 not found in the enumeration', [rawInitialValue]),
+        detail: Oration(message: 'Option %1 not found in the enumeration', textParts: [rawInitialValue]),
         function: () => optionsList.selectItem((x) => x.value == rawInitialValue)!.value,
       );
     } else {
       throw NegativeResult(
         identifier: NegativeResultCodes.wrongType,
-        message: tr('This widget only uses integer, string or Enum values;  but a type %1 was defined', [rawInitialValue.runtimeType]),
+        message: Oration(message: 'This widget only uses integer, string or Enum values;  but a type %1 was defined', textParts: [rawInitialValue.runtimeType]),
       );
     }
   }

@@ -6,7 +6,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 class ReflectedFormText extends ReflectionFieldImplementation {
   final bool enable;
-  final TranslatableText? title;
+  final Oration? title;
   final int? maxCharacter;
   final int? maxLines;
   final TextInputAction? inputAction;
@@ -34,16 +34,16 @@ class ReflectedFormText extends ReflectionFieldImplementation {
 }
 
 class _StateReflectedFormText extends StateReflectionFieldImplementation<ReflectedFormText> {
-  late final AlreadyTranslatedText _translatedTitle;
+  late final TranslatedOration _translatedTitle;
 
   @override
   void initState() {
     super.initState();
 
     if (widget.title == null) {
-      _translatedTitle = AlreadyTranslatedText.translate(text: formalName);
+      _translatedTitle = TranslatedOration.translate(text: formalName);
     } else {
-      _translatedTitle = AlreadyTranslatedText.translate(text: widget.title!);
+      _translatedTitle = TranslatedOration.translate(text: widget.title!);
     }
   }
 
@@ -62,7 +62,6 @@ class _StateReflectedFormText extends StateReflectionFieldImplementation<Reflect
       validators: validators,
       onChangeValue: widget.onChangeValue,
       onSubmitted: widget.onSubmitted,
-      
     );
   }
 }

@@ -54,13 +54,13 @@ mixin DialogUtilities {
     );
   }
 
-  static Future<XFile?> selectFile({String? initialAddress, List<XTypeGroup> filter = const [], TranslatableText? title}) async {
+  static Future<XFile?> selectFile({String? initialAddress, List<XTypeGroup> filter = const [], Oration? title}) async {
     initialAddress ??= await ApplicationManager.instance.getCurrentDirectory();
 
     return openFile(confirmButtonText: title?.toString(), initialDirectory: initialAddress, acceptedTypeGroups: filter);
   }
 
-  static Future<String?> selectFolder({String? initialAddress, TranslatableText? title}) async {
+  static Future<String?> selectFolder({String? initialAddress, Oration? title}) async {
     initialAddress ??= await ApplicationManager.instance.getCurrentDirectory();
 
     return getDirectoryPath(confirmButtonText: title?.toString(), initialDirectory: initialAddress);
@@ -72,7 +72,7 @@ mixin DialogUtilities {
     String? initialAddress,
     List<XTypeGroup> filter = const [],
     bool askIfWantReplace = true,
-    TranslatableText? title,
+    Oration? title,
     String? suggestiveName,
   }) async {
     initialAddress ??= await ApplicationManager.instance.getCurrentDirectory();
@@ -96,7 +96,7 @@ mixin DialogUtilities {
       }
       if (await QuestionDialog.showMaterialDialog(
             context: context,
-            text: const TranslatableText(message: 'The file already exists, do you want to replace it?'),
+            text: const Oration(message: 'The file already exists, do you want to replace it?'),
             icon: Icons.warning,
             iconColor: Colors.orangeAccent,
           ) !=

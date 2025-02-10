@@ -5,7 +5,7 @@ import 'package:maxi_library/maxi_library.dart';
 
 class ReflectedFormNumber extends ReflectionFieldImplementation {
   final bool enable;
-  final TranslatableText? title;
+  final Oration? title;
   final Widget? icon;
   final double interval;
   final bool showButtons;
@@ -31,7 +31,7 @@ class ReflectedFormNumber extends ReflectionFieldImplementation {
 }
 
 class _StateReflectedFormNumber extends StateReflectionFieldImplementation<ReflectedFormNumber> {
-  late final TranslatableText _translatedTitle;
+  late final Oration _translatedTitle;
 
   @override
   void initState() {

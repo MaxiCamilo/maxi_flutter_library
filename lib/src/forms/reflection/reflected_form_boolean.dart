@@ -6,7 +6,7 @@ import 'package:maxi_library/maxi_library.dart';
 class ReflectedFormBoolean extends ReflectionFieldImplementation {
   final bool useSwitch;
   final bool expandHorizontally;
-  final TranslatableText? description;
+  final Oration? description;
 
   const ReflectedFormBoolean({
     super.key,
@@ -23,7 +23,7 @@ class ReflectedFormBoolean extends ReflectionFieldImplementation {
 }
 
 class _StateReflectedFormBoolean extends StateReflectionFieldImplementation<ReflectedFormBoolean> {
-  late final TranslatableText _translatedDescription;
+  late final Oration _translatedDescription;
 
   @override
   void initState() {

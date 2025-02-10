@@ -3,7 +3,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class MaxiTranslatableText extends StatefulWidget {
-  final TranslatableText text;
+  final Oration text;
   final double? size;
   final bool bold;
   final Color? color;
@@ -31,7 +31,7 @@ class MaxiTranslatableText extends StatefulWidget {
 }
 
 class _MaxiTranslatableTextState extends StateWithLifeCycle<MaxiTranslatableText> {
-  late TranslatableText _originalText;
+  late Oration _originalText;
   late String _text;
 
   @override
@@ -41,7 +41,7 @@ class _MaxiTranslatableTextState extends StateWithLifeCycle<MaxiTranslatableText
 /*
   @override
   void reloadWidget(value) {
-    if (value is TranslatableText) {
+    if (value is Oration) {
       _originalText = value.message;
       _text = value.toString();
     }

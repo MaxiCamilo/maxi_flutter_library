@@ -39,8 +39,8 @@ class MaxiSelectableList<T> extends StatefulWidget {
 
   Future<List<int>?> showDialog({
     required BuildContext context,
-    TranslatableText? title,
-    TranslatableText? buttonDone,
+    Oration? title,
+    Oration? buttonDone,
     double? width,
     IconData doneIcon = Icons.done,
   }) {
@@ -125,7 +125,7 @@ class MaxiSelectableList<T> extends StatefulWidget {
               child: MaxiTransparentButton(
                 icon: Icon(doneIcon),
                 textColor: Colors.green,
-                text: buttonDone ?? const TranslatableText(message: 'Done'),
+                text: buttonDone ?? const Oration(message: 'Done'),
                 onTouch: () => dialogOperator.defineResult(context, listOperator?.selectedIdentifiers),
               ),
             ),
@@ -215,7 +215,7 @@ class _MaxiSelectableListState<T> extends StateWithLifeCycle<MaxiSelectableList<
         FormBoolean(
           propertyName: id.toString(),
           expandHorizontally: false,
-          description: TranslatableText.empty,
+          description: Oration.empty,
           useSwitch: false,
           manager: formOperator,
           onChangeValue: (x, _) => onTouchItemChecked(id, x),

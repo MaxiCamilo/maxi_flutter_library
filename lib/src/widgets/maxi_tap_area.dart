@@ -13,7 +13,7 @@ class MaxiTapArea extends StatelessWidget {
   final Color? backgroundColorOnMouseover;
   final Color? backgroundColorOnTouch;
   final Color? backgroundColorOnFocus;
-  final TranslatableText? tooltipText;
+  final Oration? tooltipText;
 
   const MaxiTapArea({
     super.key,

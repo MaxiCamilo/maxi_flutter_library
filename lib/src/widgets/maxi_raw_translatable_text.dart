@@ -29,7 +29,7 @@ class MaxiRawTranslatableText extends StatefulWidget {
 }
 
 class _MaxiRawTranslatableTextState extends State<MaxiRawTranslatableText> {
-  late TranslatableText text;
+  late Oration text;
 
   late String lastRawText;
 
@@ -44,19 +44,19 @@ class _MaxiRawTranslatableTextState extends State<MaxiRawTranslatableText> {
     lastRawText = newText;
 
     if (newText.isEmpty) {
-      text = TranslatableText.empty;
+      text = Oration.empty;
       return;
     }
 
     final mapText = ConverterUtilities.interpretToObjectJson(text: newText);
-    final mapType = volatile(detail: const TranslatableText(message: 'Message type required'), function: () => mapText['\$type']);
+    final mapType = volatile(detail: const Oration(message: 'Message type required'), function: () => mapText['\$type']);
 
-    if (mapType == 'TranslatableText') {
-      text = TranslatableText.interpretFromJson(text: mapText);
+    if (mapType == 'Oration') {
+      text = Oration.interpretFromJson(text: mapText);
     } else if (mapType.startsWith('error')) {
       text = NegativeResult.interpret(values: mapText, checkTypeFlag: true).message;
     } else {
-      text = TranslatableText(message: 'INVALID TEXT TYPE (Format: %1)', textParts: [mapType]);
+      text = Oration(message: 'INVALID TEXT TYPE (Format: %1)', textParts: [mapType]);
     }
   }
 
