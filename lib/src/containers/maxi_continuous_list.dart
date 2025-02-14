@@ -42,7 +42,7 @@ mixin MaxiContinuousListOperator<T> {
   bool get isLoading;
   Stream<MaxiContinuousListOperator<T>> get onValueUpdate;
   set ascendant(bool value);
-  updateValue();
+  void updateValue();
 }
 
 class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<T>> with StartableState<void>, MaxiContinuousListOperator<T> {

@@ -217,11 +217,17 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
       _actualValue = managerValue;
       hasValue = true;
     } else {
-      log('Field $propertyName accepts only values of type $T, but a value of "$propertyName"(${managerValue.runtimeType}) was returned in the operator');
-      if (widget.getterInitialValue == null) {
-        _actualValue = getDefaultValue;
+      final otherValue = convertUnknownValue(managerValue);
+      if (otherValue == null) {
+        log('Field $propertyName accepts only values of type $T, but a value of "$propertyName"(${managerValue.runtimeType}) was returned in the operator');
+        if (widget.getterInitialValue == null) {
+          _actualValue = getDefaultValue;
+        } else {
+          _actualValue = widget.getterInitialValue!();
+        }
       } else {
-        _actualValue = widget.getterInitialValue!();
+        _actualValue = otherValue;
+        hasValue = true;
       }
     }
 
@@ -235,6 +241,11 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
     if (!hasValue) {
       manager.setValue(propertyName: propertyName, value: _actualValue);
     }
+  }
+
+  @protected
+  T? convertUnknownValue(dynamic value) {
+    return null;
   }
 
   @override

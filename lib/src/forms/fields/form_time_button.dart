@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class FormDateButton extends OneValueFormField<DateTime> {
+class FormTimeButton extends OneValueFormField<DateTime> {
   final Widget? icon;
   final Oration? textIfEmpty;
   final Color? backgroundColor;
@@ -12,15 +12,11 @@ class FormDateButton extends OneValueFormField<DateTime> {
   final double circularRadius;
   final double borderWidth;
   final DateTime? initialDate;
-  final DateTime firstDate;
-  final DateTime lastDate;
   final void Function(DateTime)? onChangeDate;
 
-  const FormDateButton({
+  const FormTimeButton({
     super.key,
     required super.propertyName,
-    required this.firstDate,
-    required this.lastDate,
     super.formalName = Oration.empty,
     super.manager,
     super.validators,
@@ -39,10 +35,10 @@ class FormDateButton extends OneValueFormField<DateTime> {
   });
 
   @override
-  OneValueFormFieldImplementation<DateTime, OneValueFormField<DateTime>> createState() => _FormDateButton();
+  OneValueFormFieldImplementation<DateTime, OneValueFormField<DateTime>> createState() => _FormTimeButton();
 }
 
-class _FormDateButton extends OneValueFormFieldImplementation<DateTime, FormDateButton> {
+class _FormTimeButton extends OneValueFormFieldImplementation<DateTime, FormTimeButton> {
   DateTime? actualDate;
   late Oration buttonText;
 
@@ -56,16 +52,20 @@ class _FormDateButton extends OneValueFormFieldImplementation<DateTime, FormDate
     if (actualDate == null) {
       buttonText = Oration.empty;
     } else {
-      buttonText = TranslatedOration(message: TextUtilities.formatDate(actualDate!, putTime: false));
+      buttonText = _createText();
     }
 
     super.initState();
   }
 
+  Oration _createText() {
+    return TranslatedOration(message: '${actualDate?.hour}:${actualDate?.minute}');
+  }
+
   @override
   void renderingNewValue(DateTime newValue) {
     actualDate = newValue;
-    buttonText = TranslatedOration(message: TextUtilities.formatDate(actualDate!, putTime: false));
+    buttonText = _createText();
 
     if (mounted) {
       setState(() {});
@@ -88,18 +88,26 @@ class _FormDateButton extends OneValueFormFieldImplementation<DateTime, FormDate
   }
 
   Future<void> _onTouch() async {
-    final result = await showDatePicker(
+    final result = await showTimePicker(
       context: context,
-      initialEntryMode: DatePickerEntryMode.calendarOnly,
-      initialDate: actualDate,
-      firstDate: widget.firstDate,
-      lastDate: widget.lastDate,
+      initialTime: TimeOfDay.fromDateTime(actualValue),
+      cancelText: const Oration(message: 'Cancel').toString(),
+      confirmText: const Oration(message: 'Done').toString(),
     );
 
     if (result != null) {
-      declareChangedValue(value: result);
+      actualDate ??= DateTime.now();
+      final newValue = DateTime(
+        actualDate!.year,
+        actualDate!.month,
+        actualDate!.day,
+        result.hour,
+        result.minute,
+        0,
+      );
+      declareChangedValue(value: newValue);
       if (widget.onChangeDate != null) {
-        widget.onChangeDate!(result);
+        widget.onChangeDate!(newValue);
       }
     }
   }
