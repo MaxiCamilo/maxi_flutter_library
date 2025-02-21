@@ -12,7 +12,6 @@ export 'package:maxi_flutter_library/src/forms/fields/form_toggles.dart';
 export 'package:maxi_flutter_library/src/forms/fields/form_date_time_button.dart';
 export 'package:maxi_flutter_library/src/forms/fields/form_text_list_editor.dart';
 export 'package:maxi_flutter_library/src/forms/fields/form_number_list_editor.dart';
-export 'package:maxi_flutter_library/src/forms/fields/form_time_button.dart';
 
 export 'package:maxi_flutter_library/src/forms/reflection/reflected_form_boolean.dart';
 export 'package:maxi_flutter_library/src/forms/reflection/reflected_form_enum.dart';

@@ -17,3 +17,5 @@ export 'package:maxi_flutter_library/src/containers/maxi_basic_list.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_continuous_list.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_vertical_hider.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_rectangle.dart';
+export 'package:maxi_flutter_library/src/containers/maxi_animated_rectangle.dart';
+export 'package:maxi_flutter_library/src/containers/maxi_multiple_page_screen.dart';

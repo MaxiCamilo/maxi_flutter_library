@@ -67,7 +67,7 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
   }
 
   static Stream<StreamState<Oration, T>> _runAsFuture<T>(FutureOr<T> Function() function, Oration text) async* {
-    yield streamTranslateText(text);
+    yield streamTextStatus(text);
     final result = await function();
     yield streamResult(result);
   }
@@ -85,6 +85,8 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
   late Oration lastText;
   T? lastResult;
   StreamSubscription<StreamState<Oration, T>>? actualStream;
+
+  List<NegativeResultValue> invalidProperties = [];
 
   @override
   void initState() {
@@ -127,6 +129,13 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     } catch (ex) {
       wasFailure = true;
       final lastError = NegativeResult.searchNegativity(item: ex, actionDescription: const Oration(message: 'Obtaining a functional stream'));
+
+      if (lastError is NegativeResultValue) {
+        invalidProperties = lastError.invalidProperties;
+      } else {
+        invalidProperties = [];
+      }
+
       if (widget.onError != null) {
         widget.onError!(lastError);
       }
@@ -213,7 +222,11 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
       mainAxisSize: MainAxisSize.min,
       //crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _makeTextWidget(context),
+        Flexible(
+          child: MaxiScroll(
+            child: _makeTextWidget(context),
+          ),
+        ),
         const SizedBox(
           height: 15,
         ),
@@ -226,6 +239,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     if (wasFailure) {
       return ErrorLabelTemplate(
         message: lastText,
+        invalidProperties: invalidProperties,
       );
     }
 

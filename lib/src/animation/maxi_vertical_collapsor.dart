@@ -7,7 +7,8 @@ class MaxiVerticalCollapsor extends StatefulWidget {
   final bool startsOpen;
   final Widget Function(BuildContext) makeChild;
   final Duration duration;
-  final Curve curve;
+  final Curve curveHide;
+  final Curve curveSize;
 
   final FutureOr<List<Stream<bool>>> Function()? modifiers;
   final void Function(IMaxiVerticalCollapsorOperator)? onCreatedOperator;
@@ -20,7 +21,8 @@ class MaxiVerticalCollapsor extends StatefulWidget {
     required this.makeChild,
     this.startsOpen = true,
     this.duration = const Duration(milliseconds: 300),
-    this.curve = Curves.easeInOut,
+    this.curveHide = Curves.easeInOut,
+    this.curveSize = Curves.easeInOut,
     this.modifiers,
     this.onCreatedOperator,
     this.onChangedStatus,
@@ -152,13 +154,13 @@ class _MaxiVerticalCollapsorState extends StateWithLifeCycle<MaxiVerticalCollaps
     return ClipRect(
       child: AnimatedAlign(
         duration: widget.duration,
-        curve: widget.curve,
+        curve: widget.curveHide,
         alignment: currentStatus ? Alignment.topCenter : Alignment.bottomCenter,
         heightFactor: currentStatus ? 1.0 : 0.0,
         onEnd: _onAnimationEnd,
         child: AnimatedSize(
           duration: widget.duration,
-          curve: widget.curve,
+          curve: widget.curveSize,
           child: showChild ? widget.makeChild(context) : const SizedBox.shrink(),
         ),
       ),

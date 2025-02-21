@@ -34,6 +34,7 @@ mixin DialogUtilities {
     bool barrierDismissible = true,
     RoundedRectangleBorder? shape,
     Color? backgroundColor,
+    EdgeInsetsGeometry? contentPadding,
   }) async {
     final dialogOperator = _DialogWindowPop<T>();
     return showDialog(
@@ -41,15 +42,19 @@ mixin DialogUtilities {
       barrierDismissible: barrierDismissible,
       builder: (BuildContext context) {
         return AlertDialog(
+            contentPadding: contentPadding,
             shape: shape ??
                 const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(7.0)),
                 ),
             backgroundColor: backgroundColor ?? const Color.fromARGB(255, 46, 46, 46),
             content: Material(
-              color: Colors.transparent,
-              child: builder(context, dialogOperator),
-            ));
+                color: Colors.transparent,
+                child: AnimatedSize(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.decelerate,
+                  child: builder(context, dialogOperator),
+                )));
       },
     );
   }

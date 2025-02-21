@@ -1,4 +1,3 @@
-import 'package:maxi_library/maxi_library.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 mixin PersistentValues {

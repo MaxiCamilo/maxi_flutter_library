@@ -98,6 +98,7 @@ class ErrorDialog extends StatelessWidget {
           iconSize: iconSize,
           rowFrom: rowFrom,
           textSize: textSize,
+          invalidProperties: (negativeResult is NegativeResultValue) ? (negativeResult as NegativeResultValue).invalidProperties : [],
         ),
         const SizedBox(height: 15),
         Align(

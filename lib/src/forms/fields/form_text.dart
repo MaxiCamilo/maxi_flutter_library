@@ -109,6 +109,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
     return TextField(
       controller: textController,
       enabled: widget.enable,
+      minLines: 1,
       maxLines: _maxLines,
       focusNode: widget.focusNode,
       textInputAction: widget.inputAction,

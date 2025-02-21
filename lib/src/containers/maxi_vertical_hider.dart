@@ -72,7 +72,7 @@ class _MaxiVerticalHiderState extends StateWithLifeCycle<MaxiVerticalHider> {
           ),
           startsOpen: !hided,
           onCreatedOperator: (x) => collapsorOperator = x,
-          curve: widget.curve,
+          curveSize: widget.curve,
           duration: widget.duration,
         ),
       ],

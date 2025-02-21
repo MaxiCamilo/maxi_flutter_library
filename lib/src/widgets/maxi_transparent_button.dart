@@ -5,6 +5,7 @@ import 'package:maxi_library/maxi_library.dart';
 class MaxiTransparentButton extends StatelessWidget {
   final Widget? icon;
   final Oration? text;
+  final bool enable;
   final void Function()? onTouch;
   final Color? backgroundColor;
   final Color? textColor;
@@ -23,6 +24,7 @@ class MaxiTransparentButton extends StatelessWidget {
     this.padding = 2.0,
     this.circularRadius = 5.0,
     this.borderWidth = 1.0,
+    this.enable = true,
     this.borderColors,
   });
 
@@ -30,11 +32,11 @@ class MaxiTransparentButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: onTouch,
+      onPressed: enable ? onTouch : null,
       style: OutlinedButton.styleFrom(
         backgroundColor: backgroundColor,
         foregroundColor: textColor,
-        side: BorderSide(width: borderWidth, color: borderColors ?? textColor ?? Colors.white),
+        side: BorderSide(width: borderWidth, color: enable ? borderColors ?? textColor ?? Colors.white : Colors.blueGrey),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(circularRadius),
         ),
@@ -48,7 +50,7 @@ class MaxiTransparentButton extends StatelessWidget {
 
   Widget _createContent(BuildContext context) {
     if (icon == null) {
-      return text == null ? const SizedBox() : MaxiTranslatableText(text: text!);
+      return text == null ? const SizedBox() : MaxiTranslatableText(text: text!, color: enable ? textColor ?? borderColors ?? Colors.white : Colors.blueGrey);
     } else {
       return Flex(
         direction: Axis.horizontal,
@@ -57,7 +59,7 @@ class MaxiTransparentButton extends StatelessWidget {
             ? [
                 icon ?? const SizedBox(),
                 icon == null ? const SizedBox() : const SizedBox(width: 5),
-                Flexible(child: MaxiTranslatableText(text: text!)),
+                Flexible(child: MaxiTranslatableText(text: text!, color: enable ? textColor ?? borderColors ?? Colors.white : Colors.blueGrey)),
               ]
             : [
                 icon ?? const SizedBox(),
