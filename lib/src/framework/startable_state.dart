@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-mixin StartableState<R> {
+mixin StartableState<R> implements IMaxiUpdatebleValueState{
   bool _firstExecution = true;
 
   Future<R> initializedAsynchronous();

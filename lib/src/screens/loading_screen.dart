@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class LoadingScreen<T> extends StatefulWidget {
+class LoadingScreen<T> extends StatefulWidget with IMaxiAnimatorWidget {
   final bool startActive;
 
   final void Function(ILoadingScreenOperator<T>)? onCreatedOperator;
@@ -26,6 +26,8 @@ class LoadingScreen<T> extends StatefulWidget {
   final Duration duration;
   final Curve curve;
   final Duration? waitingReupdated;
+  @override
+  final IMaxiAnimatorManager? animatorManager;
 
   const LoadingScreen({
     super.key,
@@ -47,20 +49,22 @@ class LoadingScreen<T> extends StatefulWidget {
     this.onError,
     this.whenCompleted,
     this.waitingReupdated,
+    this.animatorManager,
   });
 
   @override
   State<LoadingScreen<T>> createState() => _LoadingScreenState<T>();
 }
 
-mixin ILoadingScreenOperator<T> {
+mixin ILoadingScreenOperator<T> on IMaxiUpdatebleValueState {
   bool get isActive;
-  void updateValue();
+  //void updateValue();
   void reloadWidgets({required bool changeState});
   void cancel();
+  Stream<T> get notifyNewItems;
 }
 
-class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with ILoadingScreenOperator<T> {
+class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with IMaxiUpdatebleValueState, ILoadingScreenOperator<T>, IMaxiAnimatorState<LoadingScreen<T>> {
   @override
   bool get isActive => updaterSynchronizer.isActive;
   bool wasFailed = false;
@@ -73,9 +77,17 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
 
   Completer<T>? waitingForCancellation;
 
+  StreamController<T>? _notifyNewItems;
+
   //final executor = Semaphore();
 
   late final StreamController<bool> _reloader;
+
+  @override
+  Stream<T> get notifyNewItems {
+    _notifyNewItems ??= createEventController<T>(isBroadcast: true);
+    return _notifyNewItems!.stream;
+  }
 
   @override
   void initState() {
@@ -92,6 +104,8 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     if (widget.startActive) {
       updaterSynchronizer.execute();
     }
+
+    initializeAnimator();
 
     if (widget.onCreatedOperator != null) {
       widget.onCreatedOperator!(this);

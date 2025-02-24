@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class SingleStackScreen extends StatefulWidget {
+class SingleStackScreen extends StatefulWidget with IMaxiAnimatorWidget {
   final void Function(ISingleStackScreenOperator)? onCreatedOperator;
 
   final Widget Function(BuildContext)? initialChildBuild;
   final Duration duration;
   final Curve curve;
+
+  @override
+  final IMaxiAnimatorManager? animatorManager;
 
   const SingleStackScreen({
     super.key,
@@ -17,6 +20,7 @@ class SingleStackScreen extends StatefulWidget {
     this.duration = const Duration(seconds: 1),
     this.curve = Curves.linear,
     this.onCreatedOperator,
+    this.animatorManager,
   });
 
   static ISingleStackScreenOperator getOperatorByAncestor(BuildContext context) {
@@ -38,7 +42,7 @@ mixin ISingleStackScreenOperator {
   void changeScreenWithoutAnimation({required Widget newChild});
 }
 
-class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStackScreenOperator {
+class _SingleStackScreenState extends StateWithLifeCycle<SingleStackScreen> with ISingleStackScreenOperator, IMaxiAnimatorState<SingleStackScreen> {
   late Duration duration;
   late Curve curve;
   @override
@@ -63,6 +67,8 @@ class _SingleStackScreenState extends State<SingleStackScreen> with ISingleStack
     actualWidget = const SizedBox();
     duration = widget.duration;
     curve = widget.curve;
+
+    initializeAnimator();
 
     if (widget.onCreatedOperator != null) {
       widget.onCreatedOperator!(this);

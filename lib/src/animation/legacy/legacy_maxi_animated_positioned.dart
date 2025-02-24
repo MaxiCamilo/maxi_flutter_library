@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:maxi_flutter_library/src/animation/widget_animator.dart';
+import 'package:maxi_flutter_library/src/animation/legacy/legacy_maxi_widget_animator.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-abstract class MaxiAnimatedPositionedState extends State<_MaxiAnimatedPositionedWidget> {
+abstract class LegacyMaxiAnimatedPositionedState extends State<_LegacyMaxiAnimatedPositionedWidget> {
   Future<void> changePosition({
     double? left,
     double? top,
@@ -19,7 +19,7 @@ abstract class MaxiAnimatedPositionedState extends State<_MaxiAnimatedPositioned
   });
 }
 
-class MaxiAnimatedPositioned with WidgetAnimator {
+class LegacyMaxiAnimatedPositioned with LegacyMaxiWidgetAnimator {
   final double? left;
   final double? top;
   final double? right;
@@ -29,9 +29,9 @@ class MaxiAnimatedPositioned with WidgetAnimator {
 
   final Duration duration;
   final Curve curve;
-  final void Function(MaxiAnimatedPositionedState)? onCreated;
+  final void Function(LegacyMaxiAnimatedPositionedState)? onCreated;
 
-  const MaxiAnimatedPositioned({
+  const LegacyMaxiAnimatedPositioned({
     required this.duration,
     this.left,
     this.top,
@@ -45,7 +45,7 @@ class MaxiAnimatedPositioned with WidgetAnimator {
 
   @override
   Widget build({required BuildContext context, required Widget child}) {
-    return _MaxiAnimatedPositionedWidget(
+    return _LegacyMaxiAnimatedPositionedWidget(
       left: left,
       top: top,
       right: right,
@@ -60,7 +60,7 @@ class MaxiAnimatedPositioned with WidgetAnimator {
   }
 }
 
-class _MaxiAnimatedPositionedWidget extends StatefulWidget {
+class _LegacyMaxiAnimatedPositionedWidget extends StatefulWidget {
   final double? left;
   final double? top;
   final double? right;
@@ -71,9 +71,9 @@ class _MaxiAnimatedPositionedWidget extends StatefulWidget {
   final Duration duration;
   final Curve curve;
   final Widget child;
-  final void Function(MaxiAnimatedPositionedState)? onCreated;
+  final void Function(LegacyMaxiAnimatedPositionedState)? onCreated;
 
-  const _MaxiAnimatedPositionedWidget({
+  const _LegacyMaxiAnimatedPositionedWidget({
     required this.left,
     required this.top,
     required this.right,
@@ -87,10 +87,10 @@ class _MaxiAnimatedPositionedWidget extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _MaxiAnimatedPositionedState();
+  State<StatefulWidget> createState() => _LegacyMaxiAnimatedPositionedState();
 }
 
-class _MaxiAnimatedPositionedState extends MaxiAnimatedPositionedState {
+class _LegacyMaxiAnimatedPositionedState extends LegacyMaxiAnimatedPositionedState {
   late double? left;
   late double? top;
   late double? right;

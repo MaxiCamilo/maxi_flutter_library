@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class SingleRouterScreen extends StatefulWidget {
+class LegacySingleRouterScreen extends StatefulWidget {
   final Duration duration;
   final Curve curve;
 
   final void Function(StackedScreenOperator)? onCreatedOperator;
 
-  const SingleRouterScreen({
+  const LegacySingleRouterScreen({
     super.key,
     this.duration = const Duration(seconds: 1),
     this.curve = Curves.linear,
@@ -18,18 +18,18 @@ class SingleRouterScreen extends StatefulWidget {
   });
 
   @override
-  State<SingleRouterScreen> createState() => _SingleRouterScreenState();
+  State<LegacySingleRouterScreen> createState() => _LegacySingleRouterScreenState();
 }
 
-class _SingleRouterScreenState extends State<SingleRouterScreen> with StackedScreenOperator {
+class _LegacySingleRouterScreenState extends State<LegacySingleRouterScreen> with StackedScreenOperator {
   late BoxConstraints actualConstraints;
 
-  final children = <MaxiAnimatedWidget>[];
-  final positioners = <MaxiAnimatedPositionedState>[];
-  final visibles = <MaxiAnimatedVisibleState>[];
-  final opacity = <MaxiAnimatedOpacityState>[];
+  final children = <LegacyMaxiAnimatedWidget>[];
+  final positioners = <LegacyMaxiAnimatedPositionedState>[];
+  final visibles = <LegacyMaxiAnimatedVisibleState>[];
+  final opacity = <LegacyMaxiAnimatedOpacityState>[];
 
-  MaxiAnimatedWidget? get activeChild => children.isEmpty ? null : children.last;
+  LegacyMaxiAnimatedWidget? get activeChild => children.isEmpty ? null : children.last;
 
   bool wasBuilt = false;
 
@@ -95,20 +95,20 @@ class _SingleRouterScreenState extends State<SingleRouterScreen> with StackedScr
   }
 
   Future<void> _pushScreen({required Widget newWidget, Duration? duration, Curve? curve}) async {
-    final completerVisible = Completer<MaxiAnimatedVisibleState>();
-    final completerPosition = Completer<MaxiAnimatedPositionedState>();
-    final completerOpacity = Completer<MaxiAnimatedOpacityState>();
+    final completerVisible = Completer<LegacyMaxiAnimatedVisibleState>();
+    final completerPosition = Completer<LegacyMaxiAnimatedPositionedState>();
+    final completerOpacity = Completer<LegacyMaxiAnimatedOpacityState>();
 
-    final newScreen = MaxiAnimatedWidget(
+    final newScreen = LegacyMaxiAnimatedWidget(
       animators: [
-        MaxiAnimatedVisible(
+        LegacyMaxiAnimatedVisible(
           onCreated: (x) => completerVisible.complete(x),
         ),
-        MaxiAnimatedOpacity(
+        LegacyMaxiAnimatedOpacity(
           duration: duration ?? widget.duration,
           onCreated: (x) => completerOpacity.complete(x),
         ),
-        MaxiAnimatedPositioned(
+        LegacyMaxiAnimatedPositioned(
           duration: duration ?? widget.duration,
           curve: curve ?? widget.curve,
           top: 0,

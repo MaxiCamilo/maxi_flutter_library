@@ -4,13 +4,13 @@ import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class MaxiAnimatedOpacity with WidgetAnimator {
+class LegacyMaxiAnimatedOpacity with LegacyMaxiWidgetAnimator {
   final double initialopacity;
   final Duration duration;
   final Curve curve;
-  final void Function(MaxiAnimatedOpacityState)? onCreated;
+  final void Function(LegacyMaxiAnimatedOpacityState)? onCreated;
 
-  const MaxiAnimatedOpacity({
+  const LegacyMaxiAnimatedOpacity({
     required this.duration,
     this.initialopacity = 1.0,
     this.curve = Curves.linear,
@@ -19,7 +19,7 @@ class MaxiAnimatedOpacity with WidgetAnimator {
 
   @override
   Widget build({required BuildContext context, required Widget child}) {
-    return _MaxiAnimatedOpacityWidget(
+    return _LegacyMaxiAnimatedOpacityWidget(
       opacity: initialopacity,
       curve: curve,
       duration: duration,
@@ -29,7 +29,7 @@ class MaxiAnimatedOpacity with WidgetAnimator {
   }
 }
 
-mixin MaxiAnimatedOpacityState<T extends StatefulWidget> on State<T> {
+mixin LegacyMaxiAnimatedOpacityState<T extends StatefulWidget> on State<T> {
   double get opacity;
 
   Stream<double> get opacityChanged;
@@ -43,14 +43,14 @@ mixin MaxiAnimatedOpacityState<T extends StatefulWidget> on State<T> {
   });
 }
 
-class _MaxiAnimatedOpacityWidget extends StatefulWidget {
+class _LegacyMaxiAnimatedOpacityWidget extends StatefulWidget {
   final Widget child;
   final double opacity;
   final Duration duration;
   final Curve curve;
-  final void Function(MaxiAnimatedOpacityState)? onCreated;
+  final void Function(LegacyMaxiAnimatedOpacityState)? onCreated;
 
-  const _MaxiAnimatedOpacityWidget({
+  const _LegacyMaxiAnimatedOpacityWidget({
     required this.opacity,
     required this.child,
     required this.duration,
@@ -59,10 +59,10 @@ class _MaxiAnimatedOpacityWidget extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _MaxiAnimatedOpacityState();
+  State<StatefulWidget> createState() => _LegacyMaxiAnimatedOpacityState();
 }
 
-class _MaxiAnimatedOpacityState extends StateWithLifeCycle<_MaxiAnimatedOpacityWidget> with MaxiAnimatedOpacityState {
+class _LegacyMaxiAnimatedOpacityState extends StateWithLifeCycle<_LegacyMaxiAnimatedOpacityWidget> with LegacyMaxiAnimatedOpacityState {
   @override
   late double opacity;
   late Duration duration;

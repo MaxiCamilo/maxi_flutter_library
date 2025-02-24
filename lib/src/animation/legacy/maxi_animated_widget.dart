@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
-import 'package:maxi_flutter_library/src/animation/widget_animator.dart';
+import 'package:maxi_flutter_library/src/animation/legacy/legacy_maxi_widget_animator.dart';
 
-class MaxiAnimatedWidget extends StatefulWidget {
-  final  List<WidgetAnimator> animators;
+class LegacyMaxiAnimatedWidget extends StatefulWidget {
+  final List<LegacyMaxiWidgetAnimator> animators;
   final bool isFixedAnimatorsList;
   final Widget child;
 
-  const MaxiAnimatedWidget({
+  const LegacyMaxiAnimatedWidget({
     super.key,
     required this.animators,
     required this.child,
@@ -17,11 +17,11 @@ class MaxiAnimatedWidget extends StatefulWidget {
   });
 
   @override
-  State<MaxiAnimatedWidget> createState() => _MaxiAnimatedWidgetAnimatedWidgetState();
+  State<LegacyMaxiAnimatedWidget> createState() => _LegacyMaxiAnimatedWidgetAnimatedWidgetState();
 }
 
-class _MaxiAnimatedWidgetAnimatedWidgetState extends State<MaxiAnimatedWidget> {
-  List<WidgetAnimator>? _lastAnimations;
+class _LegacyMaxiAnimatedWidgetAnimatedWidgetState extends State<LegacyMaxiAnimatedWidget> {
+  List<LegacyMaxiWidgetAnimator>? _lastAnimations;
 
   Widget _buildFixed(BuildContext context) {
     Widget result = widget.child;

@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-mixin WidgetAnimator {
+mixin LegacyMaxiWidgetAnimator {
   Widget build({required BuildContext context, required Widget child});
 
   static T? getAnimatorByAncestorOptional<T extends State<StatefulWidget>>(BuildContext context) {

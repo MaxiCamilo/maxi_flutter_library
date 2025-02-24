@@ -3,23 +3,33 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 
-class MaxiBuildBox extends StatefulWidget {
-  final List<Stream<bool>> Function() reloaders;
+class MaxiBuildBox extends StatefulWidget with IMaxiAnimatorWidget {
+  final List<Stream<bool>> Function()? reloaders;
   final bool cached;
   final Widget Function(BuildContext) builer;
+  final void Function(IMaxiBuildBoxOperator)? onCreatedOperator;
+
+  @override
+  final IMaxiAnimatorManager? animatorManager;
 
   const MaxiBuildBox({
     super.key,
-    required this.reloaders,
+    this.reloaders,
     required this.cached,
     required this.builer,
+    this.animatorManager,
+    this.onCreatedOperator,
   });
 
   @override
   State<MaxiBuildBox> createState() => _MaxiBuildWidgetState();
 }
 
-class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> {
+mixin IMaxiBuildBoxOperator on IMaxiUpdatebleValueState {
+  void reloadWidget(bool changeStateWidget);
+}
+
+class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> with IMaxiUpdatebleValueState, IMaxiBuildBoxOperator, IMaxiAnimatorState<MaxiBuildBox> {
   int stateNumber = 0;
   Widget? savedItem;
 
@@ -27,24 +37,33 @@ class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> {
   void initState() {
     super.initState();
     getReloadWidgets();
+
+    if (widget.onCreatedOperator != null) {
+      widget.onCreatedOperator!(this);
+    }
+
+    initializeAnimator();
   }
 
   void getReloadWidgets() {
-    final list = widget.reloaders();
+    if (widget.reloaders != null) {
+      final list = widget.reloaders!();
 
-    for (final item in list) {
-      joinEvent(
-          event: item,
-          onData: (x) {
-            if (mounted) {
-              if (x) {
-                stateNumber += 1;
-              }
+      for (final item in list) {
+        joinEvent(event: item, onData: reloadWidget);
+      }
+    }
+  }
 
-              savedItem = null;
-              setState(() {});
-            }
-          });
+  @override
+  void reloadWidget(bool changeStateWidget) {
+    if (mounted) {
+      if (changeStateWidget) {
+        stateNumber += 1;
+      }
+
+      savedItem = null;
+      setState(() {});
     }
   }
 
@@ -63,4 +82,7 @@ class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> {
       child: child,
     );
   }
+
+  @override
+  void updateValue() => reloadWidget(true);
 }

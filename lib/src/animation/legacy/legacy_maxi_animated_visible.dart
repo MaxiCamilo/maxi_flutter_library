@@ -5,13 +5,13 @@ import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class MaxiAnimatedVisible with WidgetAnimator {
+class LegacyMaxiAnimatedVisible with LegacyMaxiWidgetAnimator {
   final bool visible;
   final bool maintainState;
 
-  final void Function(MaxiAnimatedVisibleState)? onCreated;
+  final void Function(LegacyMaxiAnimatedVisibleState)? onCreated;
 
-  const MaxiAnimatedVisible({
+  const LegacyMaxiAnimatedVisible({
     this.visible = true,
     this.maintainState = true,
     this.onCreated,
@@ -19,7 +19,7 @@ class MaxiAnimatedVisible with WidgetAnimator {
 
   @override
   Widget build({required BuildContext context, required Widget child}) {
-    return _MaxiAnimatedVisibleWidget(
+    return _LegacyMaxiAnimatedVisibleWidget(
       maintainState: maintainState,
       visible: visible,
       onCreated: onCreated,
@@ -28,17 +28,17 @@ class MaxiAnimatedVisible with WidgetAnimator {
   }
 }
 
-abstract class MaxiAnimatedVisibleState extends State<_MaxiAnimatedVisibleWidget> {
+abstract class LegacyMaxiAnimatedVisibleState extends State<_LegacyMaxiAnimatedVisibleWidget> {
   Future<void> changeVisibility({required bool visibility, required bool animated, Duration? duration, Curve? curve, bool sincronized = false});
 }
 
-class _MaxiAnimatedVisibleWidget extends StatefulWidget {
+class _LegacyMaxiAnimatedVisibleWidget extends StatefulWidget {
   final bool visible;
   final bool maintainState;
   final Widget child;
-  final void Function(MaxiAnimatedVisibleState)? onCreated;
+  final void Function(LegacyMaxiAnimatedVisibleState)? onCreated;
 
-  const _MaxiAnimatedVisibleWidget({
+  const _LegacyMaxiAnimatedVisibleWidget({
     required this.visible,
     required this.maintainState,
     required this.child,
@@ -46,15 +46,15 @@ class _MaxiAnimatedVisibleWidget extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _MaxiAnimatedVisibleState();
+  State<StatefulWidget> createState() => _LegacyMaxiAnimatedVisibleState();
 }
 
-class _MaxiAnimatedVisibleState extends MaxiAnimatedVisibleState {
+class _LegacyMaxiAnimatedVisibleState extends LegacyMaxiAnimatedVisibleState {
   late bool visible;
   late bool maintainState;
 
   bool _obtainedOpacity = false;
-  MaxiAnimatedOpacityState? _animatedOpacity;
+  LegacyMaxiAnimatedOpacityState? _animatedOpacity;
 
   Semaphore? _sincronizer;
 
@@ -63,8 +63,6 @@ class _MaxiAnimatedVisibleState extends MaxiAnimatedVisibleState {
     super.initState();
     visible = widget.visible;
     maintainState = widget.maintainState;
-    
-
 
     if (widget.onCreated != null) {
       widget.onCreated!(this);
@@ -75,7 +73,7 @@ class _MaxiAnimatedVisibleState extends MaxiAnimatedVisibleState {
   Widget build(BuildContext context) {
     if (!_obtainedOpacity) {
       _obtainedOpacity = true;
-      _animatedOpacity = WidgetAnimator.getAnimatorByAncestorOptional<MaxiAnimatedOpacityState>(context);
+      _animatedOpacity = LegacyMaxiWidgetAnimator.getAnimatorByAncestorOptional<LegacyMaxiAnimatedOpacityState>(context);
     }
 
     if (widget.maintainState) {
@@ -124,7 +122,7 @@ class _MaxiAnimatedVisibleState extends MaxiAnimatedVisibleState {
 
       return;
     } else if (animated) {
-      log('[MaxiAnimatedVisible] The widget must first have an opacity animator to be able to animate the opacity');
+      log('[LegacyMaxiAnimatedVisible] The widget must first have an opacity animator to be able to animate the opacity');
     }
 
     visible = visibility;

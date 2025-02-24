@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:maxi_flutter_library/src/screens/single_stack_screen.dart';
+import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class MaxiWallpaper extends StatefulWidget {
+class MaxiWallpaper extends StatefulWidget with IMaxiAnimatorWidget {
   final ImageProvider<Object> initialImage;
   final double? width;
   final double? height;
@@ -16,6 +16,9 @@ class MaxiWallpaper extends StatefulWidget {
 
   final Duration duration;
   final Curve curve;
+
+  @override
+  final IMaxiAnimatorManager? animatorManager;
 
   final void Function(IMaxiWallpaperOperator)? onCreatedOperator;
 
@@ -32,6 +35,7 @@ class MaxiWallpaper extends StatefulWidget {
     this.repeat = ImageRepeat.noRepeat,
     this.filterQuality = FilterQuality.medium,
     this.onCreatedOperator,
+    this.animatorManager,
   });
 
   @override
@@ -53,7 +57,7 @@ mixin IMaxiWallpaperOperator {
   });
 }
 
-class _MaxiWallpaperState extends State<MaxiWallpaper> with IMaxiWallpaperOperator {
+class _MaxiWallpaperState extends StateWithLifeCycle<MaxiWallpaper> with IMaxiWallpaperOperator, IMaxiAnimatorState<MaxiWallpaper> {
   late Widget initialChild;
   late ISingleStackScreenOperator stackScreenOperator;
   late ImageProvider<Object> currentImageProvider;
@@ -69,6 +73,7 @@ class _MaxiWallpaperState extends State<MaxiWallpaper> with IMaxiWallpaperOperat
     currentImageProvider = widget.initialImage;
     initialChild = buildImage(image: widget.initialImage);
 
+    initializeAnimator();
     if (widget.onCreatedOperator != null) {
       widget.onCreatedOperator!(this);
     }

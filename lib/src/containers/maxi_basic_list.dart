@@ -4,13 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class MaxiBasicList<T> extends StatefulWidget {
+class MaxiBasicList<T> extends StatefulWidget with IMaxiAnimatorWidget {
   final FutureOr<List<Stream<bool>>> Function()? reloaders;
   final FutureOr<List<Stream>> Function()? valueUpdaters;
   final FutureOr<List<T>> Function() valueGetter;
   final Widget Function(BuildContext cont, T item, int ind) childGenerator;
   final Widget Function(BuildContext, List<Widget>)? listGenerator;
   final Widget Function(BuildContext)? emptyGenerator;
+
+  final void Function(IMaxiBasicList<T>)? onCreatedOperator;
+
+  @override
+  final IMaxiAnimatorManager? animatorManager;
 
   const MaxiBasicList({
     required this.valueGetter,
@@ -20,13 +25,17 @@ class MaxiBasicList<T> extends StatefulWidget {
     this.valueUpdaters,
     this.listGenerator,
     this.emptyGenerator,
+    this.animatorManager,
+    this.onCreatedOperator,
   });
 
   @override
   State<MaxiBasicList> createState() => _MaxiBasicListState<T>();
 }
 
-class _MaxiBasicListState<T> extends StateWithLifeCycle<MaxiBasicList<T>> with StartableState<List<T>> {
+mixin IMaxiBasicList<T> on IMaxiUpdatebleValueState {}
+
+class _MaxiBasicListState<T> extends StateWithLifeCycle<MaxiBasicList<T>> with StartableState<List<T>>, IMaxiBasicList<T>, IMaxiAnimatorState<MaxiBasicList<T>> {
   @override
   void initState() {
     super.initState();
@@ -47,6 +56,11 @@ class _MaxiBasicListState<T> extends StateWithLifeCycle<MaxiBasicList<T>> with S
           joinEvent(event: item, onData: _updateValues);
         }
       });
+    }
+
+    initializeAnimator();
+    if (widget.onCreatedOperator != null) {
+      widget.onCreatedOperator!(this);
     }
   }
 

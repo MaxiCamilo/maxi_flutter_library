@@ -31,6 +31,8 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     }
   }
 
+  
+
   StreamController<R> createEventController<R>({required bool isBroadcast}) {
     late final StreamController<R> newController;
 

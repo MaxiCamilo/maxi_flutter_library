@@ -4,15 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/export_reflectors.dart';
 
-class MaxiDarkenInteractionWidget extends StatefulWidget {
+class MaxiDarkenInteractionWidget extends StatefulWidget with IMaxiAnimatorWidget {
   final bool isEnabled;
   final Widget child;
   final Widget Function(BuildContext, bool)? buildDisableWidget;
   //final Color backgroundColor;
   final double backgroundTransparent;
   final Duration animationDuration;
-
   final void Function(IMaxiDarkenInteractionOperator)? onCreatedOperator;
+
+  @override
+  final IMaxiAnimatorManager? animatorManager;
 
   const MaxiDarkenInteractionWidget({
     super.key,
@@ -21,8 +23,10 @@ class MaxiDarkenInteractionWidget extends StatefulWidget {
     this.buildDisableWidget,
     this.backgroundTransparent = 0.6,
     this.animationDuration = const Duration(milliseconds: 400),
-    //this.backgroundColor = const Color.fromARGB(139, 0, 0, 0),
     this.onCreatedOperator,
+    this.animatorManager,
+    //this.backgroundColor = const Color.fromARGB(139, 0, 0, 0),
+    // this.onCreatedOperator,
   });
 
   @override
@@ -48,7 +52,7 @@ mixin IMaxiDarkenInteractionOperator {
   });
 }
 
-class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInteractionWidget> with IMaxiDarkenInteractionOperator {
+class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInteractionWidget> with IMaxiDarkenInteractionOperator, IMaxiAnimatorState<MaxiDarkenInteractionWidget> {
   late bool _isEnabled;
   late Semaphore _semaphore;
   late StreamController<bool> _lastTextChange;
@@ -75,6 +79,8 @@ class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInt
     _isEnabled = widget.isEnabled;
     _semaphore = Semaphore();
     _lastTextChange = createEventController<bool>(isBroadcast: true);
+
+    initializeAnimator();
 
     if (widget.onCreatedOperator != null) {
       widget.onCreatedOperator!(this);

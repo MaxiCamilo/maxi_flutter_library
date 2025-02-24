@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 
-class MaxiVerticalCollapsor extends StatefulWidget {
+class MaxiVerticalCollapsor extends StatefulWidget with IMaxiAnimatorWidget {
   final bool startsOpen;
   final Widget Function(BuildContext) makeChild;
   final Duration duration;
@@ -15,6 +15,9 @@ class MaxiVerticalCollapsor extends StatefulWidget {
   final void Function(bool)? onChangedStatus;
   final void Function()? onShow;
   final void Function()? onHide;
+
+  @override
+  final IMaxiAnimatorManager? animatorManager;
 
   const MaxiVerticalCollapsor({
     super.key,
@@ -28,6 +31,7 @@ class MaxiVerticalCollapsor extends StatefulWidget {
     this.onChangedStatus,
     this.onHide,
     this.onShow,
+    this.animatorManager,
   });
 
   @override
@@ -63,7 +67,7 @@ mixin IMaxiVerticalCollapsorOperator {
   }
 }
 
-class _MaxiVerticalCollapsorState extends StateWithLifeCycle<MaxiVerticalCollapsor> with IMaxiVerticalCollapsorOperator {
+class _MaxiVerticalCollapsorState extends StateWithLifeCycle<MaxiVerticalCollapsor> with IMaxiVerticalCollapsorOperator, IMaxiAnimatorState<MaxiVerticalCollapsor> {
   late bool currentStatus;
   late bool showChild;
 
@@ -113,6 +117,8 @@ class _MaxiVerticalCollapsorState extends StateWithLifeCycle<MaxiVerticalCollaps
     if (widget.modifiers != null) {
       scheduleMicrotask(() => _hookModifierEvents());
     }
+
+    initializeAnimator();
 
     if (widget.onCreatedOperator != null) {
       widget.onCreatedOperator!(this);

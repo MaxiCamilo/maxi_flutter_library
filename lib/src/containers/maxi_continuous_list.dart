@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class MaxiContinuousList<T> extends StatefulWidget {
+class MaxiContinuousList<T> extends StatefulWidget with IMaxiAnimatorWidget {
   final FutureOr<List<Stream<bool>>> Function()? reloaders;
   final FutureOr<List<Stream>> Function()? valueUpdaters;
   final int Function(T) gettetIdentifier;
@@ -16,6 +16,8 @@ class MaxiContinuousList<T> extends StatefulWidget {
   final Duration animationDuration;
   final Curve animationCurve;
   final void Function(MaxiContinuousListOperator<T>)? onCreatedOperator;
+  @override
+  final IMaxiAnimatorManager? animatorManager;
 
   const MaxiContinuousList({
     super.key,
@@ -30,22 +32,22 @@ class MaxiContinuousList<T> extends StatefulWidget {
     this.animationDuration = const Duration(milliseconds: 500),
     this.animationCurve = Curves.decelerate,
     this.onCreatedOperator,
+    this.animatorManager,
   });
 
   @override
   State<MaxiContinuousList<T>> createState() => _MaxiContinuousListState<T>();
 }
 
-mixin MaxiContinuousListOperator<T> {
+mixin MaxiContinuousListOperator<T> on IMaxiUpdatebleValueState {
   List<T> get content;
   bool get ascendant;
   bool get isLoading;
   Stream<MaxiContinuousListOperator<T>> get onValueUpdate;
   set ascendant(bool value);
-  void updateValue();
 }
 
-class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<T>> with StartableState<void>, MaxiContinuousListOperator<T> {
+class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<T>> with StartableState<void>, MaxiContinuousListOperator<T>, IMaxiAnimatorState {
   @override
   final content = <T>[];
 
@@ -104,6 +106,8 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     if (widget.onCreatedOperator != null) {
       widget.onCreatedOperator!(this);
     }
+
+    initializeAnimator();
   }
 
   void _reload(bool x) {
@@ -180,7 +184,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
         lastResult = await widget.valueGetter(widget.ascendant ? lastID + 1 : lastID - 1);
       }
     } catch (ex) {
-      lastError = NegativeResult.searchNegativity(item: ex, actionDescription: Oration(message: 'Getting values from %1', textParts:[lastID]));
+      lastError = NegativeResult.searchNegativity(item: ex, actionDescription: Oration(message: 'Getting values from %1', textParts: [lastID]));
       isLoading = false;
       reloadWidgets(changeState: false);
       return;
