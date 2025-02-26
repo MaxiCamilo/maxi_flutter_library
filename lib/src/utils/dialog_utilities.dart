@@ -10,7 +10,9 @@ mixin IDialogWindow<T> {
 class _DialogWindowPop<T> with IDialogWindow<T> {
   @override
   void defineResult(BuildContext context, [T? result]) {
-    Navigator.pop(context, result);
+    if (context.mounted) {
+      Navigator.pop(context, result);
+    }
   }
 }
 

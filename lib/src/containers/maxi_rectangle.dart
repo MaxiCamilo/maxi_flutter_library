@@ -12,6 +12,7 @@ class MaxiRectangle extends StatelessWidget {
   final double borderStrokeAlign;
   final double? width;
   final double? height;
+  
 
   final Widget child;
 

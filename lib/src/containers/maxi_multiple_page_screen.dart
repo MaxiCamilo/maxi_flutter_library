@@ -17,6 +17,8 @@ abstract class MaxiMultiplePageScreen<T extends StatefulWidget> extends StateWit
 
   Widget buildInitialScreen(BuildContext context);
 
+  
+
   Future<void> changeScreen({required Widget newChild, Duration? duration, Curve? curve}) async {
     if (!mounted) {
       return;
