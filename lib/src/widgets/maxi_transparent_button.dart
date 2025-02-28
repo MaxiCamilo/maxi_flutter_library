@@ -36,7 +36,7 @@ class MaxiTransparentButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         backgroundColor: backgroundColor,
         foregroundColor: textColor,
-        side: BorderSide(width: borderWidth, color: enable ? borderColors ?? textColor ?? Colors.white : Colors.blueGrey),
+        side: BorderSide(width: borderWidth, color: enable && onTouch != null ? (borderColors ?? textColor ?? Colors.white) : Colors.blueGrey),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(circularRadius),
         ),
@@ -50,7 +50,12 @@ class MaxiTransparentButton extends StatelessWidget {
 
   Widget _createContent(BuildContext context) {
     if (icon == null) {
-      return text == null ? const SizedBox() : MaxiTranslatableText(text: text!, color: enable ? textColor ?? borderColors ?? Colors.white : Colors.blueGrey);
+      return text == null
+          ? const SizedBox()
+          : MaxiTranslatableText(
+              text: text!,
+              color: enable && onTouch != null ? (textColor ?? borderColors ?? Colors.white) : Colors.blueGrey,
+            );
     } else {
       return Flex(
         direction: Axis.horizontal,
@@ -59,7 +64,7 @@ class MaxiTransparentButton extends StatelessWidget {
             ? [
                 icon ?? const SizedBox(),
                 icon == null ? const SizedBox() : const SizedBox(width: 5),
-                Flexible(child: MaxiTranslatableText(text: text!, color: enable ? textColor ?? borderColors ?? Colors.white : Colors.blueGrey)),
+                Flexible(child: MaxiTranslatableText(text: text!, color: enable && onTouch != null ? (textColor ?? borderColors ?? Colors.white) : Colors.blueGrey)),
               ]
             : [
                 icon ?? const SizedBox(),

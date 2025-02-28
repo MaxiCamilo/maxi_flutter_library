@@ -51,7 +51,7 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
   StreamSubscription<R> joinEvent<R>({
     required Stream<R> event,
     required void Function(R) onData,
-    void Function(dynamic)? onError,
+    void Function(dynamic, StackTrace?)? onError,
     void Function()? onDone,
   }) {
     late final StreamSubscription<R> subscription;
