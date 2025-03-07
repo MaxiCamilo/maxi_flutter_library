@@ -37,7 +37,7 @@ mixin IMaxiDarkenInteractionOperator {
   bool get isEnabled;
   set isEnabled(bool newStatus);
 
-  Future<void> executeFunction<T>({
+  Future<T?> executeFunction<T>({
     required Future<T> Function() function,
     void Function(T)? onDone,
     void Function(Object, StackTrace)? onError,
@@ -165,13 +165,14 @@ class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInt
   }
 
   @override
-  Future<void> executeFunction<T>({
+  Future<T?> executeFunction<T>({
     required Future<T> Function() function,
     void Function(T)? onDone,
     void Function(Object, StackTrace)? onError,
     IMaxiErrorPosterOperator? posterError,
   }) {
     return _semaphore.execute(function: () async {
+      T? returnResult;
       _returnTextState = false;
       isEnabled = false;
 
@@ -184,6 +185,7 @@ class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInt
 
       try {
         final result = await function();
+        returnResult = result;
         if (onDone != null) {
           onDone(result);
         }
@@ -199,6 +201,8 @@ class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInt
           isEnabled = true;
         }
       }
+
+      return returnResult;
     });
   }
 

@@ -31,8 +31,6 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     }
   }
 
-  
-
   StreamController<R> createEventController<R>({required bool isBroadcast}) {
     late final StreamController<R> newController;
 
@@ -53,11 +51,19 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     required void Function(R) onData,
     void Function(dynamic, StackTrace?)? onError,
     void Function()? onDone,
+    bool? cancelOnError,
   }) {
     late final StreamSubscription<R> subscription;
     subscription = event.listen(
       onData,
-      onError: onError,
+      cancelOnError: cancelOnError,
+      onError: (x, y) {
+        if (onError == null) {
+          log('[Stream connected to ${runtimeType.toString()}] Not captured error: $x');
+        } else {
+          onError(x, y);
+        }
+      },
       onDone: () {
         _eventsList.remove(subscription);
         if (onDone != null) {

@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 
 class MaxiBuildBox extends StatefulWidget with IMaxiAnimatorWidget {
-  final List<Stream<bool>> Function()? reloaders;
+  final FutureOr<List<Stream<bool>>> Function()? reloaders;
   final bool cached;
   final Widget Function(BuildContext) builer;
   final void Function(IMaxiBuildBoxOperator)? onCreatedOperator;
@@ -45,9 +45,9 @@ class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> with IMaxiU
     initializeAnimator();
   }
 
-  void getReloadWidgets() {
+  Future<void> getReloadWidgets() async{
     if (widget.reloaders != null) {
-      final list = widget.reloaders!();
+      final list = await widget.reloaders!();
 
       for (final item in list) {
         joinEvent(event: item, onData: reloadWidget);
