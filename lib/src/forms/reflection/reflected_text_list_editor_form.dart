@@ -34,6 +34,7 @@ class _StateReflectedTextListEditorForm extends StateReflectionFieldImplementati
       firstBackgroudColor: widget.firstBackgroudColor,
       secondBackgroundColor: widget.secondBackgroundColor,
       validators: validators,
+      title: widget.title,
       manager: widget.fieldManager,
     );
   }

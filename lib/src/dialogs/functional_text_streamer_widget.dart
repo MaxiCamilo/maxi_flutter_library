@@ -50,8 +50,14 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
     );
   }
 
-  static Future<T?> showFutureMaterialDialog<T>(
-      {required BuildContext context, required bool canCancel, required bool canRetry, required FutureOr<T> Function() function, Oration text = const Oration(message: 'Wait for the task to complete its execution')}) {
+  static Future<T?> showFutureMaterialDialog<T>({
+    required BuildContext context,
+    required bool canCancel,
+    required bool canRetry,
+    required FutureOr<T> Function() function,
+    void Function(T)? onDone,
+    Oration text = const Oration(message: 'Wait for the task to complete its execution'),
+  }) {
     return DialogUtilities.showWidgetAsMaterialDialog<T>(
       context: context,
       barrierDismissible: false,
@@ -59,7 +65,12 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
         canCancel: canCancel,
         canRetry: canRetry,
         startWhenDisplayed: true,
-        onDone: (x) => dialogOperator.defineResult(context, x),
+        onDone: (x) {
+          dialogOperator.defineResult(context, x);
+          if (onDone != null) {
+            onDone(x);
+          }
+        },
         onCancel: () => dialogOperator.defineResult(context),
         function: () => _runAsFuture(function, text),
       ),

@@ -7,6 +7,7 @@ class MaxiScroll extends StatefulWidget {
 
   final double? thickness;
   final Radius? radius;
+  final bool expand;
 
   final void Function(ScrollController)? onScrollCreated;
 
@@ -18,6 +19,7 @@ class MaxiScroll extends StatefulWidget {
     this.onScrollCreated,
     this.thickness,
     this.radius,
+    this.expand = false,
   });
 
   @override
@@ -44,6 +46,14 @@ class _MaxiScrollState extends State<MaxiScroll> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.expand) {
+      return _buildExpandedView(context);
+    } else {
+      return _buildView(context);
+    }
+  }
+
+  Widget _buildView(BuildContext context) {
     return Scrollbar(
       controller: _scrollController,
       thumbVisibility: true,
@@ -54,6 +64,29 @@ class _MaxiScrollState extends State<MaxiScroll> {
         controller: _scrollController,
         child: widget.child,
       ),
+    );
+  }
+
+  Widget _buildExpandedView(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Scrollbar(
+          controller: _scrollController,
+          thumbVisibility: true,
+          thickness: widget.thickness,
+          radius: widget.radius,
+          child: SingleChildScrollView(
+            scrollDirection: widget.scrollDirection,
+            controller: _scrollController,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight,
+              ),
+              child: widget.child,
+            ),
+          ),
+        );
+      },
     );
   }
 }

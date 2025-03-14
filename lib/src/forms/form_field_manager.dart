@@ -46,6 +46,8 @@ class FormFieldManager with IFormFieldManager {
     }
   }
 
+  factory FormFieldManager.fromReflection(Object item) => FormFieldManager(values: ReflectionManager.getReflectionEntity(item.runtimeType).serializeToMap(item));
+
   @override
   bool hasProperty({required String propertyName}) => _values.containsKey(propertyName);
 
@@ -201,4 +203,6 @@ class FormFieldManager with IFormFieldManager {
 
     return negativeMap;
   }
+
+  
 }

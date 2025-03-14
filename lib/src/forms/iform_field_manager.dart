@@ -29,4 +29,11 @@ mixin IFormFieldManager {
   Map<String, dynamic> createMap({required bool onlyIfIsValid});
 
   void dispose();
+
+  Map<String, NegativeResult> setReflectionValues(Object item) => setSeveralValues(ReflectionManager.getReflectionEntity(item.runtimeType).serializeToMap(item));
+
+  T createEntityObject<T extends Object>() {
+    final map = createMap(onlyIfIsValid: true);
+    return ReflectionManager.getReflectionEntity(T).interpret(value: map, tryToCorrectNames: false) as T;
+  }
 }

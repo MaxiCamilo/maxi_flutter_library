@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-mixin StartableState<R> implements IMaxiUpdatebleValueState{
+mixin StartableState<R> implements IMaxiUpdatebleValueState {
   bool _firstExecution = true;
 
   Future<R> initializedAsynchronous();
@@ -67,6 +67,7 @@ mixin StartableState<R> implements IMaxiUpdatebleValueState{
   }
 
   @override
+  @mustCallSuper
   void updateValue() {
     if (screenOperator == null) {
       log('[Startable State] creen Operator not found');
@@ -75,6 +76,7 @@ mixin StartableState<R> implements IMaxiUpdatebleValueState{
     }
   }
 
+  @mustCallSuper
   void reloadWidgets({required bool changeState}) {
     if (screenOperator == null) {
       log('[Startable State] creen Operator not found');
@@ -83,6 +85,7 @@ mixin StartableState<R> implements IMaxiUpdatebleValueState{
     }
   }
 
+  @mustCallSuper
   void cancel() {
     screenOperator?.cancel();
     onCancelState();

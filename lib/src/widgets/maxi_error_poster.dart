@@ -35,6 +35,7 @@ class MaxiErrorPoster extends StatefulWidget {
 mixin IMaxiErrorPosterOperator {
   void hidePoster();
   void showPoster({NegativeResult? error});
+  void showGenericError(Object generic, [Oration? actionDescription]);
 }
 
 class _MaxiErrorPosterState extends StateWithLifeCycle<MaxiErrorPoster> with IMaxiErrorPosterOperator {
@@ -147,5 +148,10 @@ class _MaxiErrorPosterState extends StateWithLifeCycle<MaxiErrorPoster> with IMa
     } else {
       collapsorOperator?.show();
     }
+  }
+
+  @override
+  void showGenericError(Object generic, [Oration? actionDescription]) {
+    showPoster(error: NegativeResult.searchNegativity(item: generic, actionDescription: actionDescription ?? const Oration(message: 'Executing a functionality')));
   }
 }

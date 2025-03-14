@@ -144,4 +144,17 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
       ThreadManager.instance.callFunctionOnTheServer(function: (x) => (ThreadManager.instance as IThreadManagerServer).killAllThread());
     }
   }
+
+  @override
+  void finishApplication() {
+    Future.delayed(const Duration(milliseconds: 100)).then((value) async {
+      exit(0);
+    });
+  }
+
+  @override
+  void resetApplication({List<String> arguments = const []}) {
+    Process.run(Platform.resolvedExecutable, arguments);
+    finishApplication();
+  }
 }

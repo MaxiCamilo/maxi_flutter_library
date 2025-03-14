@@ -17,12 +17,14 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
 
   bool get isDispose => _isDispose;
 
+  @mustCallSuper
   Future<StateWithLifeCycle<T>> get onDispose {
     _waitingDiscarded ??= Completer<StateWithLifeCycle<T>>();
     return _waitingDiscarded!.future;
   }
 
   @override
+  @mustCallSuper
   void initState() {
     super.initState();
 
@@ -31,6 +33,7 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     }
   }
 
+  @mustCallSuper
   StreamController<R> createEventController<R>({required bool isBroadcast}) {
     late final StreamController<R> newController;
 
@@ -46,6 +49,7 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     return newController;
   }
 
+  @mustCallSuper
   StreamSubscription<R> joinEvent<R>({
     required Stream<R> event,
     required void Function(R) onData,
@@ -75,11 +79,13 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     return subscription;
   }
 
+  @mustCallSuper
   R joinObject<R extends Object>({required R item}) {
     _otherActiveList.add(item);
     return item;
   }
 
+  @mustCallSuper
   Future<void> callEntityStreamDirectly<S extends Object, R>({
     InvocationParameters parameters = InvocationParameters.emptry,
     required FutureOr<Stream<R>> Function(S serv, InvocationParameters para) function,
@@ -105,6 +111,7 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
   }
 
   @override
+  @mustCallSuper
   void dispose() {
     super.dispose();
 
@@ -130,6 +137,7 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     _waitingDiscarded = null;
   }
 
+  @mustCallSuper
   void changueWidgetState([dynamic value]) {
     if (mounted) {
       setState(() {});

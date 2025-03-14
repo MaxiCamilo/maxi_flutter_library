@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -157,11 +158,16 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
 
       if (wasValid != isCorrect || lastErrorText != lastTranslatedErrorText) {
         scheduleMicrotask(() {
-          textController.value = TextEditingValue(
-            text: textController.text,
-            selection: TextSelection.collapsed(offset: textController.selection.end),
-          );
-          textController.selection = TextSelection.collapsed(offset: position);
+          try {
+            textController.value = TextEditingValue(
+              text: textController.text,
+              selection: TextSelection.collapsed(offset: textController.selection.end),
+            );
+            textController.selection = TextSelection.collapsed(offset: position);
+          } catch (ex) {
+            log('[FormText] fail select: $ex');
+            textController.selection = const TextSelection.collapsed(offset: 0);
+          }
         });
       }
 
