@@ -21,5 +21,6 @@ export 'package:maxi_flutter_library/src/containers/maxi_multiple_page_screen.da
 export 'package:maxi_flutter_library/src/containers/maxi_stream_box.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_scroll_conditional.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_conditional_container_build.dart';
+export 'package:maxi_flutter_library/src/containers/maxi_body_with_header_and_footer.dart';
 
 export 'package:maxi_flutter_library/src/containers/maxi_tap_area.dart';

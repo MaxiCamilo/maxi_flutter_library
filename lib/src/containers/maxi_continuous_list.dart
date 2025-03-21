@@ -11,7 +11,7 @@ class MaxiContinuousList<T> extends StatefulWidget with IMaxiAnimatorWidget {
   final FutureOr<List<T>> Function(int from) valueGetter;
   final Widget Function(BuildContext cont, T item, int ind) childGenerator;
   final Widget Function(BuildContext)? emptyGenerator;
-  final bool ascendant;
+  final bool Function()? ascendant;
   final Duration waitingReupdated;
   final Duration animationDuration;
   final Curve animationCurve;
@@ -27,7 +27,7 @@ class MaxiContinuousList<T> extends StatefulWidget with IMaxiAnimatorWidget {
     this.reloaders,
     this.valueUpdaters,
     this.emptyGenerator,
-    this.ascendant = true,
+    this.ascendant,
     this.waitingReupdated = const Duration(seconds: 1),
     this.animationDuration = const Duration(milliseconds: 500),
     this.animationCurve = Curves.decelerate,
@@ -78,7 +78,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
   void initState() {
     super.initState();
 
-    _ascendant = widget.ascendant;
+    _ascendant = widget.ascendant == null ? true : widget.ascendant!();
 
     scrollController = ScrollController();
     scrollController.addListener(onScroll);
@@ -132,6 +132,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
 
   @override
   Future<void> initializedAsynchronous() async {
+    _ascendant = widget.ascendant == null ? true : widget.ascendant!();
     lastID = 0;
     lastError = null;
     content.clear();
@@ -178,10 +179,10 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     late List<T> lastResult;
 
     try {
-      if (!widget.ascendant && lastID - 1 == 0) {
+      if (!_ascendant && lastID - 1 == 0) {
         lastResult = [];
       } else {
-        lastResult = await widget.valueGetter(widget.ascendant ? lastID + 1 : lastID - 1);
+        lastResult = await widget.valueGetter(_ascendant ? lastID + 1 : lastID - 1);
       }
     } catch (ex) {
       lastError = NegativeResult.searchNegativity(item: ex, actionDescription: Oration(message: 'Getting values from %1', textParts: [lastID]));
@@ -191,7 +192,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     }
 
     if (lastResult.isNotEmpty) {
-      if (widget.ascendant) {
+      if (_ascendant) {
         lastResult = lastResult.orderByFunction((x) => widget.gettetIdentifier(x));
       } else {
         lastResult = lastResult.orderByFunction((x) => widget.gettetIdentifier(x)).reversed.toList();

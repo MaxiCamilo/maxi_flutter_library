@@ -13,7 +13,7 @@ class MaxiSelectableList<T> extends StatefulWidget {
   final List<int> Function()? initialSelected;
   final Widget Function(BuildContext)? emptyGenerator;
   final void Function(IMaxiSelectableList<T>)? onCreatedOperator;
-  final bool ascendant;
+  final bool Function()? ascendant;
   final Duration waitingReupdated;
   final Duration animationDuration;
   final Curve animationCurve;
@@ -30,7 +30,7 @@ class MaxiSelectableList<T> extends StatefulWidget {
     this.valueUpdaters,
     this.emptyGenerator,
     this.onCreatedOperator,
-    this.ascendant = true,
+    this.ascendant,
     this.touchingMakesSelecting = true,
     this.waitingReupdated = const Duration(seconds: 1),
     this.animationDuration = const Duration(milliseconds: 500),

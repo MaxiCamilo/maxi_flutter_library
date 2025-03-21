@@ -73,11 +73,11 @@ class SharedPreferencesOperator with IFileOperator {
     if (value == null) {
       throw NegativeResult(
         identifier: NegativeResultCodes.nonExistent,
-        message: Oration(message: 'The file located at %1 cannot be read because it does not exist', textParts:[route]),
+        message: Oration(message: 'The file located at %1 cannot be read because it does not exist', textParts: [route]),
       );
     }
 
-    return volatile(detail:const Oration(message: 'File %1 does not have a valid base64 format'), function: () => base64.decode(value));
+    return volatile(detail: const Oration(message: 'File %1 does not have a valid base64 format'), function: () => base64.decode(value));
   }
 
   @override
@@ -97,7 +97,7 @@ class SharedPreferencesOperator with IFileOperator {
     if (value == null) {
       throw NegativeResult(
         identifier: NegativeResultCodes.nonExistent,
-        message: Oration(message: 'The file located at %1 cannot be read because it does not exist',textParts: [route]),
+        message: Oration(message: 'The file located at %1 cannot be read because it does not exist', textParts: [route]),
       );
     }
     return value;
@@ -119,7 +119,7 @@ class SharedPreferencesOperator with IFileOperator {
     if (routeSplit.length < 2) {
       throw NegativeResult(
         identifier: NegativeResultCodes.contextInvalidFunctionality,
-        message:const Oration(message: 'Cannot download more from the folder'),
+        message: const Oration(message: 'Cannot download more from the folder'),
       );
     }
 
@@ -148,5 +148,20 @@ class SharedPreferencesOperator with IFileOperator {
       final newText = content + actual;
       await writeText(content: newText, secured: secured);
     }
+  }
+
+  @override
+  Stream<IFileOperator> getFolderContent() {
+    throw UnimplementedError('NOP!');
+  }
+
+  @override
+  Future<DateTime> getCreationDate() {
+    throw UnimplementedError('NOP!');
+  }
+
+  @override
+  Future<DateTime> getLastModificationDate() {
+    throw UnimplementedError('NOP!');
   }
 }
