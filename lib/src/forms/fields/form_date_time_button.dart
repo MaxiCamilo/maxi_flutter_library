@@ -55,14 +55,14 @@ class _FormDateButton extends OneValueFormFieldImplementation<DateTime, FormDate
   void initState() {
     super.initState();
 
-    buttonDateText = TranslatedOration(message: TextUtilities.formatDate(actualValue, putTime: false));
-    buttonTimeText = TranslatedOration(message: '${TextUtilities.zeroFill(value: actualValue.hour, quantityZeros: 2)}:${TextUtilities.zeroFill(value: actualValue.minute, quantityZeros: 2)}');
+    buttonDateText = TranslatedText(message: TextUtilities.formatDate(actualValue, putTime: false));
+    buttonTimeText = TranslatedText(message: '${TextUtilities.zeroFill(value: actualValue.hour, quantityZeros: 2)}:${TextUtilities.zeroFill(value: actualValue.minute, quantityZeros: 2)}');
   }
 
   @override
   void renderingNewValue(DateTime newValue) {
-    buttonDateText = TranslatedOration(message: TextUtilities.formatDate(actualValue, putTime: false));
-    buttonTimeText = TranslatedOration(message: '${TextUtilities.zeroFill(value: actualValue.hour, quantityZeros: 2)}:${TextUtilities.zeroFill(value: actualValue.minute, quantityZeros: 2)}');
+    buttonDateText = TranslatedText(message: TextUtilities.formatDate(actualValue, putTime: false));
+    buttonTimeText = TranslatedText(message: '${TextUtilities.zeroFill(value: actualValue.hour, quantityZeros: 2)}:${TextUtilities.zeroFill(value: actualValue.minute, quantityZeros: 2)}');
 
     if (mounted) {
       setState(() {});
@@ -74,7 +74,7 @@ class _FormDateButton extends OneValueFormFieldImplementation<DateTime, FormDate
     if (widget.showDateButton && widget.showTimeButton) {
       return Wrap(
         spacing: 8.0,
-        runSpacing: 8.0,        
+        runSpacing: 8.0,
         children: [
           _buildDateButton(context),
           _buildTimeButton(context),

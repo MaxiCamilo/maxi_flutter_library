@@ -58,13 +58,18 @@ class FormFieldManager with IFormFieldManager {
     if (fields.contains(field)) {
       return;
     }
-
     field.discardedField.then((x) => removeField(field: x));
     final subscription = field.notifyValueChanged.listen(_reactFieldChanged);
     _mapSubscriptions[field] = subscription;
     fields.add(field);
 
     _newField.add(field);
+  }
+
+  void sendStatus() {
+    Future.delayed(const Duration(milliseconds: 150)).whenComplete(() {
+      _notifyStatusChange.addIfActive(this);
+    });
   }
 
   @override
@@ -203,6 +208,4 @@ class FormFieldManager with IFormFieldManager {
 
     return negativeMap;
   }
-
-  
 }

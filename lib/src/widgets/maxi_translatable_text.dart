@@ -67,7 +67,7 @@ class _MaxiTranslatableTextState extends StateWithLifeCycle<MaxiTranslatableText
 
     return MaxiText(
       text: _text,
-      aling: widget.aling ?? TextAlign.justify,
+      aling: widget.aling /*?? TextAlign.justify*/,
       bold: widget.bold,
       decoration: widget.decoration,
       italic: widget.italic,

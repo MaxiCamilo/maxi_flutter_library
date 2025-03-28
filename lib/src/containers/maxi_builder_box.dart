@@ -36,7 +36,9 @@ class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> with IMaxiU
   @override
   void initState() {
     super.initState();
-    getReloadWidgets();
+    if (widget.reloaders != null) {
+      getReloadWidgets();
+    }
 
     if (widget.onCreatedOperator != null) {
       widget.onCreatedOperator!(this);
@@ -45,13 +47,11 @@ class _MaxiBuildWidgetState extends StateWithLifeCycle<MaxiBuildBox> with IMaxiU
     initializeAnimator();
   }
 
-  Future<void> getReloadWidgets() async{
-    if (widget.reloaders != null) {
-      final list = await widget.reloaders!();
+  Future<void> getReloadWidgets() async {
+    final list = await widget.reloaders!();
 
-      for (final item in list) {
-        joinEvent(event: item, onData: reloadWidget);
-      }
+    for (final item in list) {
+      joinEvent(event: item, onData: reloadWidget);
     }
   }
 

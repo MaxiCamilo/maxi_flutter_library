@@ -30,12 +30,7 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
     this.onReset,
   });
 
-  static Future<T?> showMaterialDialog<T>({
-    required BuildContext context,
-    required bool canCancel,
-    required bool canRetry,
-    required FutureOr<StreamStateTexts<T>> Function() function,
-  }) {
+  static Future<T?> showMaterialDialog<T>({required BuildContext context, required bool canCancel, required bool canRetry, required FutureOr<StreamStateTexts<T>> Function() function, void Function(T)? onDone}) {
     return DialogUtilities.showWidgetAsMaterialDialog<T>(
       context: context,
       barrierDismissible: false,
@@ -44,7 +39,12 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
         canRetry: canRetry,
         function: function,
         startWhenDisplayed: true,
-        onDone: (x) => dialogOperator.defineResult(context, x),
+        onDone: (x) {
+          dialogOperator.defineResult(context, x);
+          if (onDone != null) {
+            onDone(x);
+          }
+        },
         onCancel: () => dialogOperator.defineResult(context),
       ),
     );
