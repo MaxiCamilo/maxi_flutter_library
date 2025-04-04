@@ -1,7 +1,12 @@
 import 'package:flutter/widgets.dart';
 
-mixin StackedScreenOperator {
+mixin IStackedScreenOperator {
   int get numberOfScreens;
+  int get actualPage;
+
+  Stream<int> get notifyChangeScreen;
+
+  Stream get notifyDispose;
 
   void goBack({Duration? duration, Curve? curve});
 

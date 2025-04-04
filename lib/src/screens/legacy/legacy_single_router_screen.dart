@@ -8,7 +8,7 @@ class LegacySingleRouterScreen extends StatefulWidget {
   final Duration duration;
   final Curve curve;
 
-  final void Function(StackedScreenOperator)? onCreatedOperator;
+  final void Function(IStackedScreenOperator)? onCreatedOperator;
 
   const LegacySingleRouterScreen({
     super.key,
@@ -21,7 +21,7 @@ class LegacySingleRouterScreen extends StatefulWidget {
   State<LegacySingleRouterScreen> createState() => _LegacySingleRouterScreenState();
 }
 
-class _LegacySingleRouterScreenState extends State<LegacySingleRouterScreen> with StackedScreenOperator {
+class _LegacySingleRouterScreenState extends StateWithLifeCycle<LegacySingleRouterScreen> with IStackedScreenOperator {
   late BoxConstraints actualConstraints;
 
   final children = <LegacyMaxiAnimatedWidget>[];
@@ -31,16 +31,31 @@ class _LegacySingleRouterScreenState extends State<LegacySingleRouterScreen> wit
 
   LegacyMaxiAnimatedWidget? get activeChild => children.isEmpty ? null : children.last;
 
+  @override
+  Stream<int> get notifyChangeScreen => notifyChangeScreenController.stream;
+
+  @override
+  Stream get notifyDispose => notifyDisposeController.stream;
+
   bool wasBuilt = false;
+  int _actualPage = 0;
 
   final _sincronizer = Semaphore();
+  late final StreamController<int> notifyChangeScreenController;
+  late final StreamController notifyDisposeController;
 
   @override
   int get numberOfScreens => children.length;
 
   @override
+  int get actualPage => _actualPage;
+
+  @override
   void initState() {
     super.initState();
+
+    notifyChangeScreenController = createEventController<int>(isBroadcast: true);
+    notifyDisposeController = createEventController(isBroadcast: true);
 
     if (widget.onCreatedOperator != null) {
       widget.onCreatedOperator!(this);
@@ -58,9 +73,11 @@ class _LegacySingleRouterScreenState extends State<LegacySingleRouterScreen> wit
         }
 
         wasBuilt = true;
-        return SizedBox(
-          height: constraints.maxHeight,
-          width: constraints.maxWidth,
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: constraints.maxHeight,
+            maxWidth: constraints.maxWidth,
+          ),
           child: Stack(children: children),
         );
       },
@@ -123,6 +140,9 @@ class _LegacySingleRouterScreenState extends State<LegacySingleRouterScreen> wit
     final int position = children.length;
 
     children.add(newScreen);
+    _actualPage += 1;
+
+    notifyChangeScreenController.addIfActive(children.length);
     setState(() {});
 
     final newVisibleOperator = await completerVisible.future;
@@ -183,6 +203,9 @@ class _LegacySingleRouterScreenState extends State<LegacySingleRouterScreen> wit
     checkProgrammingFailure(thatChecks: const Oration(message: 'Single stacked screen  is still active'), result: () => mounted);
     checkProgrammingFailure(thatChecks: const Oration(message: 'Must be built before'), result: () => wasBuilt);
 
+    _actualPage -= 1;
+    notifyChangeScreenController.addIfActive(children.length - 1);
+
     final position = children.length - 1;
 
     final futureShow = _showScreen(position: position - 1, toLeft: true, duration: duration ?? widget.duration, curve: curve ?? widget.curve);
@@ -203,12 +226,19 @@ class _LegacySingleRouterScreenState extends State<LegacySingleRouterScreen> wit
     checkProgrammingFailure(thatChecks: const Oration(message: 'Must be built before'), result: () => wasBuilt);
     checkProgrammingFailure(thatChecks: const Oration(message: 'Single stacked screen  is still active'), result: () => mounted);
     _sincronizer.execute(function: () {
+      _actualPage = 0;
       if (children.isEmpty) {
         return _pushScreen(newWidget: newWidget, curve: curve, duration: duration);
       } else {
         return _resetScreen(newWidget: newWidget, curve: curve, duration: duration);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    notifyDisposeController.addIfActive(null);
+    super.dispose();
   }
 
   Future<void> _resetScreen({required Widget newWidget, Duration? duration, Curve? curve}) async {
@@ -218,6 +248,8 @@ class _LegacySingleRouterScreenState extends State<LegacySingleRouterScreen> wit
     opacity.clear();
     positioners.clear();
     visibles.clear();
+
+    notifyChangeScreenController.addIfActive(0);
 
     setState(() {});
 

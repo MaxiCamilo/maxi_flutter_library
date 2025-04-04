@@ -77,7 +77,7 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
   }
 
   void _declareClosed() async {
-    killAllThread();
+    ThreadManager.killAllThread();
   }
 
   @override
@@ -137,13 +137,7 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
     }
   }
 
-  void killAllThread() {
-    if (ThreadManager.instance is IThreadManagerServer) {
-      (ThreadManager.instance as IThreadManagerServer).killAllThread();
-    } else {
-      ThreadManager.instance.callFunctionOnTheServer(function: (x) => (ThreadManager.instance as IThreadManagerServer).killAllThread());
-    }
-  }
+  
 
   @override
   void finishApplication() {

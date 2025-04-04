@@ -9,6 +9,9 @@ class MaxiScroll extends StatefulWidget {
   final Radius? radius;
   final bool expand;
 
+  final double verticalScrollPadding;
+  final double horizontalScrollPadding;
+
   final void Function(ScrollController)? onScrollCreated;
 
   const MaxiScroll({
@@ -20,6 +23,8 @@ class MaxiScroll extends StatefulWidget {
     this.thickness,
     this.radius,
     this.expand = false,
+    this.horizontalScrollPadding = 10.0,
+    this.verticalScrollPadding = 10.0,
   });
 
   @override
@@ -59,10 +64,19 @@ class _MaxiScrollState extends State<MaxiScroll> {
       thumbVisibility: true,
       thickness: widget.thickness,
       radius: widget.radius,
-      child: SingleChildScrollView(
-        scrollDirection: widget.scrollDirection,
-        controller: _scrollController,
-        child: widget.child,
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+        child: SingleChildScrollView(
+          scrollDirection: widget.scrollDirection,
+          controller: _scrollController,
+          child: Padding(
+            padding: EdgeInsets.only(
+              right: widget.scrollDirection == Axis.vertical ? widget.verticalScrollPadding : 0,
+              bottom: widget.scrollDirection == Axis.horizontal ? widget.horizontalScrollPadding : 0,
+            ),
+            child: widget.child,
+          ),
+        ),
       ),
     );
   }
@@ -70,19 +84,29 @@ class _MaxiScrollState extends State<MaxiScroll> {
   Widget _buildExpandedView(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        //print(_scrollController.hasClients && _scrollController.position.maxScrollExtent > 0);
         return Scrollbar(
           controller: _scrollController,
           thumbVisibility: true,
           thickness: widget.thickness,
           radius: widget.radius,
-          child: SingleChildScrollView(
-            scrollDirection: widget.scrollDirection,
-            controller: _scrollController,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            child: SingleChildScrollView(
+              scrollDirection: widget.scrollDirection,
+              controller: _scrollController,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: widget.scrollDirection == Axis.vertical ? widget.verticalScrollPadding : 0,
+                  bottom: widget.scrollDirection == Axis.horizontal ? widget.horizontalScrollPadding : 0,
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: widget.scrollDirection == Axis.vertical ? constraints.maxHeight : 0,
+                  ),
+                  child: widget.child,
+                ),
               ),
-              child: widget.child,
             ),
           ),
         );

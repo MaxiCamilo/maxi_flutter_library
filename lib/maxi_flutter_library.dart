@@ -9,3 +9,4 @@ export 'package:maxi_flutter_library/src/tools.dart';
 export 'package:maxi_flutter_library/src/animation.dart';
 export 'package:maxi_flutter_library/src/containers.dart';
 export 'package:maxi_flutter_library/src/dialog.dart';
+export 'package:maxi_flutter_library/src/operators.dart';
