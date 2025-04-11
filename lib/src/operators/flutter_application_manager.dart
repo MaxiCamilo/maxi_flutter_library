@@ -108,6 +108,11 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
   }
 
   @override
+  void changeLocalAddress(String address) {
+    _currentDirectory = address;
+  }
+
+  @override
   IOperatorLanguage get languagesOperator => LanguageOperatorBasic();
 
   @override
@@ -136,8 +141,6 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
       ThreadManager.instance.callFunctionOnTheServer(function: (x) => (ThreadManager.instance as IThreadManagerServer).closeAllThread());
     }
   }
-
-  
 
   @override
   void finishApplication() {

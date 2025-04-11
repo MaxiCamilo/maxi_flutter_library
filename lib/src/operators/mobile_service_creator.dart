@@ -1,11 +1,13 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/operators/internal_prefix_movile_server.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class MobileServiceChannel with StartableFunctionality, FunctionalityWithLifeCycle, IChannel<Map<String, dynamic>, Map<String, dynamic>> {
+class MobileServiceCreator with StartableFunctionality, FunctionalityWithLifeCycle, IChannel<Map<String, dynamic>, Map<String, dynamic>> {
   final bool autoStart;
   final bool isForegroundMode;
   final bool autoStartOnBoot;
@@ -18,7 +20,7 @@ class MobileServiceChannel with StartableFunctionality, FunctionalityWithLifeCyc
 
   late StreamController<Map<String, dynamic>> _receiverController;
 
-  MobileServiceChannel({
+  MobileServiceCreator({
     required this.onForeground,
     required this.onIosBackground,
     this.autoStart = true,
@@ -75,16 +77,33 @@ class MobileServiceChannel with StartableFunctionality, FunctionalityWithLifeCyc
     _serviceInstance = FlutterBackgroundService();
 
     await _serviceInstance!.configure(
-      iosConfiguration: IosConfiguration(autoStart: true, onForeground: onForeground, onBackground: onIosBackground),
-      androidConfiguration: AndroidConfiguration(autoStart: true, onStart: onForeground, isForegroundMode: isForegroundMode, autoStartOnBoot: true),
+      iosConfiguration: IosConfiguration(autoStart: autoStart, onForeground: onForeground, onBackground: onIosBackground),
+      androidConfiguration: AndroidConfiguration(autoStart: autoStart, onStart: onForeground, isForegroundMode: isForegroundMode, autoStartOnBoot: autoStartOnBoot),
     );
 
     _mountedServiceWaiter ??= Completer();
 
+    joinEvent(
+      event: _serviceInstance!.on(InternalPrefixMovileServer.serverTextStatus),
+      onData: (event) {
+        if (event == null) {
+          log('[MobileServiceCreator] Bad status text server!');
+          return;
+        }
+        CommunicatorAndroidService.sendServerStatus(Oration.interpret(map: event));
+      },
+    );
+
     /*final initializedEvent = */ joinEvent(
       event: _serviceInstance!.on(InternalPrefixMovileServer.serviceWasInitialized),
       onData: (event) {
-        _mountedServiceWaiter?.completeIfIncomplete();
+        if (event != null && event.containsKey('\$type') && event['\$type'].toString().startsWith('error')) {
+          _mountedServiceWaiter?.completeErrorIfIncomplete(NegativeResult.interpret(values: event, checkTypeFlag: true));
+        } else {
+          _mountedServiceWaiter?.completeIfIncomplete();
+        }
+
+        _mountedServiceWaiter = null;
       },
     );
 

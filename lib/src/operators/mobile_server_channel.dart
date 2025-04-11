@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:maxi_flutter_library/src/operators/internal_prefix_movile_server.dart';
@@ -21,8 +20,6 @@ class MobileServerChannel with IChannel<Map<String, dynamic>, Map<String, dynami
 
   @override
   bool get isActive => _isActive;
-
-  bool _serverIsClosed = false;
 
   MobileServerChannel({
     required this.service,
@@ -53,6 +50,10 @@ class MobileServerChannel with IChannel<Map<String, dynamic>, Map<String, dynami
     });
 
     service.invoke(InternalPrefixMovileServer.serviceWasInitialized);
+  }
+
+  void sendServerStatus(Oration text) {
+    service.invoke(InternalPrefixMovileServer.serverTextStatus, text.serialize());
   }
 
   @override

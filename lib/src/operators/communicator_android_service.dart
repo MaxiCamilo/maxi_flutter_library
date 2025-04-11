@@ -2,15 +2,18 @@ import 'dart:async';
 
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
+import 'package:maxi_flutter_library/src/operators/internal_prefix_movile_server.dart';
 import 'package:maxi_flutter_library/src/operators/mobile_server_channel.dart';
-import 'package:maxi_flutter_library/src/operators/mobile_service_channel.dart';
+import 'package:maxi_flutter_library/src/operators/mobile_service_creator.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 mixin CommunicatorAndroidService {
   static bool get isActive => _isActive.isInitialized && _isActive.syncValue;
   static Stream<Map<String, dynamic>> get receiver => _receiver.receiver;
+  static StreamSink<Map<String, dynamic>> get sender => _sending;
+  static Stream<Oration> get serverStatus => _serverStatus.receiver;
 
-  static MobileServiceChannel? _clientChannel;
+  static MobileServiceCreator? _clientChannel;
 
   static Stream<void> get onConnected => _onConnected.receiver;
   static Stream<void> get onDisconnects => _onDisconnects.receiver;
@@ -19,6 +22,7 @@ mixin CommunicatorAndroidService {
 
   static final IsolatedEvent<Map<String, dynamic>> _receiver = IsolatedEvent<Map<String, dynamic>>(name: '&MxAndroid.receiver');
   static final IsolatedEvent<Map<String, dynamic>> _sending = IsolatedEvent<Map<String, dynamic>>(name: '&MxAndroid.sending');
+  static final IsolatedEvent<Oration> _serverStatus = IsolatedEvent<Oration>(name: '&MxAndroid.status');
 
   static final IsolatedEvent<void> _onConnected = IsolatedEvent<void>(name: '&MxAndroid.onConnected');
   static final IsolatedEvent<void> _onDisconnects = IsolatedEvent<void>(name: '&MxAndroid.onDisconnects');
@@ -35,6 +39,10 @@ mixin CommunicatorAndroidService {
     } else {
       throw NegativeResult(identifier: NegativeResultCodes.contextInvalidFunctionality, message: const Oration(message: 'The communicator is closed'));
     }
+  }
+
+  static void sendServerStatus(Oration text) {
+    _serverStatus.add(text);
   }
 
   static void requestShutdown() {
@@ -58,6 +66,28 @@ mixin CommunicatorAndroidService {
     await _requestShutdown.initialize();
     await _requestReset.initialize();
   }
+/*
+  static StreamStateTextsVoid startServiceAsStream({
+    required dynamic Function(ServiceInstance) onForeground,
+    required FutureOr<bool> Function(ServiceInstance) onIosBackground,
+    bool autoStart = true,
+    bool isForegroundMode = true,
+    bool autoStartOnBoot = true,
+  }) async* {
+    await initializeEvents();
+
+    yield* connectItemStream(
+      serverStatus.parallelizingStreamWithFuture(
+        function: () => startService(
+          onForeground: onForeground,
+          onIosBackground: onIosBackground,
+          autoStart: autoStart,
+          autoStartOnBoot: autoStartOnBoot,
+          isForegroundMode: isForegroundMode,
+        ),
+      ),
+    );
+  }*/
 
   static Future<void> startService({
     required dynamic Function(ServiceInstance) onForeground,
@@ -73,7 +103,7 @@ mixin CommunicatorAndroidService {
         return;
       }
 
-      final channel = MobileServiceChannel(
+      final channel = MobileServiceCreator(
         onForeground: onForeground,
         onIosBackground: onIosBackground,
         autoStart: autoStart,
@@ -119,7 +149,7 @@ mixin CommunicatorAndroidService {
     required ServiceInstance service,
     required List<IReflectorAlbum> reflectors,
     required bool defineLanguageOperatorInOtherThread,
-    required Future<void> Function(AndroidServiceApplicationManager, IChannel<Map<String, dynamic>, Map<String, dynamic>>) preparatoryFunction,
+    required StreamStateTextsVoid Function(AndroidServiceApplicationManager, IChannel<Map<String, dynamic>, Map<String, dynamic>>) preparatoryFunction,
     bool useWorkingPath = false,
     bool useWorkingPathInDebug = true,
   }) async {
@@ -140,9 +170,20 @@ mixin CommunicatorAndroidService {
     await _isActive.changeValue(true);
 
     try {
-      await preparatoryFunction(manager, channel);
-    } catch (_) {
-      channel.close();
+      await waitFunctionalStream(
+        stream: preparatoryFunction(manager, channel),
+        onData: (x) => channel.sendServerStatus(x),
+      );
+    } catch (ex) {
+      final rn = NegativeResult.searchNegativity(item: ex, actionDescription: const Oration(message: 'Starting the Android service'));
+      service.invoke(InternalPrefixMovileServer.serviceWasInitialized, rn.serialize());
+
+      scheduleMicrotask(() {
+        ThreadManager.killAllThread();
+
+        channel.close();
+        service.stopSelf();
+      });
       rethrow;
     }
 
