@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/operators/internal_prefix_movile_server.dart';
-import 'package:maxi_flutter_library/src/operators/mobile_server_channel.dart';
-import 'package:maxi_flutter_library/src/operators/mobile_service_creator.dart';
+import 'package:maxi_flutter_library/src/operators/services/mobile_service_creator.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 mixin CommunicatorAndroidService {

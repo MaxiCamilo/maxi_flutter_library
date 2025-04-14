@@ -34,16 +34,16 @@ class ReflectedFormText extends ReflectionFieldImplementation {
 }
 
 class _StateReflectedFormText extends StateReflectionFieldImplementation<ReflectedFormText> {
-  late final TranslatedText _translatedTitle;
+  late final TranslatedOration _translatedTitle;
 
   @override
   void initState() {
     super.initState();
 
     if (widget.title == null) {
-      _translatedTitle = TranslatedText.translate(text: formalName);
+      _translatedTitle = TranslatedOration.translate(text: formalName);
     } else {
-      _translatedTitle = TranslatedText.translate(text: widget.title!);
+      _translatedTitle = TranslatedOration.translate(text: widget.title!);
     }
   }
 

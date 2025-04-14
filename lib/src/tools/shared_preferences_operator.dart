@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'package:maxi_library/maxi_library.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPreferencesOperator with IFileOperator {
+class SharedPreferencesOperator with IAbstractFileOperator, IReadOnlyFileOperator, IFileModifierOperator, IFileOperator {
   @override
   bool get isLocal => true;
 

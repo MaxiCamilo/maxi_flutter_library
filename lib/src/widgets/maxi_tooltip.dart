@@ -12,7 +12,7 @@ class MaxiTooltip extends StatefulWidget {
 }
 
 class _MaxiTooltipState extends State<MaxiTooltip> {
-  late String translatedText;
+  late String translatedOration;
   late Oration text;
 
   @override
@@ -20,18 +20,18 @@ class _MaxiTooltipState extends State<MaxiTooltip> {
     super.initState();
     text = widget.text;
 
-    translatedText = widget.text.toString();
+    translatedOration = widget.text.toString();
   }
 
   @override
   Widget build(BuildContext context) {
     if (widget.text != text) {
       text = widget.text;
-      translatedText = widget.text.toString();
+      translatedOration = widget.text.toString();
     }
 
     return Tooltip(
-      message: translatedText,
+      message: translatedOration,
       child: widget.child,
     );
   }
