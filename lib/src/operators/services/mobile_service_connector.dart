@@ -4,7 +4,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 import 'package:maxi_library_online/maxi_library_online.dart';
 
-class MobileServiceConnector with IHttpRequester, StartableFunctionality {
+class MobileServiceConnector with IHttpRequester, StartableFunctionality, FunctionalityWithLifeCycle {
   late MapServerConnector _connector;
 
   MobileServiceConnector();
@@ -13,7 +13,7 @@ class MobileServiceConnector with IHttpRequester, StartableFunctionality {
   bool get isActive => CommunicatorAndroidService.isActive;
 
   @override
-  Future<void> initializeFunctionality() async {
+  Future<void> afterInitializingFunctionality() async {
     _connector = MapServerConnector(
       receiver: CommunicatorAndroidService.receiver,
       sender: CommunicatorAndroidService.sender,
@@ -23,12 +23,20 @@ class MobileServiceConnector with IHttpRequester, StartableFunctionality {
     await _connector.initialize();
 
     _connector.done.whenComplete(() => dispose());
+    joinEvent(
+        event: CommunicatorAndroidService.onDisconnects,
+        onData: (_) {
+          dispose();
+        });
+
+    CommunicatorAndroidService.notifyNewClient();
   }
 
   @override
   void performObjectDiscard() {
     super.performObjectDiscard();
 
+    CommunicatorAndroidService.notifyRemovedClient();
     _connector.close();
   }
 

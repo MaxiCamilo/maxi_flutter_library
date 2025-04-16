@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class FileOperatorAsset with IAbstractFileOperator, IReadOnlyFileOperator {
@@ -17,6 +18,7 @@ class FileOperatorAsset with IAbstractFileOperator, IReadOnlyFileOperator {
 
   FileOperatorAsset({required this.route}) {
     _serializedAddress = route.replaceAll('${DirectoryUtilities.prefixRouteLocal}/', '').replaceAll(DirectoryUtilities.prefixRouteLocal, '');
+    WidgetsFlutterBinding.ensureInitialized();
   }
 
   @override

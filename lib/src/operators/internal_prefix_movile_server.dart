@@ -6,5 +6,7 @@ mixin InternalPrefixMovileServer {
   static const String serverTextStatus = 'STxS';
   static const String serverMessage = 'SM';
   static const String clientMessage = 'CM';
+  static const String clientClose = 'CL';
+  static const String newClient = 'NC';
   static const String resetMessage = 'RM';
 }

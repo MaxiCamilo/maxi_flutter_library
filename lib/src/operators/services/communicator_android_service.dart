@@ -11,6 +11,10 @@ mixin CommunicatorAndroidService {
   static Stream<Map<String, dynamic>> get receiver => _receiver.receiver;
   static StreamSink<Map<String, dynamic>> get sender => _sending;
   static Stream<Oration> get serverStatus => _serverStatus.receiver;
+  static Stream<int> get changedNumberClient => _numbrerOfClients.receiver;
+  static Stream<void> get withoutClients => _withoutClients.receiver;
+
+  static int get numberOfClients => _numbrerOfClients.syncValue;
 
   static MobileServiceCreator? _clientChannel;
 
@@ -18,6 +22,9 @@ mixin CommunicatorAndroidService {
   static Stream<void> get onDisconnects => _onDisconnects.receiver;
 
   static final IsolatedValue<bool> _isActive = IsolatedValue<bool>(name: '&MxAndroid.isActive', defaultValue: false);
+  static final IsolatedValue<int> _numbrerOfClients = IsolatedValue<int>(name: '&MxAndroid.numbrerOfClient', defaultValue: 0);
+
+  static final IsolatedEvent<void> _withoutClients = IsolatedEvent<void>(name: '&MxAndroid.withoutClients');
 
   static final IsolatedEvent<Map<String, dynamic>> _receiver = IsolatedEvent<Map<String, dynamic>>(name: '&MxAndroid.receiver');
   static final IsolatedEvent<Map<String, dynamic>> _sending = IsolatedEvent<Map<String, dynamic>>(name: '&MxAndroid.sending');
@@ -31,6 +38,12 @@ mixin CommunicatorAndroidService {
 
   static final _clientSynchronizer = Semaphore();
   static final _eventList = <StreamSubscription>[];
+
+  static final _addClient = IsolatedEvent<void>(name: '&MxAndroid.newClient');
+  static final _removedClient = IsolatedEvent<void>(name: '&MxAndroid.closeClient');
+
+  static void notifyNewClient() => _addClient.add(null);
+  static void notifyRemovedClient() => _removedClient.add(null);
 
   static void sendData(Map<String, dynamic> data) {
     if (isActive) {
@@ -47,6 +60,7 @@ mixin CommunicatorAndroidService {
   static void requestShutdown() {
     if (isActive) {
       _requestShutdown.add(null);
+      
     }
   }
 
@@ -64,6 +78,11 @@ mixin CommunicatorAndroidService {
     await _onDisconnects.initialize();
     await _requestShutdown.initialize();
     await _requestReset.initialize();
+    await _numbrerOfClients.initialize();
+    await _withoutClients.initialize();
+
+    await _addClient.initialize();
+    await _removedClient.initialize();
   }
 /*
   static StreamStateTextsVoid startServiceAsStream({
@@ -120,14 +139,7 @@ mixin CommunicatorAndroidService {
         channel.addIfActive(x);
       }));
 
-      channel.done.then((_) {
-        _clientChannel = null;
-        _isActive.changeValue(false);
-        _onDisconnects.add(null);
-
-        _eventList.iterar((x) => x.cancel());
-        _eventList.clear();
-      });
+      channel.done.whenComplete(() => _declareClosed());
 
       _eventList.add(_requestShutdown.receiver.listen((_) {
         channel.closeService();
@@ -137,11 +149,34 @@ mixin CommunicatorAndroidService {
         channel.resetService();
       }));
 
+      _eventList.add(_addClient.receiver.listen((_) {
+        channel.notifyNewClient();
+      }));
+
+      _eventList.add(_removedClient.receiver.listen((_) {
+        channel.notifyRemovedClient();
+      }));
+
       _clientChannel = channel;
 
       _isActive.changeValue(true);
       _onConnected.add(null);
     });
+  }
+
+  static Future<void> _declareClosed() async {
+    if (!isActive) {
+      return;
+    }
+
+    _isActive.changeValue(false);
+    _onDisconnects.add(null);
+
+    _eventList.iterar((x) => x.cancel());
+    _eventList.clear();
+
+    _clientChannel?.close();
+    _clientChannel = null;
   }
 
   static Future<AndroidServiceApplicationManager> initializeAsService({
@@ -156,6 +191,28 @@ mixin CommunicatorAndroidService {
     final channel = MobileServerChannel(service: service, manualActivation: true);
 
     _connectServerEvents(channel);
+
+    _requestShutdown.receiver.listen((_) {
+      channel.close();
+    });
+
+    _requestReset.receiver.listen((_) {
+      service.invoke(InternalPrefixMovileServer.resetMessage);
+    });
+
+    service.on(InternalPrefixMovileServer.newClient).listen((_) {
+      final value = _numbrerOfClients.syncValue;
+      _numbrerOfClients.changeValue(value + 1);
+    });
+
+    service.on(InternalPrefixMovileServer.clientClose).listen((_) {
+      final value = _numbrerOfClients.syncValue - 1;
+      _numbrerOfClients.changeValue(value);
+
+      if (value == 0) {
+        _withoutClients.add(null);
+      }
+    });
 
     final manager = await ApplicationManager.changeInstance(
       newInstance: AndroidServiceApplicationManager(

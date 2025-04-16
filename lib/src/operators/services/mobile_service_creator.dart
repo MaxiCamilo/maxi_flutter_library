@@ -42,6 +42,24 @@ class MobileServiceCreator with StartableFunctionality, FunctionalityWithLifeCyc
     _serviceInstance!.invoke(InternalPrefixMovileServer.requestServerClosure);
   }
 
+  void notifyNewClient() {
+    if (_serviceInstance == null) {
+      log('[MobileServiceCreator] Service instance is null!');
+      return;
+    } else {
+      _serviceInstance!.invoke(InternalPrefixMovileServer.newClient);
+    }
+  }
+
+  void notifyRemovedClient() {
+    if (_serviceInstance == null) {
+      log('[MobileServiceCreator] Service instance is null!');
+      return;
+    } else {
+      _serviceInstance!.invoke(InternalPrefixMovileServer.clientClose);
+    }
+  }
+
   Future<void> resetService() async {
     if (isActive) {
       scheduleMicrotask(() => closeService());
@@ -149,6 +167,8 @@ class MobileServiceCreator with StartableFunctionality, FunctionalityWithLifeCyc
   void performObjectDiscard() {
     //close();
     super.performObjectDiscard();
+
+    _serviceInstance?.invoke(InternalPrefixMovileServer.clientClose);
 
     _doneWaiter?.completeIfIncomplete();
     _doneWaiter = null;

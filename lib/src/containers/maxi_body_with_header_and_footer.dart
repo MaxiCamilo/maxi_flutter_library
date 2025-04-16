@@ -3,6 +3,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 
 class MaxiBodyWithHeaderAndFooter extends StatelessWidget {
   final double determiningWidth;
+  final double determiningHeigth;
   final bool useScreenSize;
   final Axis direction;
 
@@ -11,11 +12,14 @@ class MaxiBodyWithHeaderAndFooter extends StatelessWidget {
   final Widget? footer;
 
   final bool likeAsMaxiFlex;
+  final bool expandVertically;
 
   const MaxiBodyWithHeaderAndFooter({
     super.key,
     required this.determiningWidth,
+    required this.determiningHeigth,
     this.useScreenSize = true,
+    this.expandVertically = true,
     this.direction = Axis.vertical,
     this.header,
     this.body,
@@ -26,22 +30,22 @@ class MaxiBodyWithHeaderAndFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (useScreenSize) {
-      return _buildWithWidth(context, context.screenWidth);
+      return _buildWithWidth(context, context.screenWidth, context.screenHeigth);
     } else {
-      return LayoutBuilder(builder: (context, constraints) => _buildWithWidth(context, constraints.maxWidth));
+      return LayoutBuilder(builder: (context, constraints) => _buildWithWidth(context, constraints.maxWidth, constraints.maxHeight));
     }
   }
 
-  Widget _buildWithWidth(BuildContext context, double width) {
+  Widget _buildWithWidth(BuildContext context, double width, double heigth) {
     if (likeAsMaxiFlex) {
-      if (width >= determiningWidth) {
+      if (width >= determiningWidth && (heigth == double.infinity || heigth >= determiningHeigth)) {
         return _buildExtendedFlex(context, Axis.horizontal);
       } else {
         return _buildCompactFlex(context, Axis.vertical);
       }
     }
 
-    if (width >= determiningWidth) {
+    if (width >= determiningWidth && (heigth == double.infinity || heigth >= determiningHeigth)) {
       return _buildExtendedFlex(context, direction);
     } else {
       return _buildCompactFlex(context, direction);
@@ -52,13 +56,17 @@ class MaxiBodyWithHeaderAndFooter extends StatelessWidget {
     if (footer != null && header != null) {
       return Flex(
         direction: direction,
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: expandVertically ? MainAxisSize.max : MainAxisSize.min,
         //mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           header!,
-          Expanded(
-            child: body == null ? const SizedBox() : MaxiScroll(expand: true, child: body!),
-          ),
+          expandVertically
+              ? Expanded(
+                  child: body == null ? const SizedBox() : MaxiScroll(expand: true, child: body!),
+                )
+              : body == null
+                  ? const SizedBox()
+                  : Flexible(child: MaxiScroll(child: body!)),
           footer!,
         ],
       );
@@ -99,7 +107,7 @@ class MaxiBodyWithHeaderAndFooter extends StatelessWidget {
     }
 
     return MaxiScroll(
-      expand: true,
+      //expand: true,
       child: Flex(
         direction: direction,
         mainAxisSize: MainAxisSize.min,
