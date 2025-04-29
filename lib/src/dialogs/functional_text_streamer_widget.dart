@@ -239,7 +239,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
           ),
         ),
         const SizedBox(
-          height: 15,
+          height: 7,
         ),
         _makeButtons(context),
       ],
@@ -258,6 +258,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
       rowFrom: 400,
       useScreenSize: true,
       expandRow: true,
+      columnCrossAxisAlignment: CrossAxisAlignment.center,
       children: [
         isActive
             ? const CircularProgressIndicator()

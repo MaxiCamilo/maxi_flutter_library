@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
+import 'package:maxi_flutter_library/src/operators/service/isolated_android_service.dart';
 import 'package:maxi_library/maxi_library.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -11,7 +12,9 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
   final bool useWorkingPath;
   final bool useWorkingPathInDebug;
 
-  final _appLifecycleStateController = StreamController<AppLifecycleState>.broadcast();
+  //final _appLifecycleStateController = StreamController<AppLifecycleState>.broadcast();
+
+  static final changedApplicationStatus = IsolatedValue<AppLifecycleState>(name: '%MxCaS%', defaultValue: AppLifecycleState.resumed);
 
   @override
   final List<IReflectorAlbum> reflectors;
@@ -48,7 +51,7 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
   @override
   bool get isFlutter => true;
 
-  Stream<AppLifecycleState> get appLifeCycleStateStream => _appLifecycleStateController.stream;
+  //Stream<AppLifecycleState> get appLifeCycleStateStream => _appLifecycleStateController.stream;
 
   String? _currentDirectory;
   bool _wasBinding = false;
@@ -56,27 +59,40 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
   FlutterApplicationManager({
     this.useWorkingPath = false,
     this.useWorkingPathInDebug = true,
+    bool androidServiceIsServer = false,
     required this.reflectors,
     required this.defineLanguageOperatorInOtherThread,
-  });
+  }) {
+    ThreadManager.addThreadInitializer(initializer: IsolatedAndroidService(isServer: androidServiceIsServer));
+  }
+
+  @override
+  Future<void> initializeFunctionality() async {
+    await super.initializeFunctionality();
+    await changedApplicationStatus.initialize();
+  }
 
   void initObserver() {
     if (!_wasBinding) {
       WidgetsBinding.instance.addObserver(this);
+      changedApplicationStatus.initialize();
       _wasBinding = true;
     }
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    _appLifecycleStateController.add(state);
-
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.detached) {
+      if (AndroidServiceManager.isDefinder) {
+        AndroidServiceManager.instance.closeConnection();
+      }
       _declareClosed();
+    } else {
+      changedApplicationStatus.changeValue(state);
     }
   }
 
-  void _declareClosed() async {
+  void _declareClosed() {
     ThreadManager.killAllThread();
   }
 

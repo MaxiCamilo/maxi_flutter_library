@@ -1,0 +1,1 @@
+export 'package:maxi_flutter_library/src/singleton/android_service_manager.dart';

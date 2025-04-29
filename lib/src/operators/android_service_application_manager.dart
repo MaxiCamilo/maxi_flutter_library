@@ -1,19 +1,25 @@
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 
-class AndroidServiceApplicationManager extends FlutterApplicationManager {
+class AndroidApplicationManager extends FlutterApplicationManager {
   //final MobileServerChannel channel;
 
-  AndroidServiceApplicationManager({/*required this.channel,*/ required super.reflectors, required super.defineLanguageOperatorInOtherThread});
+  AndroidApplicationManager({
+    /*required this.channel,*/ required super.reflectors,
+    required super.defineLanguageOperatorInOtherThread,
+    super.androidServiceIsServer = true,
+    super.useWorkingPath,
+    super.useWorkingPathInDebug,
+  });
 
   @override
   void finishApplication() {
     //channel.close();
 
-    CommunicatorAndroidService.requestShutdown();
+    AndroidServiceManager.instance.shutdown();
   }
 
   @override
   void resetApplication({List<String> arguments = const []}) {
-    CommunicatorAndroidService.requestReset();
+    AndroidServiceManager.instance.reset();
   }
 }
