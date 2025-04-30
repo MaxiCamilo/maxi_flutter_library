@@ -138,7 +138,7 @@ class _LegacyMaxiAnimatedOpacityState extends StateWithLifeCycle<_LegacyMaxiAnim
     }
 
     if (isChange && mounted) {
-      _waitFinish ??= Completer();
+      _waitFinish ??= MaxiCompleter();
       setState(() {});
       await _waitFinish!.future;
       if (actualOpacity != this.opacity) {

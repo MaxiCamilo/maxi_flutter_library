@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
+import 'package:maxi_library/maxi_library.dart';
 
 class MaxiVerticalCollapsor extends StatefulWidget with IMaxiAnimatorWidget {
   final bool startsOpen;
@@ -92,7 +93,7 @@ class _MaxiVerticalCollapsorState extends StateWithLifeCycle<MaxiVerticalCollaps
       return;
     }
 
-    _waitForWidgetToDisplay ??= Completer();
+    _waitForWidgetToDisplay ??= MaxiCompleter();
     return _waitForWidgetToDisplay!.future;
   }
 

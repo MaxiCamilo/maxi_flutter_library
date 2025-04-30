@@ -119,7 +119,7 @@ mixin AndroidServiceManager {
 
   static Future<IAndroidServiceManager> get onInstanceDefined async {
     if (_instance == null) {
-      _defineInstanceWaiter ??= Completer<IAndroidServiceManager>();
+      _defineInstanceWaiter ??= MaxiCompleter<IAndroidServiceManager>();
       await _defineInstanceWaiter!.future;
     }
     if (!_instance!.isInitialized) {

@@ -112,9 +112,9 @@ class _LegacySingleRouterScreenState extends StateWithLifeCycle<LegacySingleRout
   }
 
   Future<void> _pushScreen({required Widget newWidget, Duration? duration, Curve? curve}) async {
-    final completerVisible = Completer<LegacyMaxiAnimatedVisibleState>();
-    final completerPosition = Completer<LegacyMaxiAnimatedPositionedState>();
-    final completerOpacity = Completer<LegacyMaxiAnimatedOpacityState>();
+    final completerVisible = MaxiCompleter<LegacyMaxiAnimatedVisibleState>();
+    final completerPosition = MaxiCompleter<LegacyMaxiAnimatedPositionedState>();
+    final completerOpacity = MaxiCompleter<LegacyMaxiAnimatedOpacityState>();
 
     final newScreen = LegacyMaxiAnimatedWidget(
       animators: [

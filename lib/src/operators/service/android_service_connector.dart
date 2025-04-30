@@ -122,7 +122,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
       initialNotificationTitle: initialNotificationTitle,
     );
 
-    final waiter = Completer();
+    final waiter = MaxiCompleter();
     scheduleMicrotask(() => containErrorLogAsync(
         detail: const Oration(message: 'Initializing service'),
         function: () async {
@@ -273,7 +273,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
   }
 
   Future<bool> _checkServerName({Duration? timeout, bool checkNameIsEqual = true}) async {
-    final waiter = Completer<bool>();
+    final waiter = MaxiCompleter<bool>();
 
     final subscription = joinEvent(
       event: _backgroundService.on(AndroidServiceReservedCommands.serverSendsItsName),

@@ -19,7 +19,7 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
 
   @mustCallSuper
   Future<StateWithLifeCycle<T>> get onDispose {
-    _waitingDiscarded ??= Completer<StateWithLifeCycle<T>>();
+    _waitingDiscarded ??= MaxiCompleter<StateWithLifeCycle<T>>();
     return _waitingDiscarded!.future;
   }
 

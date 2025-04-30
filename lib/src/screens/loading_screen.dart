@@ -167,7 +167,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     late Future<T> getterPromise;
 
     try {
-      waitingForCancellation = Completer<T>();
+      waitingForCancellation = MaxiCompleter<T>();
       getterPromise = widget.getterValue();
 
       item = await Future.any([getterPromise, waitingForCancellation!.future]);

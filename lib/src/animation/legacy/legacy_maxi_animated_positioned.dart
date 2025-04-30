@@ -220,7 +220,7 @@ class _LegacyMaxiAnimatedPositionedState extends LegacyMaxiAnimatedPositionedSta
 
     if (isChange && mounted) {
       setState(() {});
-      _waitFinish ??= Completer();
+      _waitFinish ??= MaxiCompleter();
       await _waitFinish!.future;
     }
   }

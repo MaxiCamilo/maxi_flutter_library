@@ -97,7 +97,7 @@ class AndroidServiceHttpConnector with StartableFunctionality, FunctionalityWith
 
   @override
   Future addStream(Stream<Map<String, dynamic>> stream) async {
-    final waiter = Completer<void>();
+    final waiter = MaxiCompleter<void>();
 
     late final StreamSubscription<Map<String, dynamic>> subscription;
     subscription = stream.listen(

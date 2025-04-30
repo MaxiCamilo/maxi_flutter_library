@@ -55,7 +55,7 @@ class _SingleStackScreenState extends StateWithLifeCycle<SingleStackScreen> with
   @override
   String actuanWidgetName = '';
 
-  final waiterPortrait = Completer();
+  final waiterPortrait = MaxiCompleter();
   final changeSemaphore = Semaphore();
 
   Completer? waiterAnimationEnd;
@@ -167,7 +167,7 @@ class _SingleStackScreenState extends StateWithLifeCycle<SingleStackScreen> with
 
   @override
   Future<void> waitAnimationEnd() {
-    waiterAnimationEnd ??= Completer();
+    waiterAnimationEnd ??= MaxiCompleter();
     return waiterAnimationEnd!.future;
   }
 
