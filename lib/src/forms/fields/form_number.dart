@@ -364,7 +364,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.period || event.logicalKey == LogicalKeyboardKey.comma) {
         if (widget.isDecimal) {
-          scheduleMicrotask(selectDecimalSection);
+          maxiScheduleMicrotask(selectDecimalSection);
         }
 
         return true;

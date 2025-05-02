@@ -106,7 +106,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     if (widget.startWhenDisplayed) {
       isActive = true;
       lastText = const Oration(message: 'Starting stream');
-      scheduleMicrotask(strartStream);
+      maxiScheduleMicrotask(strartStream);
     } else {
       lastText = const Oration(message: 'Press "start" to start the function execution');
     }
@@ -214,7 +214,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
       isActive = true;
       lastText = const Oration(message: 'Starting stream');
 
-      scheduleMicrotask(strartStream);
+      maxiScheduleMicrotask(strartStream);
       setState(() {});
     }
   }

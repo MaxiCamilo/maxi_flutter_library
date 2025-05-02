@@ -123,7 +123,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
     );
 
     final waiter = MaxiCompleter();
-    scheduleMicrotask(() => containErrorLogAsync(
+    maxiScheduleMicrotask(() => containErrorLogAsync(
         detail: const Oration(message: 'Initializing service'),
         function: () async {
           try {
@@ -397,7 +397,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
   @override
   void closeConnection() {
     if (isInitialized) {
-      scheduleMicrotask(() async {
+      maxiScheduleMicrotask(() async {
         _backgroundService.invoke(AndroidServiceReservedCommands.notifyCloseClient);
         await continueOtherFutures();
         dispose();

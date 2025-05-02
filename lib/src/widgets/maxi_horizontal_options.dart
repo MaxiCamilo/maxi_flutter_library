@@ -56,7 +56,7 @@ class _MaxiHorizontalOptionsState extends StateWithLifeCycle<MaxiHorizontalOptio
     super.initState();
 
     if (widget.reloaders != null) {
-      scheduleMicrotask(() async {
+      maxiScheduleMicrotask(() async {
         for (final stream in await widget.reloaders!()) {
           joinEvent(
               event: stream,

@@ -51,7 +51,7 @@ class _MaxiErrorPosterState extends StateWithLifeCycle<MaxiErrorPoster> with IMa
     hidden = widget.hidden;
 
     if (widget.reloaders != null) {
-      scheduleMicrotask(() async {
+      maxiScheduleMicrotask(() async {
         for (final event in await widget.reloaders!()) {
           joinEvent(
               event: event,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/animation/legacy/legacy_maxi_widget_animator.dart';
+import 'package:maxi_library/maxi_library.dart';
 
 class LegacyMaxiAnimatedWidget extends StatefulWidget {
   final List<LegacyMaxiWidgetAnimator> animators;
@@ -41,7 +42,7 @@ class _LegacyMaxiAnimatedWidgetAnimatedWidgetState extends State<LegacyMaxiAnima
 
     if (_isDiferentList()) {
       _lastAnimations = widget.animators.toList(growable: false);
-      scheduleMicrotask(() => setState(() {}));
+      maxiScheduleMicrotask(() => setState(() {}));
       return const SizedBox();
     }
 

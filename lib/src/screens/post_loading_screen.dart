@@ -68,7 +68,7 @@ class _PostLoadingScreenState<T> extends StateWithLifeCycle<PostLoadingScreen<T>
     onErrorController = createEventController<NegativeResult>(isBroadcast: true);
 
     if (widget.updatersStreams != null) {
-      scheduleMicrotask(() async {
+      maxiScheduleMicrotask(() async {
         final streamList = await widget.updatersStreams!();
         for (final stream in streamList) {
           joinEvent(event: stream, onData: updaterOnData);

@@ -116,7 +116,7 @@ class _MaxiVerticalCollapsorState extends StateWithLifeCycle<MaxiVerticalCollaps
     }
 
     if (widget.modifiers != null) {
-      scheduleMicrotask(() => _hookModifierEvents());
+      maxiScheduleMicrotask(() => _hookModifierEvents());
     }
 
     initializeAnimator();

@@ -86,7 +86,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     onValueUpdateControler = createEventController(isBroadcast: true);
 
     if (widget.reloaders != null) {
-      scheduleMicrotask(() async {
+      maxiScheduleMicrotask(() async {
         final reloaders = await widget.reloaders!();
         for (final item in reloaders) {
           joinEvent<bool>(event: item, onData: _reload);
@@ -95,7 +95,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     }
 
     if (widget.valueUpdaters != null) {
-      scheduleMicrotask(() async {
+      maxiScheduleMicrotask(() async {
         final valueUpdaters = await widget.valueUpdaters!();
         for (final item in valueUpdaters) {
           joinEvent(event: item, onData: _updateValues);

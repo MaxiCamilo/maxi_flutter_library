@@ -41,7 +41,7 @@ class _MaxiBasicListState<T> extends StateWithLifeCycle<MaxiBasicList<T>> with S
     super.initState();
 
     if (widget.reloaders != null) {
-      scheduleMicrotask(() async {
+      maxiScheduleMicrotask(() async {
         final reloaders = await widget.reloaders!();
         for (final item in reloaders) {
           joinEvent(event: item, onData: _reload);
@@ -50,7 +50,7 @@ class _MaxiBasicListState<T> extends StateWithLifeCycle<MaxiBasicList<T>> with S
     }
 
     if (widget.valueUpdaters != null) {
-      scheduleMicrotask(() async {
+      maxiScheduleMicrotask(() async {
         final valueUpdaters = await widget.valueUpdaters!();
         for (final item in valueUpdaters) {
           joinEvent(event: item, onData: _updateValues);

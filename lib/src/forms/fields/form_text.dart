@@ -157,7 +157,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
       final isCorrect = super.declareChangedValue(value: value);
 
       if (wasValid != isCorrect || lastErrorText != lastTranslatedErrorText) {
-        scheduleMicrotask(() {
+        maxiScheduleMicrotask(() {
           try {
             textController.value = TextEditingValue(
               text: textController.text,
