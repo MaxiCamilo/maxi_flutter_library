@@ -39,36 +39,21 @@ mixin AndroidServiceManager {
     bool isForegroundMode = true,
     bool autoStartOnBoot = false,
   }) async {
-    if (ThreadManager.instance.isServer) {
-      return AndroidServiceConnector.createConnector(
-        onForeground: onForeground,
-        onIosBackground: onIosBackground,
-        serverName: serverName,
-        autoStart: autoStart,
-        autoStartOnBoot: autoStartOnBoot,
-        isForegroundMode: isForegroundMode,
-        initialNotificationContent: initialNotificationContent,
-        initialNotificationTitle: initialNotificationTitle,
-      );
-    } else {
-      await ThreadManager.instance.callFunctionOnTheServer(
-          parameters: InvocationParameters.list([onForeground, onIosBackground, serverName, autoStart, autoStartOnBoot, isForegroundMode, initialNotificationContent, initialNotificationTitle]),
-          function: (x) async {
-            await AndroidServiceConnector.createConnector(
-              onForeground: x.firts(),
-              onIosBackground: x.second(),
-              serverName: x.third(),
-              autoStart: x.fourth(),
-              autoStartOnBoot: x.fifth(),
-              isForegroundMode: x.sixth(),
-              initialNotificationContent: x.seventh(),
-              initialNotificationTitle: x.octave(),
-            );
-          });
-      final isolate = IsolatedAndroidService(isServer: false);
-      await isolate.initialize();
-      return isolate;
+    if (_instance != null && _instance is IsolatedAndroidService) {
+      await _instance!.initialize();
+      return _instance!;
     }
+
+    return AndroidServiceConnector.createConnector(
+      onForeground: onForeground,
+      onIosBackground: onIosBackground,
+      serverName: serverName,
+      autoStart: autoStart,
+      autoStartOnBoot: autoStartOnBoot,
+      isForegroundMode: isForegroundMode,
+      initialNotificationContent: initialNotificationContent,
+      initialNotificationTitle: initialNotificationTitle,
+    );
   }
 
   static Future<void> initializeAsService({
@@ -76,10 +61,22 @@ mixin AndroidServiceManager {
     required ServiceInstance service,
     required List<IReflectorAlbum> reflectors,
     required bool defineLanguageOperatorInOtherThread,
-    required StreamStateTextsVoid Function() preparatoryFunction,
+    required FutureOr<dynamic> Function() preparatoryFunction,
     bool useWorkingPath = false,
     bool useWorkingPathInDebug = true,
-  }) async {
+  }) async {/*
+    final androidApp = AndroidApplicationManager(
+      defineLanguageOperatorInOtherThread: defineLanguageOperatorInOtherThread,
+      reflectors: reflectors,
+      androidServiceIsServer: true,
+      useWorkingPath: useWorkingPath,
+      useWorkingPathInDebug: useWorkingPathInDebug,
+    );
+
+    if (!ApplicationManager.isDefined) {
+      await ApplicationManager.changeInstance(newInstance: androidApp, initialize: true);
+    }*/
+
     try {
       final instance = AndroidServiceEngine(
         serverName: serverName,

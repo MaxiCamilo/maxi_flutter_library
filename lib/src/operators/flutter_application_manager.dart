@@ -63,7 +63,7 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
     required this.reflectors,
     required this.defineLanguageOperatorInOtherThread,
   }) {
-    ThreadManager.addThreadInitializer(initializer: IsolatedAndroidService(isServer: androidServiceIsServer));
+    ThreadManager.addThreadInitializer(initializer: IsolatedAndroidService());
   }
 
   @override

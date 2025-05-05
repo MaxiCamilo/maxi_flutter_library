@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:maxi_flutter_library/src/operators/service/android_service_reserved_commands.dart';
+import 'package:maxi_flutter_library/src/operators/service/isolated_android_service.dart';
 import 'package:maxi_flutter_library/src/singletons.dart';
 import 'package:maxi_library/maxi_library.dart';
 import 'package:maxi_library_online/maxi_library_online.dart';
@@ -48,6 +49,10 @@ class AndroidServiceHttpServer with StartableFunctionality, FunctionalityWithLif
         identifier: NegativeResultCodes.contextInvalidFunctionality,
         message: const Oration(message: 'An http server communicating on the services channel is already initialized'),
       );
+    }
+
+    if(AndroidServiceManager.instance is IsolatedAndroidService){
+      await AndroidServiceManager.instance.initialize();
     }
 
     AndroidServiceManager.instance.checkInitialize(); //<-- If is null, thrown negative result

@@ -11,6 +11,8 @@ class AndroidApplicationManager extends FlutterApplicationManager {
     super.useWorkingPathInDebug,
   });
 
+  
+
   @override
   void finishApplication() {
     //channel.close();

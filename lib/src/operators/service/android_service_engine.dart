@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/operators/service/android_service_reserved_commands.dart';
+import 'package:maxi_flutter_library/src/operators/service/isolated_android_service.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCycle, IRemoteFunctionalitiesExecutor, IAndroidServiceManager {
@@ -25,8 +26,6 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
 
   StreamController<(String, Map<String, dynamic>)>? _receivedData;
 
-  late StreamController _newClientController;
-  late StreamController _closeClientController;
   late StreamController<NegativeResult> _errorStreamController;
 
   AndroidServiceEngine({
@@ -43,13 +42,13 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
   bool get isServer => true;
 
   @override
-  bool hasClient = false;
+  bool get hasClient => IsolatedAndroidService.sharedHasClient.syncValue;
 
   @override
-  Stream<void> get nofityCloseClient => checkFirstIfInitialized(() => _closeClientController.stream);
+  Stream<void> get nofityCloseClient => checkFirstIfInitialized(() => IsolatedAndroidService.sharedHasClient.receiver.where((x) => !x));
 
   @override
-  Stream<void> get notifyNewClient => checkFirstIfInitialized(() => _newClientController.stream);
+  Stream<void> get notifyNewClient => checkFirstIfInitialized(() => IsolatedAndroidService.sharedHasClient.receiver.where((x) => x));
 
   @override
   Stream<NegativeResult> get notifyError => checkFirstIfInitialized(() => _errorStreamController.stream);
@@ -72,8 +71,9 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
   }
 
   Future<void> _afterInitializingFunctionalityAsStreamAsegurated() async {
-    _newClientController = createEventController(isBroadcast: true);
-    _closeClientController = createEventController(isBroadcast: true);
+    await IsolatedAndroidService.initializeEvents();
+    await IsolatedAndroidService.sharedIsServer.changeValue(true);
+
     _receivedData = createEventController<(String, Map<String, dynamic>)>(isBroadcast: true);
     _errorStreamController = createEventController<NegativeResult>(isBroadcast: true);
 
@@ -129,12 +129,14 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
       event: listenToData(eventName: AndroidServiceReservedCommands.serverSendError),
       onData: (x) {
         final error = NegativeResult.interpret(values: x, checkTypeFlag: true);
+
         _errorStreamController.addIfActive(error);
+        IsolatedAndroidService.sharedNotifyError.add(error);
       },
     );
 
-    _intanceInvocator();
-    hasClient = true;
+    await _intanceInvocator();
+    IsolatedAndroidService.sharedHasClient.changeValue(true);
   }
 
   Future<void> _intanceInvocator() async {
@@ -201,6 +203,7 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
   }
 
   Future<void> _closeService() async {
+    await continueOtherFutures();
     ThreadManager.killAllThread();
 
     if (_awaitingDone != null) {
@@ -230,6 +233,8 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
     }
 
     _receivedData!.addIfActive((name, content));
+
+    IsolatedAndroidService.sharedReceivedData.add((name, content));
   }
 
   @override
@@ -237,10 +242,12 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
     checkFirstIfInitialized(() {});
     return _syncronizerShipment.execute(function: () async {
       _awaitingShipmentConfirmation = joinWaiter();
+      _checkContent(content);
       service.invoke(
         AndroidServiceReservedCommands.serverSendMessage,
         {'name': eventName, 'content': content ?? {}},
       );
+
       await _awaitingShipmentConfirmation!.future.timeout(
         const Duration(seconds: 7),
         onTimeout: () {
@@ -256,14 +263,12 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
   }
 
   void _reactNewClient(Map<String, dynamic>? p1) {
-    hasClient = true;
-    _newClientController.addIfActive(null);
+    IsolatedAndroidService.sharedHasClient.changeValue(true);
   }
 
   void _reactCloseClient(Map<String, dynamic>? p1) {
-    hasClient = false;
-    _closeClientController.addIfActive(null);
     FlutterApplicationManager.changedApplicationStatus.add(AppLifecycleState.detached);
+    IsolatedAndroidService.sharedHasClient.changeValue(false);
   }
 
   void _reactClientSendAppStatus(Map<String, dynamic>? rawContext) {
@@ -307,5 +312,17 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
   StreamStateTexts<T> executeStreamFunctionality<T, F extends IStreamFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry, String buildName = ''}) async* {
     await initialize();
     yield* _remoteFunctionalitiesExecutor.executeStreamFunctionality<T, F>(buildName: buildName, parameters: parameters);
+  }
+
+  void _checkContent(Map<String, dynamic>? content) {
+    if (content == null) {
+      return;
+    }
+
+    for (final value in content.values) {
+      if (ConverterUtilities.isPrimitive(value.runtimeType) == null) {
+        throw 'BAD DATA!';
+      }
+    }
   }
 }

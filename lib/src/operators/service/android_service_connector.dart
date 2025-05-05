@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/operators/service/android_service_reserved_commands.dart';
+import 'package:maxi_flutter_library/src/operators/service/isolated_android_service.dart';
 import 'package:maxi_library/export_reflectors.dart';
 
 class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLifeCycle, IRemoteFunctionalitiesExecutor, IAndroidServiceManager {
@@ -39,18 +40,14 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
 
   @override
   Stream<void> get nofityCloseClient async* {
-    await onDispose;
-    yield null;
+    await IsolatedAndroidService.sharedHasClient.initialize();
+    yield* IsolatedAndroidService.sharedHasClient.receiver.where((x) => !x);
   }
 
   @override
   Stream<void> get notifyNewClient async* {
-    if (isInitialized) {
-      return;
-    }
-
-    await initialize();
-    yield null;
+    await IsolatedAndroidService.sharedHasClient.initialize();
+    yield* IsolatedAndroidService.sharedHasClient.receiver.where((x) => x);
   }
 
   AndroidServiceConnector._({
@@ -82,16 +79,23 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
       );
     }
 
+    final newInstance = AndroidServiceConnector._(
+      autoStart: autoStart,
+      autoStartOnBoot: autoStartOnBoot,
+      isForegroundMode: isForegroundMode,
+      onForeground: onForeground,
+      onIosBackground: onIosBackground,
+      serverName: serverName,
+      initialNotificationContent: initialNotificationContent,
+      initialNotificationTitle: initialNotificationTitle,
+    );
+
     //Check if it's already defined
     if (AndroidServiceManager.isDefinder) {
       final actualOperator = AndroidServiceManager.instance;
       if (actualOperator is AndroidServiceConnector) {
-        if (actualOperator.autoStart == autoStart &&
-            actualOperator.isForegroundMode == isForegroundMode &&
-            actualOperator.autoStartOnBoot == autoStartOnBoot &&
-            actualOperator.onForeground == onForeground &&
-            actualOperator.onIosBackground == onIosBackground &&
-            actualOperator.serverName == serverName) {
+        if (actualOperator == newInstance) {
+          await actualOperator.initialize();
           return actualOperator;
         } else {
           throw NegativeResult(
@@ -107,24 +111,40 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
       }
     }
 
-    final newInstance = AndroidServiceConnector._(
-      autoStart: autoStart,
-      autoStartOnBoot: autoStartOnBoot,
-      isForegroundMode: isForegroundMode,
-      onForeground: onForeground,
-      onIosBackground: onIosBackground,
-      serverName: serverName,
-      initialNotificationContent: initialNotificationContent,
-      initialNotificationTitle: initialNotificationTitle,
-    );
-
     await AndroidServiceManager.defineInstance(newInstance: newInstance, initialize: true);
     return newInstance;
   }
 
   @override
+  bool operator ==(Object other) {
+    if (other is AndroidServiceConnector) {
+      return other.autoStart == autoStart &&
+          other.isForegroundMode == isForegroundMode &&
+          other.autoStartOnBoot == autoStartOnBoot &&
+          other.onForeground == onForeground &&
+          other.onIosBackground == onIosBackground &&
+          other.serverName == serverName;
+    } else {
+      return false;
+    }
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        autoStart,
+        isForegroundMode,
+        autoStartOnBoot,
+        onForeground,
+        onIosBackground,
+        serverName,
+      ]);
+
+  @override
   Future<void> afterInitializingFunctionality() async {
     WidgetsFlutterBinding.ensureInitialized();
+
+    await IsolatedAndroidService.initializeEvents();
+    await IsolatedAndroidService.sharedIsServer.changeValue(false);
 
     _syncronizerShipment = Semaphore();
     _backgroundService = FlutterBackgroundService();
@@ -150,15 +170,16 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
         message: const Oration(message: 'The service could not be mounted'),
       );
     }
-
+/*
     if (await _checkServerName(timeout: const Duration(seconds: 1))) {
       _connectEvents();
       return;
-    }
-    final waiter = MaxiCompleter<void>();
+      final waiter = MaxiCompleter<void>();
 
     //Events
     final events = <StreamSubscription>[];
+    }*/
+
     /*
     joinEvent(
       event: _backgroundService.on(AndroidServiceReservedCommands.serverSendsInitializationStatus),
@@ -169,7 +190,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
         waiterController.addIfActive(streamTextStatus(text));
       },
     );
-    */
+   
 
     joinEvent(
       event: _backgroundService.on(AndroidServiceReservedCommands.serverSendsItsName),
@@ -178,19 +199,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
         waiter.completeIfIncomplete();
       },
     );
-
-    joinEvent(
-      event: _backgroundService.on(AndroidServiceReservedCommands.serverInitializationError),
-      onSubscriptionCreated: (x) => events.add(x),
-      onData: (x) {
-        try {
-          final error = NegativeResult.interpret(values: x ?? {}, checkTypeFlag: true);
-          waiter.completeErrorIfIncomplete(error);
-        } catch (ex, st) {
-          waiter.completeErrorIfIncomplete(ex, st);
-        }
-      },
-    );
+     */
 
     if (!await _checkServerName(timeout: const Duration(seconds: 7))) {
       throw NegativeResult(
@@ -198,13 +207,11 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
         message: const Oration(message: 'The service reports that it started, but did not return its name'),
       );
     }
-    _connectEvents();
 
-    events.iterar((x) => x.cancel());
-    events.clear();
+    _connectEvents();
   }
 
-  void _connectEvents() async {
+  void _connectEvents() {
     joinEvent(
       event: _backgroundService.on(AndroidServiceReservedCommands.serverFinishesItsExecution),
       onData: _reactServerClosed,
@@ -233,7 +240,9 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
     _backgroundService.invoke(AndroidServiceReservedCommands.notifyNewClient);
 
     if (FlutterApplicationManager.changedApplicationStatus.isInitialized) {
-      _backgroundService.invoke(AndroidServiceReservedCommands.clientSendAppStatus, {'content': (await FlutterApplicationManager.changedApplicationStatus.asyncValue).index});
+      maxiScheduleMicrotask(() async {
+        _backgroundService.invoke(AndroidServiceReservedCommands.clientSendAppStatus, {'content': (await FlutterApplicationManager.changedApplicationStatus.asyncValue).index});
+      });
     }
 
     _errorStreamController = createEventController<NegativeResult>(isBroadcast: true);
@@ -242,46 +251,44 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
       onData: (x) {
         final error = NegativeResult.interpret(values: x, checkTypeFlag: true);
         _errorStreamController.addIfActive(error);
+        IsolatedAndroidService.sharedNotifyError.add(error);
       },
     );
 
     _intanceInvocator();
+    IsolatedAndroidService.sharedHasClient.changeValue(true);
   }
 
   void _intanceInvocator() {
     _remoteFunctionalitiesExecutor = joinObject(
-        item: RemoteFunctionalitiesExecutorViaStream(
-      receiver: listenToData(eventName: AndroidServiceReservedCommands.serverInvokeRemoteObject),
-      sender: CustomStreamSink(
-        onNewItem: (x) => sendData(eventName: AndroidServiceReservedCommands.clientInvokeRemoteObject, content: x),
-        waitDone: done,
+      item: RemoteFunctionalitiesExecutorViaStream(
+        receiver: listenToData(eventName: AndroidServiceReservedCommands.serverInvokeRemoteObject),
+        sender: CustomStreamSink(
+          onNewItem: (x) => sendData(eventName: AndroidServiceReservedCommands.clientInvokeRemoteObject, content: x),
+          waitDone: done,
+        ),
+        confirmConnection: true,
       ),
-      confirmConnection: true,
-    ));
+    );
   }
 
-  Future<bool> _checkServerName({Duration? timeout, bool checkNameIsEqual = true}) async {
-    final waiter = MaxiCompleter<bool>();
-
+  Future<String?> _getServerName({Duration? timeout}) async {
+    final waiter = MaxiCompleter<String?>();
     final subscription = joinEvent(
       event: _backgroundService.on(AndroidServiceReservedCommands.serverSendsItsName),
       onData: (x) {
-        if (checkNameIsEqual) {
-          try {
-            final name = x!['name'].toString();
-            if (name == serverName) {
-              waiter.completeIfIncomplete(true);
-            } else {
-              waiter.completeErrorIfIncomplete(NegativeResult(
-                identifier: NegativeResultCodes.externalFault,
-                message: Oration(message: 'The service is called %1, but the program only accepts connecting to a server called %2', textParts: [name, serverName]),
-              ));
-            }
-          } catch (ex, st) {
-            waiter.completeErrorIfIncomplete(ex, st);
-          }
-        } else {
-          waiter.completeIfIncomplete(true);
+        waiter.completeIfIncomplete(volatile(detail: const Oration(message: 'The server did not return its name'), function: () => x!['name'].toString()));
+      },
+    );
+
+    final initError = joinEvent(
+      event: _backgroundService.on(AndroidServiceReservedCommands.serverInitializationError),
+      onData: (x) {
+        try {
+          final error = NegativeResult.interpret(values: x ?? {}, checkTypeFlag: true);
+          waiter.completeErrorIfIncomplete(error);
+        } catch (ex, st) {
+          waiter.completeErrorIfIncomplete(ex, st);
         }
       },
     );
@@ -292,7 +299,8 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
       timer = Timer(timeout, () {
         timer?.cancel();
         subscription.cancel();
-        waiter.completeIfIncomplete(false);
+        initError.cancel();
+        waiter.completeIfIncomplete();
       });
     }
 
@@ -302,7 +310,28 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
     } finally {
       timer?.cancel();
       subscription.cancel();
+      initError.cancel();
     }
+  }
+
+  Future<bool> _checkServerName({required Duration timeout}) async {
+    for (int i = 0; i < timeout.inSeconds * 4; i++) {
+      final serverName = await _getServerName(timeout: const Duration(milliseconds: 250));
+      if (serverName != null) {
+        if (serverName != this.serverName) {
+          throw NegativeResult(
+            identifier: NegativeResultCodes.externalFault,
+            message: Oration(
+              message: 'The server is named %1, but a server called %2 was expected',
+              textParts: [this.serverName, serverName],
+            ),
+          );
+        }
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @override
@@ -380,17 +409,27 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
     }
 
     _receivedData!.addIfActive((name, content));
+    IsolatedAndroidService.sharedReceivedData.add((name, content));
   }
 
   @override
   void closeConnection() {
     if (isInitialized) {
+      _backgroundService.invoke(AndroidServiceReservedCommands.notifyCloseClient);
       maxiScheduleMicrotask(() async {
-        _backgroundService.invoke(AndroidServiceReservedCommands.notifyCloseClient);
         await continueOtherFutures();
         dispose();
       });
     }
+  }
+
+  @override
+  void performObjectDiscard() {
+    super.performObjectDiscard();
+
+    IsolatedAndroidService.sharedHasClient.changeValue(false);
+    IsolatedAndroidService.sharedNotifyCloseConnection.add(null);
+    IsolatedAndroidService.sharedNotifyOnDone.add(null);
   }
 
   @override
@@ -404,12 +443,14 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
   @override
   Future<T> executeFunctionality<T, F extends IFunctionality<FutureOr<T>>>({InvocationParameters parameters = InvocationParameters.emptry, String buildName = ''}) async {
     await initialize();
+    await _remoteFunctionalitiesExecutor.initialize();
     return await _remoteFunctionalitiesExecutor.executeFunctionality<T, F>(buildName: buildName, parameters: parameters);
   }
 
   @override
   StreamStateTexts<T> executeStreamFunctionality<T, F extends IStreamFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry, String buildName = ''}) async* {
     await initialize();
+    await _remoteFunctionalitiesExecutor.initialize();
     yield* _remoteFunctionalitiesExecutor.executeStreamFunctionality<T, F>(buildName: buildName, parameters: parameters);
   }
 }

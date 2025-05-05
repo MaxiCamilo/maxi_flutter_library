@@ -3,227 +3,150 @@ import 'dart:async';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class IsolatedAndroidService with StartableFunctionality, FunctionalityWithLifeCycle, IAndroidServiceManager, IThreadInitializer {
-  @override
-  final bool isServer;
+class IsolatedAndroidService with StartableFunctionality, IRemoteFunctionalitiesExecutor, IAndroidServiceManager, IThreadInitializer {
+  static const _sharedNameID = '&#MxIAS&';
 
-  late StreamController _nofityCloseClientController;
-  late StreamController _notifyNewClientController;
-  late StreamController<NegativeResult> _notifyError;
-  late StreamController<(String, Map<String, dynamic>)> _receiverController;
+  static final sharedReceivedData = IsolatedEvent<(String, Map<String, dynamic>)>(name: '$_sharedNameID.1');
+  static final sharedHasClient = IsolatedValue<bool>(name: '$_sharedNameID.2', defaultValue: false);
+  static final sharedIsServer = IsolatedValue<bool>(name: '$_sharedNameID.3', defaultValue: false);
 
-  @override
-  bool hasClient = false;
-
-  IsolatedAndroidService({required this.isServer});
-
-  @override
-  Stream<void> get nofityCloseClient async* {
-    await initialize();
-    yield* _nofityCloseClientController.stream;
-  }
-
-  @override
-  Stream<void> get notifyNewClient async* {
-    await initialize();
-    yield* _notifyNewClientController.stream;
-  }
-
-  @override
-  Stream<(String, Map<String, dynamic>)> get receivedData async* {
-    await initialize();
-    yield* _receiverController.stream;
-  }
-
-  @override
-  Stream<NegativeResult> get notifyError async* {
-    await initialize();
-    yield* _notifyError.stream;
-  }
+  //static final sharedNotifyNewClient = IsolatedEvent<dynamic>(name: '$_sharedNameID.4');
+  //static final sharedNotifyCloseClient = IsolatedEvent<dynamic>(name: '$_sharedNameID.5');
+  static final sharedNotifyCloseConnection = IsolatedEvent<dynamic>(name: '$_sharedNameID.6');
+  static final sharedNotifyOnDone = IsolatedEvent<dynamic>(name: '$_sharedNameID.7');
+  static final sharedNotifyError = IsolatedEvent<NegativeResult>(name: '$_sharedNameID.8');
 
   @override
   Future<void> performInitializationInThread(IThreadManager channel) async {
     AndroidServiceManager.defineInstance(initialize: false, newInstance: this);
   }
 
+  static Future<void> initializeEvents() async {
+    await sharedReceivedData.initialize();
+    await sharedHasClient.initialize();
+    await sharedIsServer.initialize();
+    //await sharedNotifyNewClient.initialize();
+    //await sharedNotifyCloseClient.initialize();
+    await sharedNotifyCloseConnection.initialize();
+    await sharedNotifyOnDone.initialize();
+    await sharedNotifyError.initialize();
+  }
+
   @override
-  Future<void> afterInitializingFunctionality() async {
-    if (ThreadManager.instance.isServer) {
-      throw NegativeResult(
-        identifier: NegativeResultCodes.implementationFailure,
-        message: const Oration(message: 'The thread where this operator is executed should not be the main thread'),
-      );
-    }
-
-    await ThreadManager.instance.callFunctionOnTheServer(function: _onInitializedOnMainThread);
-    joinFuture(
-      ThreadManager.instance.callFunctionOnTheServer(function: _awaitCompletionOperator),
-      whenCompleted: () {
-        dispose();
-      },
-    );
-    await _updateHasClient();
-
-    _nofityCloseClientController = createEventController(isBroadcast: true);
-    _notifyNewClientController = createEventController(isBroadcast: true);
-    _receiverController = createEventController<(String, Map<String, dynamic>)>(isBroadcast: true);
-    _notifyError = createEventController<NegativeResult>(isBroadcast: true);
-
-    joinSubscription(await ThreadManager.callStreamOnTheServerDirectly(
-      parameters: InvocationParameters.emptry,
-      function: (_) => ThreadManager.instance.callFunctionOnTheServer(function: _receivedDataOnMainThread),
-      onListen: (x) async {
-        _receiverController.addIfActive(x);
-      },
-      onError: (error, [stackTrace]) => _receiverController.addErrorIfActive(error, stackTrace),
-    ));
-
-    joinSubscription(await ThreadManager.callStreamOnTheServerDirectly(
-      parameters: InvocationParameters.emptry,
-      function: (_) => ThreadManager.instance.callFunctionOnTheServer(function: _notifyNewClientOnMainThread),
-      onListen: (_) async {
-        await _updateHasClient();
-        _notifyNewClientController.addIfActive(null);
-      },
-    ));
-
-    joinSubscription(await ThreadManager.callStreamOnTheServerDirectly(
-      parameters: InvocationParameters.emptry,
-      function: (_) => ThreadManager.instance.callFunctionOnTheServer(function: _nofityCloseClientOnMainThread),
-      onListen: (_) async {
-        await _updateHasClient();
-        _nofityCloseClientController.addIfActive(null);
-      },
-    ));
-
-    joinSubscription(await ThreadManager.callStreamOnTheServerDirectly(
-      parameters: InvocationParameters.emptry,
-      function: (_) => ThreadManager.instance.callFunctionOnTheServer(function: _nofityErrorOnMainThread),
-      onListen: (x) {
-        _notifyError.addIfActive(x);
-      },
-    ));
+  Future<void> initializeFunctionality() async {
+    await initializeEvents();
   }
 
-  static Stream<(String, Map<String, dynamic>)> _receivedDataOnMainThread(InvocationContext context) {
-    return AndroidServiceManager.instance.receivedData;
-  }
+  @override
+  Future get onInitialized => initialize();
 
-  static Stream<void> _notifyNewClientOnMainThread(InvocationContext context) {
-    return AndroidServiceManager.instance.notifyNewClient;
-  }
+  @override
+  bool get hasClient => sharedHasClient.syncValue;
 
-  static Stream<void> _nofityCloseClientOnMainThread(InvocationContext context) {
-    return AndroidServiceManager.instance.nofityCloseClient;
-  }
+  @override
+  bool get isServer => sharedIsServer.syncValue;
 
-  static Stream<NegativeResult> _nofityErrorOnMainThread(InvocationContext context) {
-    return AndroidServiceManager.instance.notifyError;
+  @override
+  Stream<(String, Map<String, dynamic>)> get receivedData async* {
+    await initialize();
+    yield* sharedReceivedData.receiver;
   }
-
-  Future<void> _updateHasClient() async {
-    hasClient = await ThreadManager.instance.callFunctionOnTheServer(
-      function: (_) => AndroidServiceManager.instance.hasClient,
-    );
-  }
-
-  static Future<void> _awaitCompletionOperator(InvocationContext context) async {
-    await AndroidServiceManager.instance.onDispose;
-  }
-/*
-  static Future<void> _checkIfServerIsActive(InvocationContext context) async {
-    AndroidServiceManager.instance.checkFirstIfInitialized(() {});
-  }*/
-
-  /*--------------------------------------------------------------------------------------------------------- */
 
   @override
   Stream<Map<String, dynamic>> listenToData({required String eventName}) async* {
     await initialize();
-
-    yield* _receiverController.stream.where((x) => x.$1 == eventName).map((x) => x.$2);
+    yield* sharedReceivedData.receiver.where((x) => x.$1 == eventName).map((x) => x.$2);
   }
 
   @override
-  Future<void> sendData({required String eventName, Map<String, dynamic>? content}) async {
+  Stream<void> get nofityCloseClient async* {
     await initialize();
-    return await ThreadManager.instance.callFunctionOnTheServer(parameters: InvocationParameters.list([eventName, content]), function: _sendDataOnMainThread);
+    yield* sharedHasClient.receiver.where((x) => !x);
+  }
+
+  @override
+  Stream<NegativeResult> get notifyError async* {
+    await initialize();
+    yield* sharedNotifyError.receiver;
+  }
+
+  @override
+  Stream<void> get notifyNewClient async* {
+    await initialize();
+    yield* sharedHasClient.receiver.where((x) => !x);
+  }
+
+  @override
+  Future<void> get onDone async {
+    await initialize();
+    await nofityCloseClient.waitSomething();
+  }
+
+  @override
+  void closeConnection() {
+    ThreadManager.instance.callFunctionOnTheServer(function: _closeConnectionOnMainThread);
+  }
+
+  static FutureOr<void> _closeConnectionOnMainThread(InvocationContext _) {
+    if (AndroidServiceManager.isDefinder) {
+      AndroidServiceManager.instance.closeConnection();
+    }
+  }
+
+  @override
+  Future<void> sendData({required String eventName, Map<String, dynamic>? content}) {
+    return ThreadManager.instance.callFunctionOnTheServer(function: _sendDataOnMainThread, parameters: InvocationParameters.list([eventName, content ?? {}]));
   }
 
   static Future<void> _sendDataOnMainThread(InvocationContext context) {
-    final name = context.firts<String>();
-    final content = context.second<Map<String, dynamic>?>();
-
-    return AndroidServiceManager.instance.sendData(eventName: name, content: content);
+    return AndroidServiceManager.instance.sendData(eventName: context.firts<String>(), content: context.second<Map<String, dynamic>>());
   }
 
   @override
-  Future<void> reset() async {
-    await initialize();
-
-    await ThreadManager.instance.callFunctionOnTheServer(function: _resetOnMainThread);
+  Future<void> reset() {
+    return ThreadManager.instance.callFunctionOnTheServer(function: _resetOnMainThread);
   }
 
-  static Future<void> _resetOnMainThread(InvocationContext context) {
+  static Future<void> _resetOnMainThread(InvocationContext p1) {
     return AndroidServiceManager.instance.reset();
   }
 
   @override
-  Future<void> shutdown() async {
-    await initialize();
-    await ThreadManager.instance.callFunctionOnTheServer(function: _shutdownOnMainThread);
+  Future<void> sendError({required NegativeResult error}) {
+    return ThreadManager.instance.callFunctionOnTheServer(function: _sendErrorOnMainThread);
   }
 
-  static Future<void> _shutdownOnMainThread(InvocationContext context) {
+  static Future<void> _sendErrorOnMainThread(InvocationContext context) {
+    return AndroidServiceManager.instance.reset();
+  }
+
+  @override
+  Future<void> shutdown() {
+    return ThreadManager.instance.callFunctionOnTheServer(function: _shutdownOnMainThread);
+  }
+
+  static FutureOr<void> _shutdownOnMainThread(InvocationContext context) {
     return AndroidServiceManager.instance.shutdown();
   }
 
   @override
-  void closeConnection() async {
-    if (!isInitialized) {
-      return;
-    }
-    await ThreadManager.instance.callFunctionOnTheServer(function: _declareClosedOnMainThread);
-    dispose();
-  }
-
-  static void _declareClosedOnMainThread(InvocationContext context) {
-    AndroidServiceManager.instance.closeConnection();
-  }
-
-  @override
-  Future<void> get onDone => ThreadManager.instance.callFunctionOnTheServer(function: _onDoneMainThread);
-
-  static Future<void> _onDoneMainThread(InvocationContext context) {
-    return AndroidServiceManager.instance.onDone;
-  }
-
-  @override
-  Future<void> sendError({required NegativeResult error}) {
-    return ThreadManager.instance.callFunctionOnTheServer(function: _sendErrorOnMainThread, parameters: InvocationParameters.only(error));
-  }
-
-  static void _sendErrorOnMainThread(InvocationContext context) {
-    AndroidServiceManager.instance.sendError(error: context.firts<NegativeResult>());
-  }
-
-  @override
-  Future<dynamic> get onDispose async {
+  Future<T> executeFunctionality<T, F extends IFunctionality<FutureOr<T>>>({InvocationParameters parameters = InvocationParameters.emptry}) async {
     await initialize();
-    return await ThreadManager.instance.callFunctionOnTheServer(function: _onDisposeOnMainThread);
+    return ThreadManager.instance.callFunctionOnTheServer(function: _executeFunctionalityOnMainThread<T, F>, parameters: InvocationParameters.only(parameters));
   }
 
-  static Future<void> _onDisposeOnMainThread(InvocationContext context) {
-    return AndroidServiceManager.instance.onDispose;
+  static Future<T> _executeFunctionalityOnMainThread<T, F extends IFunctionality<FutureOr<T>>>(InvocationContext context) {
+    return AndroidServiceManager.instance.executeFunctionality<T, F>(parameters: context.firts<InvocationParameters>());
   }
 
   @override
-  Future<dynamic> get onInitialized async {
+  StreamStateTexts<T> executeStreamFunctionality<T, F extends IStreamFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) async* {
     await initialize();
-    return this;
+    final stream = await ThreadManager.instance.callStreamOnTheServer(function: _executeStreamFunctionalityOnMainThread<T, F>, parameters: InvocationParameters.only(parameters));
+    yield* stream;
   }
 
-  static Future<void> _onInitializedOnMainThread(InvocationContext context) async {
-    await AndroidServiceManager.instance.onInitialized;
+  static StreamStateTexts<T> _executeStreamFunctionalityOnMainThread<T, F extends IStreamFunctionality<T>>(InvocationParameters parameters) {
+    return AndroidServiceManager.instance.executeStreamFunctionality<T, F>(parameters: parameters.firts<InvocationParameters>());
   }
 }
