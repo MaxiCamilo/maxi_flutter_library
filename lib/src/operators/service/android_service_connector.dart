@@ -6,7 +6,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/operators/service/android_service_reserved_commands.dart';
 import 'package:maxi_library/export_reflectors.dart';
 
-class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLifeCycle, FunctionalityWithLifeCycleAsStream, IAndroidServiceManager {
+class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLifeCycle, IRemoteFunctionalitiesExecutor, IAndroidServiceManager {
   final bool autoStart;
   final bool isForegroundMode;
   final bool autoStartOnBoot;
@@ -20,6 +20,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
   late FlutterBackgroundService _backgroundService;
   late Semaphore _syncronizerShipment;
   late StreamController<NegativeResult> _errorStreamController;
+  late RemoteFunctionalitiesExecutorViaStream _remoteFunctionalitiesExecutor;
 
   StreamController<(String, Map<String, dynamic>)>? _receivedData;
 
@@ -63,7 +64,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
     required this.initialNotificationTitle,
   });
 
-  static StreamStateTexts<AndroidServiceConnector> createConnector({
+  static Future<AndroidServiceConnector> createConnector({
     required dynamic Function(ServiceInstance) onForeground,
     required FutureOr<bool> Function(ServiceInstance) onIosBackground,
     required String serverName,
@@ -72,7 +73,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
     bool autoStart = false,
     bool isForegroundMode = true,
     bool autoStartOnBoot = false,
-  }) async* {
+  }) async {
     //Only executable on the Flutter thread
     if (!ThreadManager.instance.isServer) {
       throw NegativeResult(
@@ -91,7 +92,7 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
             actualOperator.onForeground == onForeground &&
             actualOperator.onIosBackground == onIosBackground &&
             actualOperator.serverName == serverName) {
-          yield streamResult(actualOperator);
+          return actualOperator;
         } else {
           throw NegativeResult(
             identifier: NegativeResultCodes.implementationFailure,
@@ -106,11 +107,6 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
       }
     }
 
-    /*
-    VER SI SE PUEDE USAR OTRO METODO PARA LOS ISOLADOS, YA QUE ESTÁ CAUSANDO MUCHOS PROBLEMAS  
-    
-     */
-
     final newInstance = AndroidServiceConnector._(
       autoStart: autoStart,
       autoStartOnBoot: autoStartOnBoot,
@@ -122,26 +118,12 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
       initialNotificationTitle: initialNotificationTitle,
     );
 
-    final waiter = MaxiCompleter();
-    maxiScheduleMicrotask(() => containErrorLogAsync(
-        detail: const Oration(message: 'Initializing service'),
-        function: () async {
-          try {
-            await AndroidServiceManager.defineInstance(newInstance: newInstance, initialize: true);
-            waiter.completeIfIncomplete();
-          } catch (ex, st) {
-            waiter.completeErrorIfIncomplete(ex, st);
-            rethrow;
-          }
-        }));
-    yield* connectFunctionalStream(newInstance.textInitializationStream(initializeIsInactive: false));
-    await waiter.future;
-
-    yield streamResult(newInstance);
+    await AndroidServiceManager.defineInstance(newInstance: newInstance, initialize: true);
+    return newInstance;
   }
 
   @override
-  StreamStateTextsVoid afterInitializingFunctionalityAsStream() async* {
+  Future<void> afterInitializingFunctionality() async {
     WidgetsFlutterBinding.ensureInitialized();
 
     _syncronizerShipment = Semaphore();
@@ -160,7 +142,6 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
         initialNotificationTitle: initialNotificationTitle.toString(),
       ),
     );
-    yield checkStreamState();
 
     if (!await _backgroundService.startService()) {
       //initializedEvent.cancel();
@@ -174,13 +155,11 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
       _connectEvents();
       return;
     }
-
-    yield streamTextStatus(const Oration(message: 'Starting Android background service'));
-
-    final waiterController = StreamController<StreamState<Oration, void>>();
+    final waiter = MaxiCompleter<void>();
 
     //Events
     final events = <StreamSubscription>[];
+    /*
     joinEvent(
       event: _backgroundService.on(AndroidServiceReservedCommands.serverSendsInitializationStatus),
       onSubscriptionCreated: (x) => events.add(x),
@@ -190,12 +169,13 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
         waiterController.addIfActive(streamTextStatus(text));
       },
     );
+    */
 
     joinEvent(
-      event: _backgroundService.on(AndroidServiceReservedCommands.correctInitializedConfirmedServer),
+      event: _backgroundService.on(AndroidServiceReservedCommands.serverSendsItsName),
       onSubscriptionCreated: (x) => events.add(x),
       onData: (x) {
-        waiterController.close();
+        waiter.completeIfIncomplete();
       },
     );
 
@@ -205,18 +185,12 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
       onData: (x) {
         try {
           final error = NegativeResult.interpret(values: x ?? {}, checkTypeFlag: true);
-          waiterController.addErrorIfActive(error);
+          waiter.completeErrorIfIncomplete(error);
         } catch (ex, st) {
-          waiterController.addErrorIfActive(ex, st);
+          waiter.completeErrorIfIncomplete(ex, st);
         }
-
-        waiterController.close();
       },
     );
-
-    yield checkStreamState();
-
-    yield* connectFunctionalStream(waiterController.stream);
 
     if (!await _checkServerName(timeout: const Duration(seconds: 7))) {
       throw NegativeResult(
@@ -270,6 +244,20 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
         _errorStreamController.addIfActive(error);
       },
     );
+
+    _intanceInvocator();
+  }
+
+  void _intanceInvocator() {
+    _remoteFunctionalitiesExecutor = joinObject(
+        item: RemoteFunctionalitiesExecutorViaStream(
+      receiver: listenToData(eventName: AndroidServiceReservedCommands.serverInvokeRemoteObject),
+      sender: CustomStreamSink(
+        onNewItem: (x) => sendData(eventName: AndroidServiceReservedCommands.clientInvokeRemoteObject, content: x),
+        waitDone: done,
+      ),
+      confirmConnection: true,
+    ));
   }
 
   Future<bool> _checkServerName({Duration? timeout, bool checkNameIsEqual = true}) async {
@@ -411,5 +399,17 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
   @override
   Future<void> sendError({required NegativeResult error}) {
     return sendData(eventName: AndroidServiceReservedCommands.clientSendError, content: error.serialize());
+  }
+
+  @override
+  Future<T> executeFunctionality<T, F extends IFunctionality<FutureOr<T>>>({InvocationParameters parameters = InvocationParameters.emptry, String buildName = ''}) async {
+    await initialize();
+    return await _remoteFunctionalitiesExecutor.executeFunctionality<T, F>(buildName: buildName, parameters: parameters);
+  }
+
+  @override
+  StreamStateTexts<T> executeStreamFunctionality<T, F extends IStreamFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry, String buildName = ''}) async* {
+    await initialize();
+    yield* _remoteFunctionalitiesExecutor.executeStreamFunctionality<T, F>(buildName: buildName, parameters: parameters);
   }
 }

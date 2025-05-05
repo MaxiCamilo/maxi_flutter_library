@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:maxi_library/maxi_library.dart';
 
-mixin IAndroidServiceManager on StartableFunctionality {
+mixin IAndroidServiceManager on StartableFunctionality, IRemoteFunctionalitiesExecutor {
   Stream<(String, Map<String, dynamic>)> get receivedData;
   Stream<void> get notifyNewClient;
   Stream<void> get nofityCloseClient;
@@ -10,6 +10,9 @@ mixin IAndroidServiceManager on StartableFunctionality {
 
   bool get isServer;
   bool get hasClient;
+
+  @override
+  bool get isActive => isInitialized;
 
   Future<void> get onDone;
 

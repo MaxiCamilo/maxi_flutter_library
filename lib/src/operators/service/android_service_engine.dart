@@ -7,16 +7,19 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_flutter_library/src/operators/service/android_service_reserved_commands.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCycle, FunctionalityWithLifeCycleAsStream, IAndroidServiceManager {
+class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCycle, IRemoteFunctionalitiesExecutor, IAndroidServiceManager {
   final String serverName;
   final ServiceInstance service;
   final List<IReflectorAlbum> reflectors;
   final bool defineLanguageOperatorInOtherThread;
-  final StreamStateTextsVoid Function() preparatoryFunction;
+  final FutureOr Function() preparatoryFunction;
+
   final bool useWorkingPath;
   final bool useWorkingPathInDebug;
 
   late Semaphore _syncronizerShipment;
+  late RemoteFunctionalitiesExecutorViaStream _remoteFunctionalitiesExecutor;
+
   Completer? _awaitingShipmentConfirmation;
   Completer? _awaitingDone;
 
@@ -55,23 +58,20 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
   Stream<(String, Map<String, dynamic>)> get receivedData => checkFirstIfInitialized(() => _receivedData!.stream);
 
   @override
-  StreamStateTextsVoid afterInitializingFunctionalityAsStream() async* {
-    yield* connectOptionalFunctionalStream(
-      _afterInitializingFunctionalityAsStreamAsegurated(),
-      onData: (x) {
-        service.invoke(AndroidServiceReservedCommands.serverSendsInitializationStatus, x.serialize());
-      },
-      onResult: (x) {
-        service.invoke(AndroidServiceReservedCommands.correctInitializedConfirmedServer);
-      },
-      onError: (x, y) {
-        service.invoke(AndroidServiceReservedCommands.serverInitializationError, NegativeResult.searchNegativity(item: x, actionDescription: const Oration(message: 'Starting service')).serialize());
-        Future.delayed(const Duration(milliseconds: 20)).whenComplete(() => _closeService());
-      },
-    );
+  Future<void> afterInitializingFunctionality() async {
+    try {
+      await _afterInitializingFunctionalityAsStreamAsegurated();
+    } catch (ex, st) {
+      containErrorLog(
+        detail: const Oration(message: 'Starting service'),
+        function: () =>
+            service.invoke(AndroidServiceReservedCommands.serverInitializationError, NegativeResult.searchNegativity(item: ex, stackTrace: st, actionDescription: const Oration(message: 'Starting service')).serialize()),
+      );
+      Future.delayed(const Duration(milliseconds: 20)).whenComplete(() => _closeService());
+    }
   }
 
-  StreamStateTextsVoid _afterInitializingFunctionalityAsStreamAsegurated() async* {
+  Future<void> _afterInitializingFunctionalityAsStreamAsegurated() async {
     _newClientController = createEventController(isBroadcast: true);
     _closeClientController = createEventController(isBroadcast: true);
     _receivedData = createEventController<(String, Map<String, dynamic>)>(isBroadcast: true);
@@ -80,8 +80,7 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
     _syncronizerShipment = joinObject(item: Semaphore());
     //_awaitingDone = joinObject(item: Completer());
 
-    yield streamTextStatus(const Oration(message: 'Setting up background service'));
-    AndroidServiceManager.defineInstance(newInstance: this, initialize: false);
+    //AndroidServiceManager.defineInstance(newInstance: this, initialize: false);
 
     await ApplicationManager.changeInstance(
       initialize: true,
@@ -94,7 +93,7 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
       ),
     );
 
-    yield* preparatoryFunction();
+    await preparatoryFunction();
 
     joinEvent(
       event: service.on(AndroidServiceReservedCommands.notifyNewClient),
@@ -134,13 +133,28 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
       },
     );
 
+    _intanceInvocator();
     hasClient = true;
+  }
+
+  Future<void> _intanceInvocator() async {
+    _remoteFunctionalitiesExecutor = joinObject(
+        item: RemoteFunctionalitiesExecutorViaStream(
+      receiver: listenToData(eventName: AndroidServiceReservedCommands.clientInvokeRemoteObject),
+      sender: CustomStreamSink(
+        onNewItem: (x) => sendData(eventName: AndroidServiceReservedCommands.serverInvokeRemoteObject, content: x),
+        waitDone: done,
+      ),
+      confirmConnection: false,
+    ));
+
+    await _remoteFunctionalitiesExecutor.initialize();
   }
 
   @override
   void reactWhenInitializedFinishes() {
     super.reactWhenInitializedFinishes();
-    service.invoke(AndroidServiceReservedCommands.correctInitializedConfirmedServer);
+    _clientRequiresServerName();
   }
 
   @override
@@ -198,7 +212,7 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
     await service.stopSelf();
   }
 
-  void _clientRequiresServerName(Map<String, dynamic>? p1) {
+  void _clientRequiresServerName([_]) {
     service.invoke(AndroidServiceReservedCommands.serverSendsItsName, {'name': serverName});
   }
 
@@ -281,5 +295,17 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
       eventName: AndroidServiceReservedCommands.serverSendError,
       content: error.serialize(),
     );
+  }
+
+  @override
+  Future<T> executeFunctionality<T, F extends IFunctionality<FutureOr<T>>>({InvocationParameters parameters = InvocationParameters.emptry, String buildName = ''}) async {
+    await initialize();
+    return await _remoteFunctionalitiesExecutor.executeFunctionality<T, F>(buildName: buildName, parameters: parameters);
+  }
+
+  @override
+  StreamStateTexts<T> executeStreamFunctionality<T, F extends IStreamFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry, String buildName = ''}) async* {
+    await initialize();
+    yield* _remoteFunctionalitiesExecutor.executeStreamFunctionality<T, F>(buildName: buildName, parameters: parameters);
   }
 }

@@ -8,6 +8,7 @@ import 'package:maxi_flutter_library/src/operators/http_system/android_service_h
 import 'package:maxi_flutter_library/src/operators/service/android_service_channel.dart';
 import 'package:maxi_flutter_library/src/operators/service/android_service_connector.dart';
 import 'package:maxi_flutter_library/src/operators/service/android_service_engine.dart';
+import 'package:maxi_flutter_library/src/operators/service/isolated_android_service.dart';
 import 'package:maxi_library/maxi_library.dart';
 import 'package:maxi_library_online/maxi_library_online.dart';
 
@@ -28,7 +29,7 @@ mixin AndroidServiceManager {
     return _instance!;
   }
 
-  static StreamStateTexts<AndroidServiceConnector> createServerConnector({
+  static Future<IAndroidServiceManager> createConnector({
     required dynamic Function(ServiceInstance) onForeground,
     required FutureOr<bool> Function(ServiceInstance) onIosBackground,
     required String serverName,
@@ -37,9 +38,9 @@ mixin AndroidServiceManager {
     bool autoStart = false,
     bool isForegroundMode = true,
     bool autoStartOnBoot = false,
-  }) async* {
+  }) async {
     if (ThreadManager.instance.isServer) {
-      yield* AndroidServiceConnector.createConnector(
+      return AndroidServiceConnector.createConnector(
         onForeground: onForeground,
         onIosBackground: onIosBackground,
         serverName: serverName,
@@ -50,21 +51,23 @@ mixin AndroidServiceManager {
         initialNotificationTitle: initialNotificationTitle,
       );
     } else {
-      yield* waitForStreamReturn(
-        () => ThreadManager.instance.callStreamOnTheServer(
+      await ThreadManager.instance.callFunctionOnTheServer(
           parameters: InvocationParameters.list([onForeground, onIosBackground, serverName, autoStart, autoStartOnBoot, isForegroundMode, initialNotificationContent, initialNotificationTitle]),
-          function: (x) => AndroidServiceConnector.createConnector(
-            onForeground: x.firts(),
-            onIosBackground: x.second(),
-            serverName: x.third(),
-            autoStart: x.fourth(),
-            autoStartOnBoot: x.fifth(),
-            isForegroundMode: x.sixth(),
-            initialNotificationContent: x.seventh(),
-            initialNotificationTitle: x.octave(),
-          ),
-        ),
-      );
+          function: (x) async {
+            await AndroidServiceConnector.createConnector(
+              onForeground: x.firts(),
+              onIosBackground: x.second(),
+              serverName: x.third(),
+              autoStart: x.fourth(),
+              autoStartOnBoot: x.fifth(),
+              isForegroundMode: x.sixth(),
+              initialNotificationContent: x.seventh(),
+              initialNotificationTitle: x.octave(),
+            );
+          });
+      final isolate = IsolatedAndroidService(isServer: false);
+      await isolate.initialize();
+      return isolate;
     }
   }
 
@@ -78,7 +81,7 @@ mixin AndroidServiceManager {
     bool useWorkingPathInDebug = true,
   }) async {
     try {
-      return await AndroidServiceEngine(
+      final instance = AndroidServiceEngine(
         serverName: serverName,
         reflectors: reflectors,
         service: service,
@@ -86,7 +89,8 @@ mixin AndroidServiceManager {
         preparatoryFunction: preparatoryFunction,
         useWorkingPath: useWorkingPath,
         useWorkingPathInDebug: useWorkingPathInDebug,
-      ).initialize();
+      );
+      await defineInstance(newInstance: instance, initialize: true);
     } catch (ex, st) {
       log('[X] Server failed: $ex\nOn: $st');
       //service.stopSelf();

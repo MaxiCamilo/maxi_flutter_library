@@ -1,9 +1,9 @@
 mixin AndroidServiceReservedCommands {
   static const String initialPrefix = '&MxAs&';
 
-  static const String correctInitializedConfirmedServer = '$initialPrefix.1';
+  //static const String correctInitializedConfirmedServer = '$initialPrefix.1';
   static const String serverInitializationError = '$initialPrefix.2';
-  static const String serverSendsInitializationStatus = '$initialPrefix.3';
+  //static const String serverSendsInitializationStatus = '$initialPrefix.3';
   static const String serverSendsItsName = '$initialPrefix.4';
 
   static const String clientRequiresServerName = '$initialPrefix.5';
@@ -27,4 +27,7 @@ mixin AndroidServiceReservedCommands {
   static const String clientHttpMessage = '$initialPrefix.18';
   static const String clientCheckHttpServerIsActive = '$initialPrefix.19';
   static const String serverResponseHttpIfItsActive = '$initialPrefix.20';
+
+  static const String serverInvokeRemoteObject = '$initialPrefix.21';
+  static const String clientInvokeRemoteObject = '$initialPrefix.22';
 }
