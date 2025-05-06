@@ -453,4 +453,10 @@ class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLife
     await _remoteFunctionalitiesExecutor.initialize();
     yield* _remoteFunctionalitiesExecutor.executeStreamFunctionality<T, F>(buildName: buildName, parameters: parameters);
   }
+
+  @override
+  Future<R> executeReflectedEntityFunction<R>({required String entityName, required String methodName, InvocationParameters parameters = InvocationParameters.emptry}) async {
+    await initialize();
+    return await _remoteFunctionalitiesExecutor.executeReflectedEntityFunction<R>(entityName: entityName, methodName: methodName, parameters: parameters);
+  }
 }

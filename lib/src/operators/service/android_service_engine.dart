@@ -325,4 +325,10 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
       }
     }
   }
+
+  @override
+  Future<R> executeReflectedEntityFunction<R>({required String entityName, required String methodName, InvocationParameters parameters = InvocationParameters.emptry}) async {
+    await initialize();
+    return await _remoteFunctionalitiesExecutor.executeReflectedEntityFunction<R>(entityName: entityName, methodName: methodName, parameters: parameters);
+  }
 }

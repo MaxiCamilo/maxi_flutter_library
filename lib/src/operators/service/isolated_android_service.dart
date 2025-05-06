@@ -149,4 +149,21 @@ class IsolatedAndroidService with StartableFunctionality, IRemoteFunctionalities
   static StreamStateTexts<T> _executeStreamFunctionalityOnMainThread<T, F extends IStreamFunctionality<T>>(InvocationParameters parameters) {
     return AndroidServiceManager.instance.executeStreamFunctionality<T, F>(parameters: parameters.firts<InvocationParameters>());
   }
+
+  @override
+  Future<R> executeReflectedEntityFunction<R>({required String entityName, required String methodName, InvocationParameters parameters = InvocationParameters.emptry}) async {
+    await initialize();
+    return await ThreadManager.instance.callFunctionOnTheServer(
+      function: _executeReflectedEntityFunctionOnMainThread<R>,
+      parameters: InvocationParameters.list([entityName, methodName, parameters]),
+    );
+  }
+
+  static Future<R> _executeReflectedEntityFunctionOnMainThread<R>(InvocationContext context) {
+    return AndroidServiceManager.instance.executeReflectedEntityFunction<R>(
+      entityName: context.firts<String>(),
+      methodName: context.second<String>(),
+      parameters: context.third<InvocationParameters>(),
+    );
+  }
 }
