@@ -167,6 +167,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       enabled: widget.enable,
       controller: textController,
       textAlign: TextAlign.end,
+      keyboardType: TextInputType.number,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
         labelText: translateTitle,
@@ -211,6 +212,12 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       return;
     }
 
+    if (text.last == '-') {
+      textController.text = previousText.toString();
+      selectIntegerSection();
+      return;
+    }
+
     dio = double.tryParse(text);
 
     if (dio == actualNumberOnField) {
@@ -218,6 +225,17 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
     }
 
     if (dio == null) {
+      final diferentChar = containError(function: () => previousText.getDifferences(text).first.$3);
+      if ((diferentChar != null && (diferentChar == '.' || diferentChar == ',')) || text.last == '.') {
+        textController.text = previousText.toString();
+        selectDecimalSection();
+        return;
+      } else if ((diferentChar != null && (diferentChar == '-' || diferentChar == ' ')) || text.last == '-') {
+        textController.text = previousText.toString();
+        selectIntegerSection();
+        return;
+      }
+
       final lastBaseOffset = textController.selection.baseOffset - 1;
       textController.text = previousText.toString();
       if (lastBaseOffset >= 0 && lastBaseOffset < textController.text.length) {
@@ -238,31 +256,11 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
 
     actualNumberOnField = dio;
 
-    /*
-
-    if (minimum > dio) {
-      //textController.text = _formatText(minimum);
-      declareFailded(
-        error: NegativeResult(
-          identifier: NegativeResultCodes.invalidValue,
-          message: Oration(message:'The minimum accepted is %1', [minimum]),
-        ),
-        value: dio,
-      );
+    if (actualNumberOnField < minimum && minimum >= 0 && actualNumberOnField < 0) {
+      textController.text = previousText.toString();
+      selectIntegerSection();
       return;
     }
-
-    if (maximum < dio) {
-      //textController.text = _formatText(maximum);
-      declareFailded(
-        error: NegativeResult(
-          identifier: NegativeResultCodes.invalidValue,
-          message: Oration(message:'The maximum accepted is %1', [maximum]),
-        ),
-        value: dio,
-      );
-      return;
-    }*/
 
     declareChangedValue(value: dio);
   }
@@ -344,8 +342,7 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
     if (firstSelection) {
       firstSelection = false;
       //if (widget.isDecimal) {
-      final intLength = textController.text.split('.').first.length;
-      textController.selection = TextSelection(baseOffset: 0, extentOffset: intLength);
+      selectIntegerSection();
       //}
     }
 
@@ -369,6 +366,11 @@ class _FormNumberState extends OneValueFormFieldImplementation<num, FormNumber> 
       }
     }
     return false;
+  }
+
+  void selectIntegerSection() {
+    final intLength = textController.text.split('.').first.length;
+    textController.selection = TextSelection(baseOffset: 0, extentOffset: intLength);
   }
 
   void selectDecimalSection() {

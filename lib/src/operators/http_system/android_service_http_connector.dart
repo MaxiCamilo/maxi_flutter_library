@@ -17,13 +17,10 @@ class AndroidServiceHttpConnector with StartableFunctionality, FunctionalityWith
     await AndroidServiceManager.instance.onInitialized;
     await AndroidServiceManager.instance.initialize();
 
-    await makeSeveralAttemptsAsync(
-      attempts: 4,
-      function: () => AndroidServiceManager.instance.sendAndWaitResponse(
-        eventSent: AndroidServiceReservedCommands.clientCheckHttpServerIsActive,
-        eventReceived: AndroidServiceReservedCommands.serverResponseHttpIfItsActive,
-        timeout: const Duration(seconds: 2),
-      ),
+    await AndroidServiceManager.instance.sendAndWaitResponse(
+      eventSent: AndroidServiceReservedCommands.clientCheckHttpServerIsActive,
+      eventReceived: AndroidServiceReservedCommands.serverResponseHttpIfItsActive,
+      timeout: const Duration(seconds: 7),
     );
 
     _connector = joinObject(

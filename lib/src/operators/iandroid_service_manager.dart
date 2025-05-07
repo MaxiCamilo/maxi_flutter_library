@@ -32,15 +32,46 @@ mixin IAndroidServiceManager on StartableFunctionality, IRemoteFunctionalitiesEx
   }) async {
     checkInitialize();
 
-    await sendData(eventName: eventSent, content: content);
+    final result = await sendAndWaitForAnswerAsOptional(eventSent: eventSent, eventReceived: eventReceived, content: content, timeout: timeout);
+    if (result == null) {
+      throw NegativeResult(
+        identifier: NegativeResultCodes.timeout,
+        message: const Oration(message: 'The server took too long to respond to a request, it\'s probably down or very busy'),
+      );
+    } else {
+      return result;
+    }
+  }
 
-    return await listenToData(eventName: eventReceived).waitItem(
-        timeout: timeout,
-        onTimeout: () {
-          throw NegativeResult(
-            identifier: NegativeResultCodes.timeout,
-            message: const Oration(message: 'The server took too long to respond to a request, it\'s probably down or very busy'),
-          );
-        });
+  Future<Map<String, dynamic>?> sendAndWaitForAnswerAsOptional({
+    required String eventSent,
+    required String eventReceived,
+    Map<String, dynamic>? content,
+    Duration timeout = const Duration(seconds: 7),
+  }) async {
+    checkInitialize();
+    var waiter = MaxiCompleter<Map<String, dynamic>?>();
+
+    final subscription = listenToData(eventName: eventReceived).listen((x) {
+      waiter.completeIfIncomplete((x));
+    });
+
+    for (int i = 0; i <= timeout.inSeconds * 4; i++) {
+      try {
+        waiter = MaxiCompleter<Map<String, dynamic>?>();
+        sendData(eventName: eventSent, content: content);
+        final result = await waiter.future.timeout(const Duration(milliseconds: 250), onTimeout: () => null);
+        if (result != null) {
+          subscription.cancel();
+          return result;
+        }
+      } finally {
+        waiter.completeIfIncomplete();
+      }
+    }
+
+    subscription.cancel();
+
+    return null;
   }
 }
