@@ -13,3 +13,6 @@ export 'package:maxi_flutter_library/src/animation/legacy/legacy_maxi_animated_p
 
 export 'package:maxi_flutter_library/src/animation/maxi_single_animation_container.dart';
 export 'package:maxi_flutter_library/src/animation/maxi_animation_point.dart';
+export 'package:maxi_flutter_library/src/animation/maxi_animation_sequences.dart';
+export 'package:maxi_flutter_library/src/animation/imaxi_animated_value.dart';
+export 'package:maxi_flutter_library/src/animation/single_status_animation.dart';

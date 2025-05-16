@@ -2,26 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/export_reflectors.dart';
-
-mixin IMaxiAnimatedValue<T extends Object?> on IDisposable {
-  Type get valueType;
-  T get value;
-  set value(T newValue);
-  bool get isAnimating;
-  bool get isPause;
-  void addListener(VoidCallback listener);
-  void removeListener(VoidCallback listener);
-  Future<bool> reverseAnimation({required bool stopIfItAnimating, Duration? duration, Curve? curve});
-  Future<bool> changeValue({required T value, required bool stopIfItAnimating, Duration? duration, Curve? curve});
-  Future<bool> waitAnimationFinish();
-  Future<bool> startAnimation();
-
-  void stopAnimation();
-  T pauseAnimation();
-  void resumeAnimation();
-  void resetAnimation();
-}
 
 class MaxiAnimatedValue<T extends Object?> extends ValueListenable<T> with IDisposable, ChangeNotifier, IMaxiAnimatedValue<T> {
   final Tween<T> Function(T begin, T end)? tweenBuiler;
@@ -45,7 +27,7 @@ class MaxiAnimatedValue<T extends Object?> extends ValueListenable<T> with IDisp
   @override
   T get value => _value;
   @override
-  bool get isAnimating => !_wasAnimating;
+  bool get isAnimating => _wasAnimating;
   @override
   bool get isPause => _isPause;
 
@@ -128,6 +110,8 @@ class MaxiAnimatedValue<T extends Object?> extends ValueListenable<T> with IDisp
     if (isAnimating && isPause) {
       _isPause = false;
       _animator.forward(from: 0);
+    } else if (!isAnimating) {
+      startAnimation();
     }
   }
 
@@ -194,6 +178,7 @@ class MaxiAnimatedValue<T extends Object?> extends ValueListenable<T> with IDisp
     _waiter ??= MaxiCompleter<bool>();
 
     _animator.forward(from: 0);
+    _wasAnimating = true;
     final result = await _waiter!.future;
 
     if (_value != _animation.value) {

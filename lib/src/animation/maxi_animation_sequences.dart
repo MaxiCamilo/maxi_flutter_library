@@ -2,15 +2,12 @@ import 'package:flutter/widgets.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-//TODO Hacer que puede ejecutar el guión desde el principio, elegir lugar especifico, etc
-
-class MaxiAnimationScript<T extends Object?> with IDisposable, IMaxiAnimatedValue<T> {
-  final List<MaxiAnimationPoint<T>> _guide;
+class MaxiAnimationSequences<T extends Object?> with IDisposable, IMaxiAnimatedValue<T> {
   final _semaphore = Semaphore();
 
   late final MaxiAnimatedValue<T> _animator;
 
-  int _pointIndex = 0;
+  int _pointIndex = -1;
 
   @override
   Type get valueType => List<MaxiAnimationPoint<T>>;
@@ -28,8 +25,9 @@ class MaxiAnimationScript<T extends Object?> with IDisposable, IMaxiAnimatedValu
   bool get isPause => _animator.isPause;
 
   bool _wasReversed = false;
+  List<MaxiAnimationPoint<T>> _guide;
 
-  MaxiAnimationScript({
+  MaxiAnimationSequences({
     required TickerProvider vsync,
     required List<MaxiAnimationPoint<T>> guide,
     Tween<T> Function(T, T)? tweenBuiler,
@@ -45,6 +43,12 @@ class MaxiAnimationScript<T extends Object?> with IDisposable, IMaxiAnimatedValu
     );
   }
 
+  void changeScript(List<MaxiAnimationPoint<T>> newScript) {
+    _guide = newScript;
+    stopAnimation();
+    _pointIndex = -1;
+  }
+
   @override
   void addListener(VoidCallback listener) {
     _animator.addListener(listener);
@@ -57,7 +61,7 @@ class MaxiAnimationScript<T extends Object?> with IDisposable, IMaxiAnimatedValu
 
   @override
   Future<bool> changeValue({required T value, required bool stopIfItAnimating, Duration? duration, Curve? curve}) {
-    _pointIndex = 0;
+    _pointIndex = -1;
     return _animator.changeValue(value: value, stopIfItAnimating: stopIfItAnimating, duration: duration, curve: curve);
   }
 
@@ -75,6 +79,7 @@ class MaxiAnimationScript<T extends Object?> with IDisposable, IMaxiAnimatedValu
   Future<bool> reverseAnimation({required bool stopIfItAnimating, Duration? duration, Curve? curve}) {
     if (stopIfItAnimating && _animator.isAnimating) {
       _animator.stopAnimation();
+      _pointIndex = -1;
     }
     return _semaphore.execute(function: () => _startAnimationScript(reversed: true));
   }
@@ -85,52 +90,66 @@ class MaxiAnimationScript<T extends Object?> with IDisposable, IMaxiAnimatedValu
   }
 
   @override
-  void resetAnimation() {
+  void resetAnimation({bool? reversed}) {
     _animator.stopAnimation();
     _semaphore.execute(function: () {
+      _pointIndex = -1;
+      if (reversed != null && reversed != _wasReversed) {
+        _wasReversed = reversed;
+      }
       _startAnimationScript(reversed: _wasReversed);
     });
   }
 
-  Future<bool> _startAnimationScript({required bool reversed}) async {
+  Future<bool> _startAnimationScript({required bool reversed}) {
     _wasReversed = reversed;
     if (reversed) {
-      if (_pointIndex < 0 || _pointIndex >= _guide.length) {
-        _pointIndex = _guide.length - 1;
-      }
-
-      while (_pointIndex >= 0) {
-        //SEPARAR ESTO EN UNA FUNCIÓN APARTE
-        final point = _guide[_pointIndex];
-        _pointIndex -= 1;
-        final completed = await _animator.changeValue(
-          value: point.value,
-          stopIfItAnimating: false,
-          curve: point.curve,
-          duration: point.duration,
-        );
-        if (!completed) {
-          return false;
-        }
-      }
+      return _startAnimationScriptOnReverse();
     } else {
-      //SEPARAR ESTO EN UNA FUNCIÓN APARTE
-      if (_pointIndex >= _guide.length) {
-        _pointIndex = 0;
+      return _startAnimationScriptStandart();
+    }
+  }
+
+  Future<bool> _startAnimationScriptStandart() async {
+    if (_pointIndex >= _guide.length || _pointIndex < 0) {
+      _pointIndex = 0;
+    }
+    while (_pointIndex < _guide.length) {
+      final point = _guide[_pointIndex];
+
+      final completed = await _animator.changeValue(
+        value: point.value,
+        stopIfItAnimating: false,
+        curve: point.curve,
+        duration: point.duration,
+      );
+      if (!completed) {
+        return false;
       }
-      while (_pointIndex < _guide.length) {
-        final point = _guide[_pointIndex];
-        _pointIndex += 1;
-        final completed = await _animator.changeValue(
-          value: point.value,
-          stopIfItAnimating: false,
-          curve: point.curve,
-          duration: point.duration,
-        );
-        if (!completed) {
-          return false;
-        }
+      _pointIndex += 1;
+    }
+
+    return true;
+  }
+
+  Future<bool> _startAnimationScriptOnReverse() async {
+    if (_pointIndex < 0 || _pointIndex >= _guide.length) {
+      _pointIndex = _guide.length - 1;
+    }
+
+    while (_pointIndex >= 0) {
+      final point = _guide[_pointIndex];
+
+      final completed = await _animator.changeValue(
+        value: point.value,
+        stopIfItAnimating: false,
+        curve: point.curve,
+        duration: point.duration,
+      );
+      if (!completed) {
+        return false;
       }
+      _pointIndex -= 1;
     }
 
     return true;

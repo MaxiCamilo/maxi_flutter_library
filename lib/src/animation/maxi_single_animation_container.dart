@@ -8,6 +8,7 @@ class MaxiSingleAnimationContainer<T> extends StatefulWidget {
   final IMaxiAnimatedValue<T>? initialOperator;
 
   final Widget Function(BuildContext context, T value) builder;
+  final IMaxiAnimatedValue<T> Function(T value, Duration duration, Curve curve, TickerProvider vsync)? operatorBuilder;
   final void Function(IMaxiAnimatedValue<T>)? onCreated;
 
   const MaxiSingleAnimationContainer({
@@ -18,6 +19,7 @@ class MaxiSingleAnimationContainer<T> extends StatefulWidget {
     this.curve = Curves.decelerate,
     this.onCreated,
     this.initialOperator,
+    this.operatorBuilder,
   });
 
   @override
@@ -33,7 +35,10 @@ class _MaxiSingleAnimationContainerState<T> extends State<MaxiSingleAnimationCon
   void initState() {
     super.initState();
 
-    if (widget.initialOperator == null) {
+    if (widget.operatorBuilder != null) {
+      _operator = widget.operatorBuilder!(widget.initialValue, widget.duration, widget.curve, this);
+      _createdOperator = true;
+    } else if (widget.initialOperator == null) {
       //_operator = MaxiAnimatedValue<T>(curve: widget.curve, duration: widget.duration, value: widget.initialValue, vsync: this);
       _operator = MaxiAnimatedValue<T>.searchByType(curve: widget.curve, duration: widget.duration, value: widget.initialValue, vsync: this);
       _createdOperator = true;
