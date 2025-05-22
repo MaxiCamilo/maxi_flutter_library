@@ -6,7 +6,7 @@ import 'package:maxi_flutter_library/src/operators/service/android_service_reser
 import 'package:maxi_library/maxi_library.dart';
 import 'package:maxi_library_online/maxi_library_online.dart';
 
-class AndroidServiceHttpConnector with StartableFunctionality, FunctionalityWithLifeCycle, IHttpRequester implements StreamSink<Map<String, dynamic>> {
+class AndroidServiceHttpConnector with StartableFunctionality,PaternalFunctionality , FunctionalityWithLifeCycle, IHttpRequester implements StreamSink<Map<String, dynamic>> {
   @override
   bool get isActive => isInitialized;
 

@@ -8,7 +8,7 @@ import 'package:maxi_flutter_library/src/operators/service/android_service_reser
 import 'package:maxi_flutter_library/src/operators/service/isolated_android_service.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCycle, IRemoteFunctionalitiesExecutor, IAndroidServiceManager {
+class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, FunctionalityWithLifeCycle, IRemoteFunctionalitiesExecutor, IAndroidServiceManager {
   final String serverName;
   final ServiceInstance service;
   final List<IReflectorAlbum> reflectors;
@@ -124,6 +124,10 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
       event: service.on(AndroidServiceReservedCommands.clientSendAppStatus),
       onData: _reactClientSendAppStatus,
     );
+    joinEvent(
+      event: service.on(AndroidServiceReservedCommands.clientRequestsServiceTermination),
+      onData: (_) => shutdown(),
+    );
 
     joinEvent(
       event: listenToData(eventName: AndroidServiceReservedCommands.serverSendError),
@@ -187,9 +191,13 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
   }
 
   @override
-  Future<void> shutdown() {
+  Future<void> shutdown() async {
     service.invoke(AndroidServiceReservedCommands.serverFinishesItsExecution);
-    return _closeService();
+    dispose();
+    await continueOtherFutures();
+    ThreadManager.killAllThread();
+    await continueOtherFutures();
+    await _closeService();
   }
 
   @override
@@ -203,9 +211,6 @@ class AndroidServiceEngine with StartableFunctionality, FunctionalityWithLifeCyc
   }
 
   Future<void> _closeService() async {
-    await continueOtherFutures();
-    ThreadManager.killAllThread();
-
     if (_awaitingDone != null) {
       _awaitingDone?.completeIfIncomplete();
       _awaitingDone = null;

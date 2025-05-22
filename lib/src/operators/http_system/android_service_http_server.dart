@@ -6,7 +6,7 @@ import 'package:maxi_flutter_library/src/singletons.dart';
 import 'package:maxi_library/maxi_library.dart';
 import 'package:maxi_library_online/maxi_library_online.dart';
 
-class AndroidServiceHttpServer with StartableFunctionality, FunctionalityWithLifeCycle, IHttpServer implements StreamSink<Map<String, dynamic>> {
+class AndroidServiceHttpServer with StartableFunctionality, PaternalFunctionality, FunctionalityWithLifeCycle, IHttpServer implements StreamSink<Map<String, dynamic>> {
   final List<FunctionalRoute> routes;
   final List<IHttpMiddleware> generalMiddleware;
 
@@ -51,7 +51,7 @@ class AndroidServiceHttpServer with StartableFunctionality, FunctionalityWithLif
       );
     }
 
-    if(AndroidServiceManager.instance is IsolatedAndroidService){
+    if (AndroidServiceManager.instance is IsolatedAndroidService) {
       await AndroidServiceManager.instance.initialize();
     }
 

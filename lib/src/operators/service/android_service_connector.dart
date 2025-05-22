@@ -7,7 +7,7 @@ import 'package:maxi_flutter_library/src/operators/service/android_service_reser
 import 'package:maxi_flutter_library/src/operators/service/isolated_android_service.dart';
 import 'package:maxi_library/export_reflectors.dart';
 
-class AndroidServiceConnector with StartableFunctionality, FunctionalityWithLifeCycle, IRemoteFunctionalitiesExecutor, IAndroidServiceManager {
+class AndroidServiceConnector with StartableFunctionality, PaternalFunctionality ,FunctionalityWithLifeCycle, IRemoteFunctionalitiesExecutor, IAndroidServiceManager {
   final bool autoStart;
   final bool isForegroundMode;
   final bool autoStartOnBoot;

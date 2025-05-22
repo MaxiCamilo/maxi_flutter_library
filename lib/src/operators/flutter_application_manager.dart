@@ -63,7 +63,11 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
     required this.reflectors,
     required this.defineLanguageOperatorInOtherThread,
   }) {
-    ThreadManager.addThreadInitializer(initializer: IsolatedAndroidService());
+    if (kIsWeb) {
+      ThreadManager.generalFactory = const FakeThreadFactory();
+    } else {
+      ThreadManager.addThreadInitializer(initializer: IsolatedAndroidService());
+    }
   }
 
   @override

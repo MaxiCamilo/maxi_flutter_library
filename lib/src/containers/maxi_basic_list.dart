@@ -11,6 +11,7 @@ class MaxiBasicList<T> extends StatefulWidget with IMaxiAnimatorWidget {
   final Widget Function(BuildContext cont, T item, int ind) childGenerator;
   final Widget Function(BuildContext, List<Widget>)? listGenerator;
   final Widget Function(BuildContext)? emptyGenerator;
+  final bool verticalFlexExpanded;
 
   final void Function(IMaxiBasicList<T>)? onCreatedOperator;
 
@@ -20,6 +21,7 @@ class MaxiBasicList<T> extends StatefulWidget with IMaxiAnimatorWidget {
   const MaxiBasicList({
     required this.valueGetter,
     required this.childGenerator,
+    this.verticalFlexExpanded = false,
     super.key,
     this.reloaders,
     this.valueUpdaters,
@@ -89,7 +91,7 @@ class _MaxiBasicListState<T> extends StateWithLifeCycle<MaxiBasicList<T>> with S
 
     return Flex(
       direction: Axis.vertical,
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: widget.verticalFlexExpanded ? MainAxisSize.max : MainAxisSize.min,
       children: lista.mapWithPosition((x, i) => widget.childGenerator(context, x, i)).toList(growable: false),
     );
   }
