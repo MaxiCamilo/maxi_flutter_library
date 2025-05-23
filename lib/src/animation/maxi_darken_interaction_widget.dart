@@ -226,15 +226,13 @@ class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInt
 
       try {
         final streamOperator = functionality.createManager();
-        joinEvent(
-          event: streamOperator.textStream,
-          onData: (x) {
+
+        final result = await streamOperator.waitResult(
+          onText: (x) {
             _lastText = x;
             _lastTextChange.addIfActive(true);
           },
         );
-
-        final result = await streamOperator.waitStreamResult();
         if (onDone != null) {
           onDone(result);
         }
