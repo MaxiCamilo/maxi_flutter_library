@@ -95,7 +95,8 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
 
   late Oration lastText;
   T? lastResult;
-  StreamSubscription<StreamState<Oration, T>>? actualStream;
+  //StreamSubscription<StreamState<Oration, T>>? actualStream;
+  FunctionalityStreamManager<T>? manager;
 
   List<NegativeResultValue> invalidProperties = [];
 
@@ -125,12 +126,15 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
       if (mounted) {
         setState(() {});
       }
-      lastResult = await waitFunctionalStream<Oration, T>(
+
+      manager = joinObject(
+          item: ExpressFunctionalityStream<T>(
         stream: stream,
-        onDoneOrCanceled: reactOnDoneOrCanceled,
-        onData: reactNewText,
-        onSubscription: (x) => actualStream = x,
-      );
+        onDoneOrCanceled: () => reactOnDoneOrCanceled(null),
+        onText: reactNewText,
+      ).createManager());
+
+      lastResult = await manager!.waitResult();
 
       isDone = true;
 
@@ -153,7 +157,6 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
 
       lastText = lastError.message;
     } finally {
-      actualStream = null;
       if (isActive && mounted) {
         setState(() {});
       }
@@ -164,7 +167,6 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
   @override
   void dispose() {
     isActive = false;
-    actualStream?.cancel();
 
     super.dispose();
   }
@@ -221,8 +223,8 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
 
   void cancelStream() {
     if (isActive) {
-      actualStream?.cancel();
-      actualStream = null;
+      manager?.cancel();
+      manager = null;
     }
   }
 

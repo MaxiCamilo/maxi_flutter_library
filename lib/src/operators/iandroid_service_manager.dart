@@ -11,7 +11,7 @@ mixin IAndroidServiceManager on StartableFunctionality, IRemoteFunctionalitiesEx
   bool get isServer;
   bool get hasClient;
 
-  @override
+  
   bool get isActive => isInitialized;
 
   Future<void> get onDone;

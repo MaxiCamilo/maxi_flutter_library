@@ -82,6 +82,11 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
   @mustCallSuper
   R joinObject<R extends Object>({required R item}) {
     _otherActiveList.add(item);
+
+    if (item is IDisposable) {
+      item.onDispose.whenComplete(() => _otherActiveList.remove(item));
+    }
+
     return item;
   }
 
