@@ -9,7 +9,7 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
   final bool canRetry;
   final bool startWhenDisplayed;
 
-  final FutureOr<StreamStateTexts<T>> Function() function;
+  final FutureOr<TextableFunctionality<T>> Function() function;
 
   final void Function(T)? onDone;
   final void Function()? onStart;
@@ -30,7 +30,7 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
     this.onReset,
   });
 
-  static Future<T?> showMaterialDialog<T>({required BuildContext context, required bool canCancel, required bool canRetry, required FutureOr<StreamStateTexts<T>> Function() function, void Function(T)? onDone}) {
+  static Future<T?> showMaterialDialog<T>({required BuildContext context, required bool canCancel, required bool canRetry, required FutureOr<TextableFunctionality<T>> Function() function, void Function(T)? onDone}) {
     return DialogUtilities.showWidgetAsMaterialDialog<T>(
       context: context,
       barrierDismissible: false,
@@ -57,10 +57,11 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
     required FutureOr<T> Function() function,
     void Function(T)? onDone,
     Oration text = const Oration(message: 'Wait for the task to complete its execution'),
+    bool barrierDismissible = false,
   }) {
     return DialogUtilities.showWidgetAsMaterialDialog<T>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: barrierDismissible,
       builder: (context, dialogOperator) => FunctionalTextStreamerWidget(
         canCancel: canCancel,
         canRetry: canRetry,
@@ -72,15 +73,18 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
           }
         },
         onCancel: () => dialogOperator.defineResult(context),
-        function: () => _runAsFuture(function, text),
+        function: () => InteractableFunctionality.express<Oration, T>((manager) => _runAsFuture(manager: manager, function: function, text: text)),
       ),
     );
   }
 
-  static Stream<StreamState<Oration, T>> _runAsFuture<T>(FutureOr<T> Function() function, Oration text) async* {
-    yield streamTextStatus(text);
-    final result = await function();
-    yield streamResult(result);
+  static Future<T> _runAsFuture<T>({
+    required InteractableFunctionalityExecutor<Oration, T> manager,
+    required Oration text,
+    required FutureOr<T> Function() function,
+  }) async {
+    await manager.sendItemAsync(text);
+    return await function();
   }
 
   @override
@@ -96,7 +100,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
   late Oration lastText;
   T? lastResult;
   //StreamSubscription<StreamState<Oration, T>>? actualStream;
-  FunctionalityStreamManager<T>? manager;
+  TextableFunctionalityOperator<T>? manager;
 
   List<NegativeResultValue> invalidProperties = [];
 
@@ -122,19 +126,13 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     lastText = const Oration(message: 'Starting stream');
 
     try {
-      final stream = await widget.function();
+      final functionality = await widget.function();
       if (mounted) {
         setState(() {});
       }
 
-      manager = joinObject(
-          item: ExpressFunctionalityStream<T>(
-        stream: stream,
-        onDoneOrCanceled: () => reactOnDoneOrCanceled(null),
-        onText: reactNewText,
-      ).createManager());
-
-      lastResult = await manager!.waitResult();
+      manager = functionality.createOperator();
+      lastResult = await manager!.waitResult(onItem: reactNewText);
 
       isDone = true;
 
@@ -161,12 +159,16 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
         setState(() {});
       }
       isActive = false;
+      manager = null;
     }
   }
 
   @override
   void dispose() {
     isActive = false;
+
+    manager?.dispose();
+    manager = null;
 
     super.dispose();
   }

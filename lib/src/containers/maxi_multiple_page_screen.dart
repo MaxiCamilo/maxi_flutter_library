@@ -46,8 +46,8 @@ abstract class MaxiMultiplePageScreen<T extends StatefulWidget> extends StateWit
     return _darkenInteractionOperator!.executeFunction<R>(function: function, onDone: onDone, onError: onError, posterError: posterError);
   }
 
-  Future<void> executeStreamFunctionality<R>({
-    required IStreamFunctionality<R> functionality,
+  Future<void> executeTextableFunctionality<R>({
+    required TextableFunctionality<R> functionality,
     void Function(R)? onDone,
     void Function(Object, StackTrace)? onError,
     IMaxiErrorPosterOperator? posterError,
@@ -55,7 +55,7 @@ abstract class MaxiMultiplePageScreen<T extends StatefulWidget> extends StateWit
     checkProgrammingFailure(thatChecks: const Oration(message: 'Darken Interaction Operator was defined'), result: () => _darkenInteractionOperator != null);
     checkProgrammingFailure(thatChecks: const Oration(message: 'The widget is mounted'), result: () => mounted);
 
-    return _darkenInteractionOperator!.executeStreamFunctionality<R>(functionality: functionality, onDone: onDone, onError: onError, posterError: posterError);
+    return _darkenInteractionOperator!.executeTextableFunctionality<R>(functionality: functionality, onDone: onDone, onError: onError, posterError: posterError);
   }
 
   @override

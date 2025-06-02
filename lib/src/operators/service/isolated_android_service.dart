@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
+import 'package:maxi_flutter_library/src/operators/service/isolated_android_service_invokator.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class IsolatedAndroidService with StartableFunctionality, IRemoteFunctionalitiesExecutor, IAndroidServiceManager, IThreadInitializer {
+class IsolatedAndroidService with StartableFunctionality, RemoteFunctionalitiesExecutor, IAndroidServiceManager, IThreadInitializer {
   static const _sharedNameID = '&#MxIAS&';
 
   static final sharedReceivedData = IsolatedEvent<(String, Map<String, dynamic>)>(name: '$_sharedNameID.1');
@@ -130,40 +131,7 @@ class IsolatedAndroidService with StartableFunctionality, IRemoteFunctionalities
   }
 
   @override
-  Future<T> executeFunctionality<T, F extends IFunctionality<FutureOr<T>>>({InvocationParameters parameters = InvocationParameters.emptry}) async {
-    await initialize();
-    return ThreadManager.instance.callFunctionOnTheServer(function: _executeFunctionalityOnMainThread<T, F>, parameters: InvocationParameters.only(parameters));
-  }
-
-  static Future<T> _executeFunctionalityOnMainThread<T, F extends IFunctionality<FutureOr<T>>>(InvocationContext context) {
-    return AndroidServiceManager.instance.executeFunctionality<T, F>(parameters: context.firts<InvocationParameters>());
-  }
-
-  @override
-  StreamStateTexts<T> executeStreamFunctionality<T, F extends IStreamFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) async* {
-    await initialize();
-    final stream = await ThreadManager.instance.callStreamOnTheServer(function: _executeStreamFunctionalityOnMainThread<T, F>, parameters: InvocationParameters.only(parameters));
-    yield* stream;
-  }
-
-  static StreamStateTexts<T> _executeStreamFunctionalityOnMainThread<T, F extends IStreamFunctionality<T>>(InvocationParameters parameters) {
-    return AndroidServiceManager.instance.executeStreamFunctionality<T, F>(parameters: parameters.firts<InvocationParameters>());
-  }
-
-  @override
-  Future<R> executeReflectedEntityFunction<R>({required String entityName, required String methodName, InvocationParameters parameters = InvocationParameters.emptry}) async {
-    await initialize();
-    return await ThreadManager.instance.callFunctionOnTheServer(
-      function: _executeReflectedEntityFunctionOnMainThread<R>,
-      parameters: InvocationParameters.list([entityName, methodName, parameters]),
-    );
-  }
-
-  static Future<R> _executeReflectedEntityFunctionOnMainThread<R>(InvocationContext context) {
-    return AndroidServiceManager.instance.executeReflectedEntityFunction<R>(
-      entityName: context.firts<String>(),
-      methodName: context.second<String>(),
-      parameters: context.third<InvocationParameters>(),
-    );
+  InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionality<T, F extends TextableFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) {
+    return IsolatedAndroidServiceInvokator<T, F>(parameters: parameters).runInThreadServer();
   }
 }

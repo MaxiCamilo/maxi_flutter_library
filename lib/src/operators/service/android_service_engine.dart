@@ -8,7 +8,7 @@ import 'package:maxi_flutter_library/src/operators/service/android_service_reser
 import 'package:maxi_flutter_library/src/operators/service/isolated_android_service.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, FunctionalityWithLifeCycle, IRemoteFunctionalitiesExecutor, IAndroidServiceManager {
+class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, FunctionalityWithLifeCycle, RemoteFunctionalitiesExecutor, IAndroidServiceManager {
   final String serverName;
   final ServiceInstance service;
   final List<IReflectorAlbum> reflectors;
@@ -19,10 +19,10 @@ class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, F
   final bool useWorkingPathInDebug;
 
   late Semaphore _syncronizerShipment;
-  late RemoteFunctionalitiesExecutorViaStream _remoteFunctionalitiesExecutor;
 
   Completer? _awaitingShipmentConfirmation;
   Completer? _awaitingDone;
+  RemoteFunctionalitiesExecutor? _functionInvoker;
 
   StreamController<(String, Map<String, dynamic>)>? _receivedData;
 
@@ -139,22 +139,8 @@ class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, F
       },
     );
 
-    await _intanceInvocator();
     IsolatedAndroidService.sharedHasClient.changeValue(true);
-  }
-
-  Future<void> _intanceInvocator() async {
-    _remoteFunctionalitiesExecutor = joinObject(
-        item: RemoteFunctionalitiesExecutorViaStream(
-      receiver: listenToData(eventName: AndroidServiceReservedCommands.clientInvokeRemoteObject),
-      sender: CustomStreamSink(
-        onNewItem: (x) => sendData(eventName: AndroidServiceReservedCommands.serverInvokeRemoteObject, content: x),
-        waitDone: done,
-      ),
-      confirmConnection: false,
-    ));
-
-    await _remoteFunctionalitiesExecutor.initialize();
+    _makeInvoker();
   }
 
   @override
@@ -247,7 +233,6 @@ class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, F
     checkFirstIfInitialized(() {});
     return _syncronizerShipment.execute(function: () async {
       _awaitingShipmentConfirmation = joinWaiter();
-      _checkContent(content);
       service.invoke(
         AndroidServiceReservedCommands.serverSendMessage,
         {'name': eventName, 'content': content ?? {}},
@@ -307,33 +292,26 @@ class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, F
     );
   }
 
-  @override
-  Future<T> executeFunctionality<T, F extends IFunctionality<FutureOr<T>>>({InvocationParameters parameters = InvocationParameters.emptry, String buildName = ''}) async {
-    await initialize();
-    return await _remoteFunctionalitiesExecutor.executeFunctionality<T, F>(buildName: buildName, parameters: parameters);
-  }
-
-  @override
-  StreamStateTexts<T> executeStreamFunctionality<T, F extends IStreamFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry, String buildName = ''}) async* {
-    await initialize();
-    yield* _remoteFunctionalitiesExecutor.executeStreamFunctionality<T, F>(buildName: buildName, parameters: parameters);
-  }
-
-  void _checkContent(Map<String, dynamic>? content) {
-    if (content == null) {
-      return;
-    }
-
-    for (final value in content.values) {
-      if (ConverterUtilities.isPrimitive(value.runtimeType) == null) {
-        throw 'BAD DATA!';
-      }
+  void _makeInvoker() {
+    if (_functionInvoker == null) {
+      _functionInvoker = RemoteFunctionalitiesExecutor.fromStream(
+        input: listenToData(eventName: AndroidServiceReservedCommands.clientInvokeRemoteObject),
+        output: CustomStreamSink(
+          onNewItem: (x) => sendData(eventName: AndroidServiceReservedCommands.serverInvokeRemoteObject, content: x),
+          
+          waitDone: onDispose,
+        ),
+      );
+      _functionInvoker!.onDispose.whenComplete(() => _functionInvoker = null);
+      joinDisponsabeObject<RemoteFunctionalitiesExecutor>(item: _functionInvoker!);
     }
   }
 
   @override
-  Future<R> executeReflectedEntityFunction<R>({required String entityName, required String methodName, InvocationParameters parameters = InvocationParameters.emptry}) async {
-    await initialize();
-    return await _remoteFunctionalitiesExecutor.executeReflectedEntityFunction<R>(entityName: entityName, methodName: methodName, parameters: parameters);
+  InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionality<T, F extends TextableFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) {
+    checkInitialize();
+    _makeInvoker();
+
+    return _functionInvoker!.executeInteractableFunctionality<T, F>(parameters: parameters);
   }
 }

@@ -44,8 +44,8 @@ mixin IMaxiDarkenInteractionOperator {
     IMaxiErrorPosterOperator? posterError,
   });
 
-  Future<void> executeStreamFunctionality<T>({
-    required IStreamFunctionality<T> functionality,
+  Future<void> executeTextableFunctionality<T>({
+    required TextableFunctionality<T> functionality,
     void Function(T)? onDone,
     void Function(Object, StackTrace)? onError,
     IMaxiErrorPosterOperator? posterError,
@@ -207,8 +207,8 @@ class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInt
   }
 
   @override
-  Future<void> executeStreamFunctionality<T>({
-    required IStreamFunctionality<T> functionality,
+  Future<void> executeTextableFunctionality<T>({
+    required TextableFunctionality<T> functionality,
     void Function(T)? onDone,
     void Function(Object, StackTrace)? onError,
     IMaxiErrorPosterOperator? posterError,
@@ -225,10 +225,10 @@ class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInt
       }
 
       try {
-        final streamOperator = functionality.createManager();
+        final streamOperator = functionality.createOperator();
 
         final result = await streamOperator.waitResult(
-          onText: (x) {
+          onItem: (x) {
             _lastText = x;
             _lastTextChange.addIfActive(true);
           },
