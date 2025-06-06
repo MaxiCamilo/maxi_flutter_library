@@ -448,4 +448,12 @@ class AndroidServiceConnector with StartableFunctionality, PaternalFunctionality
 
     return _functionInvoker!.executeInteractableFunctionality<T, F>(parameters: parameters);
   }
+
+  @override
+  InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionalityViaName<T>({required String functionalityName, InvocationParameters parameters = InvocationParameters.emptry}) {
+    checkInitialize();
+    _makeInvoker();
+
+    return _functionInvoker!.executeInteractableFunctionalityViaName<T>(parameters: parameters, functionalityName: functionalityName);
+  }
 }

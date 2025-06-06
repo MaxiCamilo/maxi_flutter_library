@@ -298,7 +298,6 @@ class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, F
         input: listenToData(eventName: AndroidServiceReservedCommands.clientInvokeRemoteObject),
         output: CustomStreamSink(
           onNewItem: (x) => sendData(eventName: AndroidServiceReservedCommands.serverInvokeRemoteObject, content: x),
-          
           waitDone: onDispose,
         ),
       );
@@ -313,5 +312,13 @@ class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, F
     _makeInvoker();
 
     return _functionInvoker!.executeInteractableFunctionality<T, F>(parameters: parameters);
+  }
+
+  @override
+  InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionalityViaName<T>({required String functionalityName, InvocationParameters parameters = InvocationParameters.emptry}) {
+    checkInitialize();
+    _makeInvoker();
+
+    return _functionInvoker!.executeInteractableFunctionalityViaName<T>(parameters: parameters, functionalityName: functionalityName);
   }
 }

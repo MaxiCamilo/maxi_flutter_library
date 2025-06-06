@@ -11,3 +11,4 @@ export 'package:maxi_flutter_library/src/containers.dart';
 export 'package:maxi_flutter_library/src/dialog.dart';
 export 'package:maxi_flutter_library/src/operators.dart';
 export 'package:maxi_flutter_library/src/singletons.dart';
+export 'package:maxi_flutter_library/src/templates.dart';
