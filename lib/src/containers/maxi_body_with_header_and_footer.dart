@@ -46,7 +46,14 @@ class MaxiBodyWithHeaderAndFooter extends StatelessWidget {
     }
 
     if (width >= determiningWidth && (heigth == double.infinity || heigth >= determiningHeigth)) {
+      /* if (expandVertically && width != double.infinity && heigth != double.infinity) {
+        return MaxiRectangle(
+          constraints: BoxConstraints(maxHeight: heigth, maxWidth: width),
+          child: _buildExtendedFlex(context, direction),
+        );
+      } else {*/
       return _buildExtendedFlex(context, direction);
+      //}
     } else {
       return _buildCompactFlex(context, direction);
     }

@@ -27,6 +27,7 @@ mixin IFormFieldManager {
   void refreshStatus({required IFormFieldOperator field});
 
   Map<String, dynamic> createMap({required bool onlyIfIsValid});
+  
 
   void dispose();
 

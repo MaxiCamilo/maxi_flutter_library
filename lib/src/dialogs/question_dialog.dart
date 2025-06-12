@@ -36,7 +36,7 @@ class QuestionDialog extends StatefulWidget {
     bool barrierDismissible = true,
     Color? iconColor,
     double? iconSize,
-  }) async {
+  }) {
     return DialogUtilities.showWidgetAsMaterialDialog(
       context: context,
       barrierDismissible: barrierDismissible,
@@ -60,7 +60,7 @@ class QuestionDialog extends StatefulWidget {
     Oration secondOption = const Oration(message: 'No'),
     IconData icon = Icons.question_mark,
     double rowFrom = 400,
-  }) async {
+  }) {
     return DialogUtilities.showWidgetAsBottomSheet(
       context: context,
       builder: (context, dialogOperator) => QuestionDialog(

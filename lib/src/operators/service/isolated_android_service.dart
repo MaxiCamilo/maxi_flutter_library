@@ -133,11 +133,11 @@ class IsolatedAndroidService with StartableFunctionality, RemoteFunctionalitiesE
 
   @override
   InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionality<T, F extends TextableFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) {
-    return IsolatedAndroidServiceInvokator<T, F>(parameters: parameters).runInThreadServer();
+    return IsolatedAndroidServiceInvokator<T, F>(parameters: parameters).inThreadServer().createOperator();
   }
 
   @override
   InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionalityViaName<T>({required String functionalityName, InvocationParameters parameters = InvocationParameters.emptry}) {
-    return IsolatedAndroidServiceUnkownInvokator<T>(parameters: parameters, funcName: functionalityName).runInThreadServer();
+    return IsolatedAndroidServiceUnkownInvokator<T>(parameters: parameters, funcName: functionalityName).inThreadServer().createOperator();
   }
 }
