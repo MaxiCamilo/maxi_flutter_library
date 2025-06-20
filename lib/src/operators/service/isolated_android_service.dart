@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
-import 'package:maxi_flutter_library/src/operators/service/isolated_android_service_invokator.dart';
-import 'package:maxi_flutter_library/src/operators/service/isolated_android_service_unkown_invokator.dart';
+import 'package:maxi_flutter_library/src/operators/service/logic/isolated_android_service_execute_with_type.dart';
+import 'package:maxi_flutter_library/src/operators/service/logic/isolated_android_service_execute_without_type.dart';
 import 'package:maxi_library/maxi_library.dart';
 
 class IsolatedAndroidService with StartableFunctionality, RemoteFunctionalitiesExecutor, IAndroidServiceManager, IThreadInitializer {
@@ -132,12 +132,12 @@ class IsolatedAndroidService with StartableFunctionality, RemoteFunctionalitiesE
   }
 
   @override
-  InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionality<T, F extends TextableFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) {
-    return IsolatedAndroidServiceInvokator<T, F>(parameters: parameters).inThreadServer().createOperator();
+  TextableFunctionality<T> executeInteractiveFunctionality<T, F extends TextableFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) {
+    return IsolatedAndroidServiceExecuteWithType<T, F>(parameters: parameters);
   }
 
   @override
-  InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionalityViaName<T>({required String functionalityName, InvocationParameters parameters = InvocationParameters.emptry}) {
-    return IsolatedAndroidServiceUnkownInvokator<T>(parameters: parameters, funcName: functionalityName).inThreadServer().createOperator();
+  TextableFunctionality<T> executeInteractiveFunctionalityViaName<T>({required String functionalityName, InvocationParameters parameters = InvocationParameters.emptry}) {
+    return IsolatedAndroidServiceExecuteWithoutType<T>(functionalityType: functionalityName, parameters: parameters);
   }
 }

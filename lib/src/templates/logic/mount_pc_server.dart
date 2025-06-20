@@ -35,7 +35,7 @@ class MountPcServer with TextableFunctionalityVoid {
   }
 
   @override
-  Future<void> runFunctionality({required InteractableFunctionalityExecutor<Oration, void> manager}) async {
+  Future<void> runFunctionality({required InteractiveFunctionalityExecutor<Oration, void> manager}) async {
     await manager.sendItemAsync(const Oration(message: 'Setting up local server'));
 
     final String address = customExeAddress ?? _getServerAddress();

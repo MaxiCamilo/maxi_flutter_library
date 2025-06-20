@@ -281,7 +281,7 @@ class _LoadingScreenState<T> extends StateWithLifeCycle<LoadingScreen<T>> with I
     waitingForCancellation?.completeErrorIfIncomplete(
       NegativeResult(
         identifier: NegativeResultCodes.functionalityCancelled,
-        message: const Oration(message: 'The functionality was canceled'),
+        message: const Oration(message: 'The task was canceled'),
       ),
     );
 

@@ -103,7 +103,7 @@ class _MaxiScrollState extends State<MaxiScroll> {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: widget.scrollDirection == Axis.vertical ? constraints.maxHeight : 0,
-                    maxHeight: constraints.maxHeight,
+                    //maxHeight: constraints.maxHeight,
                   ),
                   child: widget.child,
                 ),

@@ -73,13 +73,13 @@ class FunctionalTextStreamerWidget<T> extends StatefulWidget {
           }
         },
         onCancel: () => dialogOperator.defineResult(context),
-        function: () => InteractableFunctionality.express<Oration, T>((manager) => _runAsFuture(manager: manager, function: function, text: text)),
+        function: () => InteractiveFunctionality.express<Oration, T>((manager) => _runAsFuture(manager: manager, function: function, text: text)),
       ),
     );
   }
 
   static Future<T> _runAsFuture<T>({
-    required InteractableFunctionalityExecutor<Oration, T> manager,
+    required InteractiveFunctionalityExecutor<Oration, T> manager,
     required Oration text,
     required FutureOr<T> Function() function,
   }) async {
@@ -184,7 +184,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     } else {
       final lastError = NegativeResult(
         identifier: NegativeResultCodes.functionalityCancelled,
-        message: const Oration(message: 'The functionality was canceled'),
+        message: const Oration(message: 'The task was canceled'),
       );
 
       lastText = lastError.message;

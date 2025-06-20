@@ -307,18 +307,14 @@ class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, F
   }
 
   @override
-  InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionality<T, F extends TextableFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) {
-    checkInitialize();
+  TextableFunctionality<T> executeInteractiveFunctionality<T, F extends TextableFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) {
     _makeInvoker();
-
-    return _functionInvoker!.executeInteractableFunctionality<T, F>(parameters: parameters);
+    return _functionInvoker!.executeInteractiveFunctionality<T, F>(parameters: parameters);
   }
 
   @override
-  InteractableFunctionalityOperator<Oration, T> executeInteractableFunctionalityViaName<T>({required String functionalityName, InvocationParameters parameters = InvocationParameters.emptry}) {
-    checkInitialize();
+  TextableFunctionality<T> executeInteractiveFunctionalityViaName<T>({required String functionalityName, InvocationParameters parameters = InvocationParameters.emptry}) {
     _makeInvoker();
-
-    return _functionInvoker!.executeInteractableFunctionalityViaName<T>(parameters: parameters, functionalityName: functionalityName);
+    return _functionInvoker!.executeInteractiveFunctionalityViaName<T>(functionalityName: functionalityName, parameters: parameters);
   }
 }
