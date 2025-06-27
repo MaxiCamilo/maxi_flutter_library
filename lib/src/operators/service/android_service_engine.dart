@@ -239,7 +239,7 @@ class AndroidServiceEngine with StartableFunctionality, PaternalFunctionality, F
       );
 
       await _awaitingShipmentConfirmation!.future.timeout(
-        const Duration(seconds: 7),
+        ApplicationManager.instance.isDebug ? const Duration(seconds: 30) : const Duration(seconds: 7),
         onTimeout: () {
           throw NegativeResult(identifier: NegativeResultCodes.timeout, message: const Oration(message: 'The client took too long to confirm receipt of the sent package'));
         },

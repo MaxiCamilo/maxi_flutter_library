@@ -403,10 +403,6 @@ class AndroidServiceConnector with StartableFunctionality, PaternalFunctionality
   void closeConnection() {
     if (isInitialized) {
       _backgroundService.invoke(AndroidServiceReservedCommands.notifyCloseClient);
-      maxiScheduleMicrotask(() async {
-        await continueOtherFutures();
-        dispose();
-      });
     }
   }
 
@@ -440,7 +436,7 @@ class AndroidServiceConnector with StartableFunctionality, PaternalFunctionality
       joinDisponsabeObject<RemoteFunctionalitiesExecutor>(item: _functionInvoker!);
     }
   }
-  
+
   @override
   TextableFunctionality<T> executeInteractiveFunctionality<T, F extends TextableFunctionality<T>>({InvocationParameters parameters = InvocationParameters.emptry}) {
     _makeInvoker();
@@ -452,6 +448,4 @@ class AndroidServiceConnector with StartableFunctionality, PaternalFunctionality
     _makeInvoker();
     return _functionInvoker!.executeInteractiveFunctionalityViaName<T>(functionalityName: functionalityName, parameters: parameters);
   }
-
-  
 }
