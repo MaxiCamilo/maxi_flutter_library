@@ -1,10 +1,10 @@
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class AndroidServiceChannel with IChannel<(String, Map<String, dynamic>), (String, Map<String, dynamic>)> {
+class AndroidServiceChannel with IDisposable, IChannel<(String, Map<String, dynamic>), (String, Map<String, dynamic>)> {
   final IAndroidServiceManager instance;
 
-  const AndroidServiceChannel({required this.instance});
+  AndroidServiceChannel({required this.instance});
 
   @override
   bool get isActive => instance.isInitialized;
@@ -13,8 +13,8 @@ class AndroidServiceChannel with IChannel<(String, Map<String, dynamic>), (Strin
   Stream<(String, Map<String, dynamic>)> get receiver => instance.receivedData;
 
   @override
-  Future close() {
-    return instance.shutdown();
+  Future close() async {
+    dispose();
   }
 
   @override
@@ -28,5 +28,10 @@ class AndroidServiceChannel with IChannel<(String, Map<String, dynamic>), (Strin
   @override
   void addError(Object error, [StackTrace? stackTrace]) {
     instance.sendError(error: NegativeResult.searchNegativity(item: error, actionDescription: const Oration(message: 'Error Channel'), stackTrace: stackTrace));
+  }
+
+  @override
+  void performObjectDiscard() {
+    containErrorLogAsync(detail: const Oration(message: 'Shutdown android instance'), function: () => instance.shutdown());
   }
 }
