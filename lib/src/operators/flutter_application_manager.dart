@@ -174,4 +174,16 @@ class FlutterApplicationManager with StartableFunctionality, IThreadInitializer,
     Process.run(Platform.resolvedExecutable, arguments);
     finishApplication();
   }
+
+  @override
+  void addReflectors(Iterable<GeneratedReflectorAlbum> albums) {
+    for (final alb in albums) {
+      if (!reflectors.contains(alb)) {
+        reflectors.add(alb);
+      }
+    }
+
+    // ignore: invalid_use_of_internal_member
+    ReflectionManager.instance.addSeveralsAlbum(albums);
+  }
 }
