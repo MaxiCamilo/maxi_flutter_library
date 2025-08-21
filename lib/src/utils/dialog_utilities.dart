@@ -17,6 +17,12 @@ class _DialogWindowPop<T> with IDialogWindow<T> {
 }
 
 mixin DialogUtilities {
+  static Future<void> closeAllDialogs({required BuildContext context}) async {
+    while (Navigator.of(context, rootNavigator: true).canPop()) {
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+  }
+
   static Future<T?> showWidgetAsBottomSheet<T>({
     required BuildContext context,
     required Widget Function(BuildContext context, IDialogWindow<T> dialogOperator) builder,

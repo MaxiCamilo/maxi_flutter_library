@@ -16,6 +16,7 @@ class FormText extends OneValueFormField<String> {
   final void Function(String, NegativeResult?)? onSubmitted;
   final void Function(String)? onIsValid;
   final void Function(NegativeResult)? onIsInvalid;
+  final bool obscureText;
 
   const FormText({
     required super.propertyName,
@@ -27,6 +28,7 @@ class FormText extends OneValueFormField<String> {
     super.validators,
     super.onChangeValue,
     this.enable = true,
+    this.obscureText = false,
     this.maxCharacter,
     this.maxLines,
     this.icon,
@@ -112,6 +114,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
       minLines: 1,
       maxLines: _maxLines,
       focusNode: widget.focusNode,
+      obscureText: widget.obscureText,
       textInputAction: widget.inputAction,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),

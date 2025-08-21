@@ -24,5 +24,6 @@ export 'package:maxi_flutter_library/src/containers/maxi_conditional_container_b
 export 'package:maxi_flutter_library/src/containers/maxi_body_with_header_and_footer.dart';
 export 'package:maxi_flutter_library/src/containers/hide_by_scroll.dart';
 export 'package:maxi_flutter_library/src/containers/maxi_translucent_builder_box.dart';
+export 'package:maxi_flutter_library/src/containers/maxi_item_list.dart';
 
 export 'package:maxi_flutter_library/src/containers/maxi_tap_area.dart';
