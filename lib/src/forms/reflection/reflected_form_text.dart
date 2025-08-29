@@ -11,6 +11,7 @@ class ReflectedFormText extends ReflectionFieldImplementation {
   final int? maxLines;
   final TextInputAction? inputAction;
   final Widget? icon;
+  final FocusNode? focusNode;
   final void Function(String, NegativeResult?)? onChangeValue;
   final void Function(String, NegativeResult?)? onSubmitted;
 
@@ -27,6 +28,7 @@ class ReflectedFormText extends ReflectionFieldImplementation {
     this.icon,
     this.onChangeValue,
     this.onSubmitted,
+    this.focusNode,
   });
 
   @override
@@ -62,6 +64,7 @@ class _StateReflectedFormText extends StateReflectionFieldImplementation<Reflect
       validators: validators,
       onChangeValue: widget.onChangeValue,
       onSubmitted: widget.onSubmitted,
+      focusNode: widget.focusNode,
     );
   }
 }

@@ -23,6 +23,7 @@ class LoadingScreen<T> extends StatefulWidget with IMaxiAnimatorWidget {
   final bool canRetry;
   final double iconSize;
   final double textSize;
+  
   final Duration duration;
   final Curve curve;
   final Duration? waitingReupdated;

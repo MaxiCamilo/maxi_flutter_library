@@ -9,6 +9,7 @@ class MaxiText extends StatelessWidget {
   final bool italic;
   final TextDecoration? decoration;
   final bool selectable;
+  final TextOverflow? overflow;
 
   const MaxiText({
     required this.text,
@@ -20,6 +21,7 @@ class MaxiText extends StatelessWidget {
     this.italic = false,
     this.decoration,
     this.selectable = false,
+    this.overflow,
   });
 
   @override
@@ -40,6 +42,7 @@ class MaxiText extends StatelessWidget {
       return Text(
         text,
         textAlign: aling,
+        overflow: overflow,
         style: TextStyle(
           decoration: decoration,
           color: color,

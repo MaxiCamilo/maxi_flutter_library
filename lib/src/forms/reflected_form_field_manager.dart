@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class ReflectedFormFieldManager<T> with IFormFieldManager {
+class ReflectedFormFieldManager<T> with IDisposable, IFormFieldManager {
   late final ITypeEntityReflection reflector;
 
   late final FormFieldManager _formOperator;
@@ -75,7 +75,7 @@ class ReflectedFormFieldManager<T> with IFormFieldManager {
   }
 
   @override
-  void dispose() {
+  void performObjectDiscard() {
     _formOperator.dispose();
     _notifyStatusChange.close();
   }

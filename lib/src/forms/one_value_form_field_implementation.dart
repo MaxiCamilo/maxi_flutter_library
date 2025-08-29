@@ -80,7 +80,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
       }
     }
 
-    _internalChangeValue(value: _actualValue);
+    _internalChangeValue(value: _actualValue, forceUpdate: false);
   }
 
   @override
@@ -112,12 +112,12 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
   }
 
   @protected
-  bool declareChangedValue({required T value}) {
-    if (_actualValue == value) {
+  bool declareChangedValue({required T value, bool forceUpdate = false}) {
+    if (_actualValue == value && !forceUpdate) {
       return isValid;
     }
 
-    final result = _internalChangeValue(value: value);
+    final result = _internalChangeValue(value: value, forceUpdate: forceUpdate);
 
     if (widget.onChangeValue != null) {
       widget.onChangeValue!(value, isValid ? null : lastError);
@@ -127,8 +127,8 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
     return result;
   }
 
-  bool _internalChangeValue({required value}) {
-    if (value == _actualValue) {
+  bool _internalChangeValue({required value, required bool forceUpdate}) {
+    if (value == _actualValue && !forceUpdate) {
       return true;
     }
 

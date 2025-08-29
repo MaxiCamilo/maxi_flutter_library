@@ -17,6 +17,7 @@ class FormText extends OneValueFormField<String> {
   final void Function(String)? onIsValid;
   final void Function(NegativeResult)? onIsInvalid;
   final bool obscureText;
+  final List<TextInputFormatter> inputFormatters;
 
   const FormText({
     required super.propertyName,
@@ -37,6 +38,7 @@ class FormText extends OneValueFormField<String> {
     this.onIsValid,
     this.focusNode,
     this.onIsInvalid,
+    this.inputFormatters = const [],
   });
 
   @override
@@ -137,9 +139,9 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
 
   List<TextInputFormatter> _createFormat() {
     if (maxCharacter != null) {
-      return [LengthLimitingTextInputFormatter(maxCharacter!) /*, FilteringTextInputFormatter.allow(RegExp("^[a-zA-Z0-9_.,-ñÑ ]*\$"))*/];
+      return [LengthLimitingTextInputFormatter(maxCharacter!) /*, FilteringTextInputFormatter.allow(RegExp("^[a-zA-Z0-9_.,-ñÑ ]*\$"))*/,...widget.inputFormatters];
     } else {
-      return [];
+      return widget.inputFormatters;
     }
   }
 
@@ -148,7 +150,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
   }
 
   @override
-  bool declareChangedValue({required String value}) {
+  bool declareChangedValue({required String value, bool forceUpdate = false}) {
     final wasValid = isValid;
     late final bool nowIsValid;
 
@@ -175,7 +177,7 @@ class _FormTextState extends OneValueFormFieldImplementation<String, FormText> {
 
       nowIsValid = isCorrect;
     } else {
-      nowIsValid = super.declareChangedValue(value: value);
+      nowIsValid = super.declareChangedValue(value: value, forceUpdate: forceUpdate);
     }
 
     if (nowIsValid != wasValid) {

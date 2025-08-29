@@ -1,7 +1,7 @@
 import 'package:maxi_flutter_library/src/forms/iform_field_operator.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-mixin IFormFieldManager {
+mixin IFormFieldManager on IDisposable{
   bool get isValid;
   List<NegativeResult> get errors;
   List<IFormFieldOperator> get fields;
@@ -29,7 +29,6 @@ mixin IFormFieldManager {
   Map<String, dynamic> createMap({required bool onlyIfIsValid});
   
 
-  void dispose();
 
   Map<String, NegativeResult> setReflectionValues(Object item) => setSeveralValues(ReflectionManager.getReflectionEntity(item.runtimeType).serializeToMap(item));
 

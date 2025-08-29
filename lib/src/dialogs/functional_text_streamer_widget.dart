@@ -110,7 +110,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
 
     if (widget.startWhenDisplayed) {
       isActive = true;
-      lastText = const Oration(message: 'Starting stream');
+      lastText = const Oration(message: 'Please wait a moment');
       maxiScheduleMicrotask(strartStream);
     } else {
       lastText = const Oration(message: 'Press "start" to start the function execution');
@@ -123,7 +123,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
     isDone = false;
     lastResult = null;
     wasExecute = true;
-    lastText = const Oration(message: 'Starting stream');
+    lastText = const Oration(message: 'Please wait a moment');
 
     try {
       final functionality = await widget.function();
@@ -216,7 +216,7 @@ class _FunctionalTextStreamerWidgetState<T> extends StateWithLifeCycle<Functiona
   void startStream() {
     if (!isActive) {
       isActive = true;
-      lastText = const Oration(message: 'Starting stream');
+      lastText = const Oration(message: 'Please wait a moment');
 
       maxiScheduleMicrotask(strartStream);
       setState(() {});

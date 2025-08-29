@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 import 'package:maxi_library/maxi_library.dart';
 
-class FormFieldManager with IFormFieldManager {
+class FormFieldManager with IDisposable, IFormFieldManager {
   late Map<String, dynamic> _values;
   final _mapErrors = <IFormFieldOperator, NegativeResult>{};
   final _mapSubscriptions = <IFormFieldOperator, StreamSubscription>{};
@@ -161,7 +161,7 @@ class FormFieldManager with IFormFieldManager {
   }
 
   @override
-  void dispose() {
+  void performObjectDiscard() {
     _mapSubscriptions.values.iterar((x) => x.cancel());
     _mapSubscriptions.clear();
     _mapErrors.clear();

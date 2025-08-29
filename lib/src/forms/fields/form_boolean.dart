@@ -40,6 +40,7 @@ class _FormBooleanState extends OneValueFormFieldImplementation<bool, FormBoolea
       return Flex(
         direction: Axis.vertical,
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           content,
           const SizedBox(height: 7),
