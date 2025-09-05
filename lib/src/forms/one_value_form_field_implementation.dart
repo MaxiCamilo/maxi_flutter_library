@@ -56,6 +56,9 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
 
   late final StreamController<OneValueFormFieldImplementation<T, W>> _notifyValueChanged;
 
+  @protected
+  T formatValue(dynamic value) => value;
+
   @override
   void initState() {
     super.initState();
@@ -113,6 +116,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
 
   @protected
   bool declareChangedValue({required T value, bool forceUpdate = false}) {
+    value = formatValue(value);
     if (_actualValue == value && !forceUpdate) {
       return isValid;
     }
@@ -128,6 +132,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
   }
 
   bool _internalChangeValue({required value, required bool forceUpdate}) {
+    value = formatValue(value);
     if (value == _actualValue && !forceUpdate) {
       return true;
     }
@@ -141,7 +146,7 @@ abstract class OneValueFormFieldImplementation<T, W extends OneValueFormField<T>
     }
 
     if (value is! T) {
-      log('Field ${this.propertyName} only accepts item of type $T, not type ${value.runtimeType}');
+      log('Field $propertyName only accepts item of type $T, not type ${value.runtimeType}');
       return false;
     }
 

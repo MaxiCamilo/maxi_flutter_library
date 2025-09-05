@@ -12,6 +12,7 @@ class MaxiTranslatableText extends StatefulWidget {
   final TextDecoration? decoration;
   final bool selectable;
   final List<Stream> Function()? reloaders;
+  final TextOverflow? overflow;
 
   const MaxiTranslatableText({
     required this.text,
@@ -24,6 +25,7 @@ class MaxiTranslatableText extends StatefulWidget {
     this.decoration,
     this.selectable = false,
     this.reloaders,
+    this.overflow,
   });
 
   @override
@@ -74,6 +76,7 @@ class _MaxiTranslatableTextState extends StateWithLifeCycle<MaxiTranslatableText
       selectable: widget.selectable,
       size: widget.size,
       color: widget.color,
+      overflow: widget.overflow,
     );
   }
 }

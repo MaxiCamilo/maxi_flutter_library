@@ -8,6 +8,7 @@ class ReflectedFormEnum extends ReflectionFieldImplementation {
   final Widget? icon;
   final bool useDropdown;
   final Widget Function(dynamic)? widgetBuilder;
+  final void Function(dynamic)? onChange;
 
   const ReflectedFormEnum({
     super.key,
@@ -18,6 +19,7 @@ class ReflectedFormEnum extends ReflectionFieldImplementation {
     this.widgetBuilder,
     this.icon,
     this.useDropdown = true,
+    this.onChange,
   });
 
   @override
@@ -27,6 +29,7 @@ class ReflectedFormEnum extends ReflectionFieldImplementation {
 class _StateReflectedFormEnum extends StateReflectionFieldImplementation<ReflectedFormEnum> {
   late final TypeEnumeratorReflector enumType;
   late final Map<dynamic, Widget> widgetOptions;
+  late final Oration name;
 
   List<EnumOption> get optionsList => enumType.optionsList;
   late final Enum _initialValue;
@@ -36,7 +39,7 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
     super.initState();
 
     enumType = volatile(detail: Oration(message: 'Property %1 is not an Enum', textParts: [widget.propertyName]), function: () => fieldReflection.reflectedType as TypeEnumeratorReflector);
-
+    name = Oration(message: '%1:', textParts: [enumType.description]);
     widgetOptions = {};
     for (final opt in optionsList) {
       if (widget.widgetBuilder == null) {
@@ -57,12 +60,38 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
   @override
   Widget build(BuildContext context) {
     if (widget.useDropdown) {
-      return FormDropDown(
-        propertyName: widget.propertyName,
-        formalName: fieldReflection.formalName,
-        optionsBuild: () => widgetOptions,
-        getterInitialValue: () => _initialValue,
-        onChangeValue: _dropdownChanged,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          name.message == '%1:'
+              ? const SizedBox()
+              : Flex(
+                  direction: Axis.horizontal,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(width: widget.icon == null ? 0 : 40),
+                    Flexible(child: MaxiTranslatableText(text: name, size: 9, aling: TextAlign.start, bold: true)),
+                  ],
+                ),
+          Flex(
+            direction: Axis.horizontal,
+            mainAxisSize: widget.expandHorizontally ? MainAxisSize.max : MainAxisSize.min,
+            children: [
+              widget.icon == null ? const SizedBox() : widget.icon!,
+              SizedBox(width: widget.icon == null ? 0 : 15),
+              Flexible(
+                child: FormDropDown(
+                  propertyName: widget.propertyName,
+                  formalName: fieldReflection.formalName,
+                  optionsBuild: () => widgetOptions,
+                  getterInitialValue: () => _initialValue,
+                  onChangeValue: _dropdownChanged,
+                  isExpanded: widget.expandHorizontally,
+                ),
+              )
+            ],
+          ),
+        ],
       );
     } else {
       return FormToggles(
@@ -118,6 +147,9 @@ class _StateReflectedFormEnum extends StateReflectionFieldImplementation<Reflect
 
   void _dropdownChanged(dynamic value, NegativeResult? error) {
     widget.fieldManager.setValue(propertyName: widget.propertyName, value: value);
+    if (widget.onChange != null && error == null) {
+      widget.onChange!(value);
+    }
   }
 
   void _togglesChanged(List list, NegativeResult? error) {

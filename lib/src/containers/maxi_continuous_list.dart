@@ -16,7 +16,7 @@ class MaxiContinuousList<T> extends StatefulWidget with IMaxiAnimatorWidget {
   final Duration animationDuration;
   final Curve animationCurve;
   final void Function(MaxiContinuousListOperator<T>)? onCreatedOperator;
-  
+
   @override
   final IMaxiAnimatorManager? animatorManager;
 

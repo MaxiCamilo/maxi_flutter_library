@@ -78,6 +78,9 @@ abstract class StateWithLifeCycle<T extends StatefulWidget> extends State<T> {
     _eventsList.add(subscription);
     return subscription;
   }
+  
+  @mustCallSuper
+  R joinDisposableObject<R extends IDisposable>({required R item}) => joinObject(item: item);
 
   @mustCallSuper
   R joinObject<R extends Object>({required R item}) {

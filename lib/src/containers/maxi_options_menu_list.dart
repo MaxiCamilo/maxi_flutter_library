@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
-import 'package:maxi_flutter_library/src/widgets/maxi_translatable_text.dart';
 import 'package:maxi_library/export_reflectors.dart';
 
 class MaxiOptionsMenuListItem {

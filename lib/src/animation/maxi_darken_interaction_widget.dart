@@ -7,6 +7,7 @@ import 'package:maxi_library/export_reflectors.dart';
 class MaxiDarkenInteractionWidget extends StatefulWidget with IMaxiAnimatorWidget {
   final bool isEnabled;
   final Widget child;
+  final Color backgroundColor;
   final Widget Function(BuildContext, bool)? buildDisableWidget;
   //final Color backgroundColor;
   final double backgroundTransparent;
@@ -21,6 +22,7 @@ class MaxiDarkenInteractionWidget extends StatefulWidget with IMaxiAnimatorWidge
     required this.isEnabled,
     required this.child,
     this.buildDisableWidget,
+    this.backgroundColor = Colors.black,
     this.backgroundTransparent = 0.6,
     this.animationDuration = const Duration(milliseconds: 400),
     this.onCreatedOperator,
@@ -113,7 +115,7 @@ class _MaxiDarkenInteractionWidgetState extends StateWithLifeCycle<MaxiDarkenInt
               duration: widget.animationDuration,
               curve: Curves.easeInOut,
               child: Container(
-                color: Colors.black,
+                color: widget.backgroundColor,
               ),
             ),
           ),
