@@ -50,11 +50,12 @@ class _MaxiTabBarState extends StateWithLifeCycle<MaxiTabBar> with SingleTickerP
     buttons = widget.children.mapWithPosition(_makeButton).toList(growable: false);
 
     tabController = joinObject(
-        item: TabController(
-      length: children.length,
-      vsync: this,
-      initialIndex: widget.initialIndex,
-    ));
+      item: TabController(
+        length: children.length,
+        vsync: this,
+        initialIndex: widget.initialIndex,
+      ),
+    );
   }
 
   Widget _makeButton(MaxiTabBarItem item, int position) {

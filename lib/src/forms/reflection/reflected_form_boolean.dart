@@ -7,6 +7,8 @@ class ReflectedFormBoolean extends ReflectionFieldImplementation {
   final bool useSwitch;
   final bool expandHorizontally;
   final Oration? description;
+  final Widget? icon;
+  final void Function(bool, NegativeResult?)? onChangeValue;
 
   const ReflectedFormBoolean({
     super.key,
@@ -16,6 +18,8 @@ class ReflectedFormBoolean extends ReflectionFieldImplementation {
     required this.useSwitch,
     required this.expandHorizontally,
     required this.description,
+    this.icon,
+    this.onChangeValue,
   });
 
   @override
@@ -41,6 +45,8 @@ class _StateReflectedFormBoolean extends StateReflectionFieldImplementation<Refl
       description: _translatedDescription,
       useSwitch: widget.useSwitch,
       manager: widget.fieldManager,
+      icon: widget.icon,
+      onChangeValue: widget.onChangeValue,
     );
   }
 }

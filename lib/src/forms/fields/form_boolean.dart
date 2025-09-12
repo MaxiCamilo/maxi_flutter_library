@@ -6,6 +6,7 @@ class FormBoolean extends OneValueFormField<bool> {
   final bool useSwitch;
   final bool expandHorizontally;
   final Oration description;
+  final Widget? icon;
 
   const FormBoolean({
     required super.propertyName,
@@ -16,6 +17,7 @@ class FormBoolean extends OneValueFormField<bool> {
     super.onChangeValue,
     super.validators,
     this.useSwitch = false,
+    this.icon,
     required this.expandHorizontally,
     required this.description,
   });
@@ -83,6 +85,11 @@ class _FormBooleanState extends OneValueFormFieldImplementation<bool, FormBoolea
           }));
     }
 
+    if (widget.icon != null) {
+      list.add(const SizedBox(width: 10));
+      list.add(widget.icon!);
+    }
+
     if (widget.description.isNotEmpty) {
       list.add(const SizedBox(width: 10));
       if (widget.expandHorizontally) {
@@ -92,7 +99,10 @@ class _FormBooleanState extends OneValueFormFieldImplementation<bool, FormBoolea
               color: Colors.transparent,
               child: InkWell(
                 onTap: () => declareChangedValue(value: !actualValue),
-                child: MaxiTranslatableText(text: widget.description),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 7.0),
+                  child: MaxiTranslatableText(text: widget.description),
+                ),
               ),
             ),
           ),

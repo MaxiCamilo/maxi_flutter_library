@@ -30,7 +30,7 @@ class MaxiItemList<T> extends StatefulWidget {
     this.emptyGenerator,
     this.titleFiltre = const Oration(message: 'Filtre name'),
     this.waitingReupdated = const Duration(seconds: 1),
-    this.animationDuration = const Duration(milliseconds: 500),
+    this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.decelerate,
     this.startReverse = false,
     this.showReverseButton = true,

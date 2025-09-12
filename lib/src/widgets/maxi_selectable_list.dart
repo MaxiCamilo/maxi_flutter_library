@@ -8,7 +8,7 @@ class MaxiSelectableList<T> extends StatefulWidget {
   final FutureOr<List<Stream<bool>>> Function()? reloaders;
   final FutureOr<List<Stream>> Function()? valueUpdaters;
   final int Function(T) gettetIdentifier;
-  final FutureOr<List<T>> Function(int from) valueGetter;
+  final FutureOr<List<T>> Function(int id, String filtre, bool reverse) valueGetter;
   final Widget Function(BuildContext cont, T item, int ind) childGenerator;
   final List<int> Function()? initialSelected;
   final Widget Function(BuildContext)? emptyGenerator;
@@ -19,6 +19,7 @@ class MaxiSelectableList<T> extends StatefulWidget {
   final Curve animationCurve;
 
   final bool touchingMakesSelecting;
+  final bool showReverseButton;
 
   const MaxiSelectableList({
     super.key,
@@ -35,6 +36,7 @@ class MaxiSelectableList<T> extends StatefulWidget {
     this.waitingReupdated = const Duration(seconds: 1),
     this.animationDuration = const Duration(milliseconds: 500),
     this.animationCurve = Curves.decelerate,
+    this.showReverseButton = true,
   });
 
   Future<List<int>?> showDialog({
@@ -114,6 +116,7 @@ class MaxiSelectableList<T> extends StatefulWidget {
                 waitingReupdated: waitingReupdated,
                 valueUpdaters: valueUpdaters,
                 onCreatedOperator: (x) => listOperator = x,
+                showReverseButton: showReverseButton,
               ),
             ),
             const Padding(
@@ -179,18 +182,19 @@ class _MaxiSelectableListState<T> extends StateWithLifeCycle<MaxiSelectableList<
 
   @override
   Widget build(BuildContext context) {
-    return MaxiContinuousList(
+    return MaxiItemList(
       valueGetter: widget.valueGetter,
       childGenerator: childGenerator,
       gettetIdentifier: widget.gettetIdentifier,
       animationCurve: widget.animationCurve,
       animationDuration: widget.animationDuration,
-      ascendant: widget.ascendant,
+      startReverse: widget.ascendant == null ? false : !widget.ascendant!(),
       emptyGenerator: widget.emptyGenerator,
       reloaders: widget.reloaders,
       valueUpdaters: widget.valueUpdaters,
       waitingReupdated: widget.waitingReupdated,
       onCreatedOperator: (x) => listOperator = x,
+      showReverseButton: widget.showReverseButton,
     );
   }
 
@@ -262,7 +266,7 @@ class _MaxiSelectableListState<T> extends StateWithLifeCycle<MaxiSelectableList<
   }
 
   Future<void> _selectAll() async {
-    final antennaList = await ListUtilities.getFromFunctionWithRange(getter: (id, _) => widget.valueGetter(id));
+    final antennaList = await ListUtilities.getFromFunctionWithRange(getter: (id, _) => widget.valueGetter(id, '', false));
     final antennaID = antennaList.map((x) => widget.gettetIdentifier(x)).toList(growable: false);
 
     _selectedIdentifiers.clear();
@@ -277,11 +281,10 @@ class _MaxiSelectableListState<T> extends StateWithLifeCycle<MaxiSelectableList<
   }
 
   Future<void> _deselectAll() async {
-    final antennaList = await ListUtilities.getFromFunctionWithRange(getter: (id, _) => widget.valueGetter(id));
+    final antennaList = await ListUtilities.getFromFunctionWithRange(getter: (id, _) => widget.valueGetter(id, '', false));
     final antennaID = antennaList.map((x) => widget.gettetIdentifier(x)).toList(growable: false);
 
     _selectedIdentifiers.clear();
-    _selectedIdentifiers.addAll(antennaID);
     listOperator.updateValue();
     for (final id in antennaID) {
       formOperator.setValue(propertyName: id.toString(), value: false);

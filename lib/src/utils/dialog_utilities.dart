@@ -70,6 +70,72 @@ mixin DialogUtilities {
     );
   }
 
+  static Future<T?> showWidgetAsMaterialDialogWithTitle<T>({
+    required BuildContext context,
+    required Oration title,
+    required Widget Function(BuildContext context, IDialogWindow<T> dialogOperator) builder,
+    bool expandVertical = false,
+    bool expandHorizontal = false,
+    bool barrierDismissible = true,
+    Widget? icon,
+    RoundedRectangleBorder? shape,
+    Color? backgroundColor,
+    EdgeInsetsGeometry? contentPadding,
+    double titleSize = 20,
+  }) {
+    return showWidgetAsMaterialDialog<T>(
+      context: context,
+      backgroundColor: backgroundColor,
+      barrierDismissible: barrierDismissible,
+      contentPadding: contentPadding,
+      shape: shape,
+      builder: (context, dialogOperator) {
+        return Flex(
+          direction: Axis.vertical,
+          mainAxisSize: expandVertical ? MainAxisSize.max : MainAxisSize.min,
+          children: [
+            Flex(
+              direction: Axis.horizontal,
+              mainAxisSize: expandHorizontal ? MainAxisSize.max : MainAxisSize.min,
+              children: [
+                icon ?? const SizedBox(),
+                SizedBox(width: icon == null ? 0 : 5),
+                Flexible(
+                  fit: FlexFit.tight,
+                  child: MaxiTranslatableText(
+                    text: title,
+                    bold: true,
+                    size: titleSize,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                MaxiTransparentButton(
+                  icon: const Icon(Icons.close),
+                  onTouch: () => dialogOperator.defineResult(context),
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Divider(height: 5),
+            ),
+            expandVertical
+                ? Expanded(
+                    child: builder(
+                    context,
+                    dialogOperator,
+                  ))
+                : Flexible(
+                    child: builder(
+                    context,
+                    dialogOperator,
+                  )),
+          ],
+        );
+      },
+    );
+  }
+
   static Future<XFile?> selectFile({String? initialAddress, List<XTypeGroup> filter = const [], Oration? title}) async {
     initialAddress ??= await ApplicationManager.instance.getCurrentDirectory();
 
