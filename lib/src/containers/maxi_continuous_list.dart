@@ -15,6 +15,7 @@ class MaxiContinuousList<T> extends StatefulWidget with IMaxiAnimatorWidget {
   final Duration waitingReupdated;
   final Duration animationDuration;
   final Curve animationCurve;
+  final int  Function()? startFrom;
   final void Function(MaxiContinuousListOperator<T>)? onCreatedOperator;
 
   @override
@@ -34,6 +35,7 @@ class MaxiContinuousList<T> extends StatefulWidget with IMaxiAnimatorWidget {
     this.animationCurve = Curves.decelerate,
     this.onCreatedOperator,
     this.animatorManager,
+    this.startFrom,
   });
 
   @override
@@ -144,7 +146,7 @@ class _MaxiContinuousListState<T> extends StateWithLifeCycle<MaxiContinuousList<
     scrollController = ScrollController();
     scrollController.addListener(onScroll);
 
-    List<T> result = await widget.valueGetter(0);
+    List<T> result = await widget.valueGetter(widget.startFrom == null ? 0 : widget.startFrom!());
 
     if (result.isNotEmpty) {
       if (_ascendant) {

@@ -7,7 +7,7 @@ import 'package:maxi_library/export_reflectors.dart';
 class MaxiItemList<T> extends StatefulWidget {
   final FutureOr<List<Stream<bool>>> Function()? reloaders;
   final FutureOr<List<Stream>> Function()? valueUpdaters;
-  final int Function(T) gettetIdentifier;
+  final int Function(T x) gettetIdentifier;
   final FutureOr<List<T>> Function(int from, String nameFiltre, bool reverse) valueGetter;
   final Widget Function(BuildContext cont, T item, int ind) childGenerator;
   final Widget Function(BuildContext)? emptyGenerator;
@@ -17,7 +17,9 @@ class MaxiItemList<T> extends StatefulWidget {
   final Curve animationCurve;
   final Oration titleFiltre;
   final bool showReverseButton;
+  final bool showNameFiltre;
   final Color borderColor;
+  final int  Function()? startFrom;
   final void Function(MaxiContinuousListOperator<T>)? onCreatedOperator;
 
   const MaxiItemList({
@@ -34,8 +36,10 @@ class MaxiItemList<T> extends StatefulWidget {
     this.animationCurve = Curves.decelerate,
     this.startReverse = false,
     this.showReverseButton = true,
+    this.showNameFiltre = true,
     this.borderColor = Colors.white,
     this.onCreatedOperator,
+    this.startFrom,
   });
 
   @override
@@ -76,26 +80,31 @@ class _MaxiItemListState<T> extends StateWithLifeCycle<MaxiItemList<T>> {
                     },
                   )
                 : const SizedBox(),
-            SizedBox(width: widget.showReverseButton ? 5 : 0),
-            Expanded(
-              child: FormText(
-                propertyName: 'nameFitre',
-                title: widget.titleFiltre,
-                icon: const Icon(Icons.search),
-                getterInitialValue: () => textFiltre,
-                validators: const [CheckTextLength(maximum: 50, maximumLines: 1)],
-                onChangeValue: (x, _) {
-                  textFiltre = x;
-                  listOperator?.updateValue();
-                },
-              ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              child: SizedBox(height: 40, child: VerticalDivider(width: 5)),
             ),
-            const SizedBox(width: 5),
+            Expanded(
+              child: widget.showNameFiltre
+                  ? FormText(
+                      propertyName: 'nameFitre',
+                      title: widget.titleFiltre,
+                      icon: const Icon(Icons.search),
+                      getterInitialValue: () => textFiltre,
+                      validators: const [CheckTextLength(maximum: 50, maximumLines: 1)],
+                      onChangeValue: (x, _) {
+                        textFiltre = x;
+                        listOperator?.updateValue();
+                      },
+                    )
+                  : const SizedBox(),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              child: SizedBox(height: 40, child: VerticalDivider(width: 5)),
+            ),
             MaxiTransparentButton(
-              icon: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 7.0),
-                child: Icon(Icons.update, size: 27),
-              ),
+              icon: const Icon(Icons.update, size: 27),
               onTouch: () {
                 listOperator?.updateValue();
               },
@@ -120,6 +129,7 @@ class _MaxiItemListState<T> extends StateWithLifeCycle<MaxiItemList<T>> {
               childGenerator: widget.childGenerator,
               gettetIdentifier: widget.gettetIdentifier,
               emptyGenerator: widget.emptyGenerator,
+              startFrom: widget.startFrom,
               onCreatedOperator: (x) {
                 listOperator = x;
                 if (widget.onCreatedOperator != null) {

@@ -6,7 +6,7 @@ import 'package:maxi_flutter_library/maxi_flutter_library.dart';
 class MaxiAsyncBuildBox extends StatefulWidget {
   final FutureOr<List<Stream<bool>>> Function() reloaders;
   final bool cached;
-  final Widget Function(BuildContext) builer;
+  final Widget Function(BuildContext context) builer;
 
   const MaxiAsyncBuildBox({
     super.key,
