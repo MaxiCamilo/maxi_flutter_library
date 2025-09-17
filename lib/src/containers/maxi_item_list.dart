@@ -19,8 +19,9 @@ class MaxiItemList<T> extends StatefulWidget {
   final bool showReverseButton;
   final bool showNameFiltre;
   final Color borderColor;
-  final int  Function()? startFrom;
+  final int Function()? startFrom;
   final void Function(MaxiContinuousListOperator<T>)? onCreatedOperator;
+  final Widget extraWidget;
 
   const MaxiItemList({
     super.key,
@@ -40,6 +41,7 @@ class MaxiItemList<T> extends StatefulWidget {
     this.borderColor = Colors.white,
     this.onCreatedOperator,
     this.startFrom,
+    this.extraWidget = const SizedBox(),
   });
 
   @override
@@ -59,6 +61,31 @@ class _MaxiItemListState<T> extends StateWithLifeCycle<MaxiItemList<T>> {
     reverse = widget.startReverse;
   }
 
+  Widget buildOrderButton(BuildContext context) {
+    return widget.showReverseButton
+        ? MaxiTooltip(
+            text: reverse ? const Oration(message: 'Change to ascending order') : const Oration(message: 'Change to descending order'),
+            child: MaxiTransparentButton(
+              icon: MaxiText(text: reverse ? '321' : '123'),
+              onTouch: () {
+                reverse = !reverse;
+                setState(() {});
+                listOperator?.ascendant = !reverse;
+              },
+            ),
+          )
+        : const SizedBox();
+  }
+
+  Widget buildUpdateButton(BuildContext context) {
+    return MaxiTransparentButton(
+      icon: const Icon(Icons.update, size: 27),
+      onTouch: () {
+        listOperator?.updateValue();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Flex(
@@ -70,16 +97,7 @@ class _MaxiItemListState<T> extends StateWithLifeCycle<MaxiItemList<T>> {
           direction: Axis.horizontal,
           mainAxisSize: MainAxisSize.max,
           children: [
-            widget.showReverseButton
-                ? MaxiTransparentButton(
-                    icon: MaxiText(text: reverse ? '321' : '123'),
-                    onTouch: () {
-                      reverse = !reverse;
-                      setState(() {});
-                      listOperator?.ascendant = !reverse;
-                    },
-                  )
-                : const SizedBox(),
+            buildOrderButton(context),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 5.0),
               child: SizedBox(height: 40, child: VerticalDivider(width: 5)),
@@ -103,12 +121,8 @@ class _MaxiItemListState<T> extends StateWithLifeCycle<MaxiItemList<T>> {
               padding: EdgeInsets.symmetric(horizontal: 5.0),
               child: SizedBox(height: 40, child: VerticalDivider(width: 5)),
             ),
-            MaxiTransparentButton(
-              icon: const Icon(Icons.update, size: 27),
-              onTouch: () {
-                listOperator?.updateValue();
-              },
-            ),
+            buildUpdateButton(context),
+            widget.extraWidget,
           ],
         ),
         Expanded(

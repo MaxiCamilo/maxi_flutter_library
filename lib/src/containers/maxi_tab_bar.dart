@@ -106,7 +106,12 @@ class _MaxiTabBarState extends StateWithLifeCycle<MaxiTabBar> with SingleTickerP
             return NavigationRailDestination(
               icon: item.icon,
               selectedIcon: item.icon,
-              label: MaxiText(text: texts[i], bold: true, color: tabController.index == i ? widget.indicatorColor : null),
+              label: MaxiText(
+                text: texts[i],
+                bold: true,
+                color: tabController.index == i ? widget.indicatorColor : null,
+                aling: TextAlign.center,
+              ),
             );
           }).toList(growable: false),
         ),
