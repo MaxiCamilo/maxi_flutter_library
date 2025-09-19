@@ -46,6 +46,8 @@ class MaxiItemList<T> extends StatefulWidget {
 
   @override
   State<MaxiItemList<T>> createState() => _MaxiItemListState<T>();
+
+  
 }
 
 class _MaxiItemListState<T> extends StateWithLifeCycle<MaxiItemList<T>> {

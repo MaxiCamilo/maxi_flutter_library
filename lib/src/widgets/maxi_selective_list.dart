@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maxi_flutter_library/maxi_flutter_library.dart';
+import 'package:maxi_library/maxi_library.dart';
 
 class MaxiSelectiveList<T> extends StatefulWidget {
   final bool startActive;
@@ -65,6 +66,14 @@ class MaxiSelectiveList<T> extends StatefulWidget {
     this.onLongSelect,
     this.onSecondarySelect,
   });
+
+  Future<T?> showDialog({required BuildContext context, required Oration title}) async {
+    return DialogUtilities.showWidgetAsMaterialDialog<T>(
+      context: context,
+      //title: title,
+      builder: (context, dialogOperator) => this,
+    );
+  }
 
   @override
   State<MaxiSelectiveList<T>> createState() => _MaxiSelectiveListState<T>();

@@ -6,6 +6,7 @@ class MaxiOptionsMenuListItem {
   final Widget icon;
   final Oration text;
   final Oration? subText;
+  final Color? color;
 
   final void Function() onTouch;
 
@@ -13,6 +14,7 @@ class MaxiOptionsMenuListItem {
     required this.icon,
     required this.text,
     required this.onTouch,
+    this.color,
     this.subText,
   });
 }
@@ -27,12 +29,7 @@ class MaxiOptionsMenuList extends StatefulWidget {
     required this.options,
   });
 
-  static Future<MaxiOptionsMenuListItem?> showDialog({
-    required BuildContext context,
-    required Oration title,
-    required List<MaxiOptionsMenuListItem> options,
-    double minWidth = 0.0
-  }) {
+  static Future<MaxiOptionsMenuListItem?> showDialog({required BuildContext context, required Oration title, required List<MaxiOptionsMenuListItem> options, double minWidth = 0.0}) {
     return DialogUtilities.showWidgetAsMaterialDialog(
       context: context,
       builder: (context, dialogOperator) => MaxiRectangle(
@@ -71,6 +68,48 @@ class MaxiOptionsMenuList extends StatefulWidget {
     );
   }
 
+  static Future<MaxiOptionsMenuListItem?> showBottomSheet({required BuildContext context, required Oration title, required List<MaxiOptionsMenuListItem> options, double minWidth = 0.0}) {
+    return DialogUtilities.showWidgetAsBottomSheet(
+      context: context,
+      builder: (context, dialogOperator) => Padding(
+        padding: const EdgeInsets.only(bottom: 8.0, left: 12.0, right: 12.0, top: 12.0),
+        child: MaxiRectangle(
+          constraints: BoxConstraints(minWidth: minWidth),
+          child: Flex(
+            direction: Axis.vertical,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flex(
+                direction: Axis.horizontal,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(child: MaxiTranslatableText(text: title, bold: true, size: 25)),
+                  const SizedBox(width: 7),
+                  MaxiTransparentButton(
+                    icon: const Icon(Icons.close),
+                    onTouch: () => dialogOperator.defineResult(context),
+                  ),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Divider(height: 5),
+              ),
+              Flexible(
+                child: MaxiScroll(
+                  child: MaxiOptionsMenuList(
+                    options: options,
+                    onSelectItem: (x) => dialogOperator.defineResult(context, x),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   State<MaxiOptionsMenuList> createState() => _MaxiOptionsMenuListState();
 }
@@ -88,6 +127,8 @@ class _MaxiOptionsMenuListState extends State<MaxiOptionsMenuList> {
   Widget _makeItem(MaxiOptionsMenuListItem item) {
     return ListTile(
       leading: item.icon,
+      iconColor: item.color,
+      textColor: item.color,
       title: MaxiTranslatableText(text: item.text),
       subtitle: item.subText == null ? null : MaxiTranslatableText(text: item.subText!),
       onTap: () {
