@@ -18,6 +18,7 @@ class MaxiItemList<T> extends StatefulWidget {
   final Oration titleFiltre;
   final bool showReverseButton;
   final bool showNameFiltre;
+  final bool showUpdateButton;
   final Color borderColor;
   final int Function()? startFrom;
   final void Function(MaxiContinuousListOperator<T>)? onCreatedOperator;
@@ -42,12 +43,81 @@ class MaxiItemList<T> extends StatefulWidget {
     this.onCreatedOperator,
     this.startFrom,
     this.extraWidget = const SizedBox(),
+    this.showUpdateButton = true,
   });
 
   @override
   State<MaxiItemList<T>> createState() => _MaxiItemListState<T>();
 
-  
+  Future<T?> showDialog({
+    required BuildContext context,
+    Oration? title,
+    Oration? buttonDone,
+    double? width,
+    IconData doneIcon = Icons.done,
+  }) {
+    return DialogUtilities.showWidgetAsMaterialDialog<T>(
+      context: context,
+      builder: (context, dialogOperator) => SizedBox(
+        //height: MediaQuery.of(context).size.height - 200,
+        width: width ?? MediaQuery.of(context).size.width - 30,
+        child: Flex(
+          direction: Axis.vertical,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flex(
+              direction: Axis.horizontal,
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: title == null ? const SizedBox() : MaxiTranslatableText(text: title, bold: true, size: 24)),
+                const SizedBox(width: 5),
+                MaxiRectangle(
+                  borderColor: Colors.white,
+                  borderWidth: 1,
+                  borderRadious: 45.0,
+                  child: MaxiTapArea(
+                    child: const Padding(
+                      padding: EdgeInsets.all(2.0),
+                      child: Icon(Icons.close),
+                    ),
+                    onTouch: () => dialogOperator.defineResult(context),
+                  ),
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Divider(height: 5),
+            ),
+            Expanded(
+              child: MaxiItemList<T>(
+                gettetIdentifier: gettetIdentifier,
+                valueGetter: valueGetter,
+                reloaders: reloaders,
+                emptyGenerator: emptyGenerator,
+                animationCurve: animationCurve,
+                animationDuration: animationDuration,
+                waitingReupdated: waitingReupdated,
+                valueUpdaters: valueUpdaters,
+                showReverseButton: showReverseButton,
+                borderColor: borderColor,
+                extraWidget: extraWidget,
+                showNameFiltre: showNameFiltre,
+                startFrom: startFrom,
+                startReverse: startReverse,
+                titleFiltre: titleFiltre,
+                childGenerator: (cont, item, ind) => MaxiTapArea(
+                  onTouch: () => dialogOperator.defineResult(context, item),
+                  child: childGenerator(cont, item, ind),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _MaxiItemListState<T> extends StateWithLifeCycle<MaxiItemList<T>> {
@@ -80,6 +150,10 @@ class _MaxiItemListState<T> extends StateWithLifeCycle<MaxiItemList<T>> {
   }
 
   Widget buildUpdateButton(BuildContext context) {
+    if (!widget.showUpdateButton) {
+      return const SizedBox();
+    }
+
     return MaxiTransparentButton(
       icon: const Icon(Icons.update, size: 27),
       onTouch: () {
